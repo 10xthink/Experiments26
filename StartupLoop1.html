@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The One Loop — Daily Startup PDCA</title>
+
+<style>
+*{
+box-sizing:border-box;
+font-family:Segoe UI,Arial,sans-serif;
+}
+
+body{
+margin:0;
+background:#f7f6f2;
+color:#2b2b28;
+}
+
+header{
+padding:36px 20px 18px;
+text-align:center;
+}
+
+header h1{
+margin:0;
+font-size:26px;
+font-weight:600;
+letter-spacing:.5px;
+color:#243b34;
+}
+
+header p{
+margin:8px auto 0;
+max-width:520px;
+color:#6b6b63;
+font-size:14px;
+line-height:1.5;
+}
+
+.container{
+max-width:640px;
+margin:0 auto;
+padding:0 20px 60px;
+}
+
+.stats{
+display:flex;
+justify-content:center;
+gap:40px;
+margin:20px 0 30px;
+}
+
+.stat{
+text-align:center;
+}
+
+.stat .num{
+font-size:32px;
+font-weight:700;
+color:#2f5d50;
+}
+
+.stat .label{
+font-size:12px;
+color:#8a8a80;
+text-transform:uppercase;
+letter-spacing:.6px;
+}
+
+.card{
+background:#ffffff;
+border-radius:16px;
+padding:28px;
+box-shadow:0 1px 3px rgba(0,0,0,.06);
+margin-bottom:24px;
+}
+
+.step{
+padding:18px 0;
+border-bottom:1px solid #eee;
+}
+
+.step:last-child{
+border-bottom:none;
+padding-bottom:0;
+}
+
+.step-label{
+font-size:11px;
+font-weight:700;
+letter-spacing:1.2px;
+color:#2f5d50;
+text-transform:uppercase;
+margin-bottom:8px;
+}
+
+.step-sub{
+font-size:13px;
+color:#8a8a80;
+margin-bottom:10px;
+}
+
+.step.disabled{
+opacity:.35;
+pointer-events:none;
+}
+
+textarea,input[type=text]{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:15px;
+resize:none;
+font-family:inherit;
+background:#fbfbf9;
+}
+
+textarea:focus,input[type=text]:focus{
+outline:none;
+border-color:#2f5d50;
+}
+
+.locked-text{
+font-size:15px;
+line-height:1.5;
+background:#f2f5f3;
+padding:12px;
+border-radius:10px;
+color:#243b34;
+}
+
+button{
+padding:10px 18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#2f5d50;
+color:white;
+font-size:14px;
+margin-top:10px;
+}
+
+button:hover{
+opacity:.9;
+}
+
+button.ghost{
+background:none;
+border:1px solid #ccc;
+color:#555;
+}
+
+.signal-row{
+display:flex;
+gap:8px;
+margin-bottom:10px;
+}
+
+.signal-btn{
+flex:1;
+padding:10px;
+border-radius:10px;
+border:1px solid #ddd;
+background:#fbfbf9;
+color:#555;
+cursor:pointer;
+font-size:13px;
+text-align:center;
+margin-top:0;
+}
+
+.signal-btn.worked.active{background:#2f5d50;color:#fff;border-color:#2f5d50;}
+.signal-btn.unclear.active{background:#b8934a;color:#fff;border-color:#b8934a;}
+.signal-btn.didnt.active{background:#a4514a;color:#fff;border-color:#a4514a;}
+
+.verdict-preview{
+font-size:14px;
+color:#243b34;
+margin-bottom:10px;
+font-weight:600;
+}
+
+.done-banner{
+text-align:center;
+padding:20px;
+color:#6b6b63;
+font-size:14px;
+}
+
+.done-banner b{
+display:block;
+color:#243b34;
+font-size:16px;
+margin-bottom:4px;
+}
+
+.heatmap{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(12px,1fr));
+gap:4px;
+margin-top:8px;
+}
+
+.hcell{
+width:100%;
+aspect-ratio:1;
+border-radius:3px;
+background:#e9e8e3;
+}
+
+.section-title{
+font-size:13px;
+font-weight:700;
+letter-spacing:.8px;
+text-transform:uppercase;
+color:#8a8a80;
+margin:0 0 12px;
+}
+
+.history{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.hist-item{
+background:#fff;
+border-radius:12px;
+padding:14px 16px;
+box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+
+.hist-date{
+font-size:12px;
+color:#8a8a80;
+margin-bottom:4px;
+}
+
+.hist-plan{
+font-size:14px;
+color:#243b34;
+margin-bottom:4px;
+}
+
+.hist-meta{
+font-size:12px;
+display:flex;
+gap:8px;
+align-items:center;
+}
+
+.tag{
+display:inline-block;
+padding:2px 8px;
+border-radius:20px;
+font-size:11px;
+font-weight:600;
+color:#fff;
+}
+
+.tag.worked{background:#2f5d50;}
+.tag.unclear{background:#b8934a;}
+.tag.didnt{background:#a4514a;}
+
+.controls{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-top:30px;
+}
+
+footer{
+text-align:center;
+color:#aaa9a0;
+font-size:12px;
+margin-top:40px;
+line-height:1.6;
+}
+
+.empty{
+text-align:center;
+color:#aaa9a0;
+font-size:13px;
+padding:20px;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+<h1>The One Loop</h1>
+<p>No business plan. No pitch deck. No course. One action, one signal, every day — plan, do, check, act. Show up and close the loop. That is the entire system.</p>
+</header>
+
+<div class="container">
+
+<div class="stats">
+<div class="stat"><div class="num" id="streakNum">0</div><div class="label">Day Streak</div></div>
+<div class="stat"><div class="num" id="totalNum">0</div><div class="label">Loops Closed</div></div>
+</div>
+
+<div class="card" id="todayCard"></div>
+
+<div class="card">
+<div class="section-title">Consistency</div>
+<div class="heatmap" id="heatmap"></div>
+</div>
+
+<div class="card">
+<div class="section-title">Loop History</div>
+<div class="history" id="history"></div>
+</div>
+
+<div class="controls">
+<button class="ghost" onclick="exportData()">Export</button>
+<button class="ghost" onclick="document.getElementById('import').click()">Import</button>
+<input type="file" id="import" hidden>
+</div>
+
+<footer>
+Offline • Stored only in your browser<br>
+Plan → Do → Check → Act. Repeat tomorrow.
+</footer>
+
+</div>
+
+<script>
+
+const STORAGE="startup_one_loop";
+let state=JSON.parse(localStorage.getItem(STORAGE)||"{\"days\":[]}");
+
+document.getElementById("import").addEventListener("change",importData);
+
+function todayKey(){
+const d=new Date();
+return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+function save(){
+localStorage.setItem(STORAGE,JSON.stringify(state));
+render();
+}
+
+function getToday(){
+let day=state.days.find(d=>d.date===todayKey());
+if(!day){
+day={date:todayKey(),plan:"",planLockedAt:null,doneAt:null,signal:null,note:"",verdict:null,completedAt:null};
+state.days.push(day);
+}
+return day;
+}
+
+function lockPlan(){
+const val=document.getElementById("planInput").value.trim();
+if(!val)return;
+const day=getToday();
+day.plan=val;
+day.planLockedAt=Date.now();
+save();
+}
+
+function markDone(){
+const day=getToday();
+day.doneAt=Date.now();
+save();
+}
+
+function setSignal(sig){
+const day=getToday();
+day.signal=sig;
+save();
+}
+
+function completeLoop(){
+const day=getToday();
+day.note=document.getElementById("noteInput").value.trim();
+day.verdict=day.signal==="worked"?"Keep":day.signal==="didnt"?"Change":"Watch";
+day.completedAt=Date.now();
+save();
+}
+
+function verdictFor(signal){
+if(signal==="worked")return"Keep doing this.";
+if(signal==="didnt")return"Change the approach tomorrow.";
+if(signal==="unclear")return"Watch it one more day.";
+return"";
+}
+
+function renderToday(){
+
+const day=getToday();
+let html="";
+
+// STEP 1 PLAN
+html+="<div class='step'>";
+html+="<div class='step-label'>1. Plan</div>";
+if(!day.planLockedAt){
+html+="<div class='step-sub'>What is the one smallest action that moves this forward today?</div>";
+html+="<textarea id='planInput' rows='2' placeholder='e.g. Ask 3 strangers if they&#39;d pay for this'></textarea>";
+html+="<button onclick='lockPlan()'>Lock it in</button>";
+}else{
+html+="<div class='locked-text'>"+escapeHtml(day.plan)+"</div>";
+}
+html+="</div>";
+
+// STEP 2 DO
+html+="<div class='step"+(day.planLockedAt?"":" disabled")+"'>";
+html+="<div class='step-label'>2. Do</div>";
+if(!day.doneAt){
+html+="<div class='step-sub'>Go do it. Then come back.</div>";
+html+="<button onclick='markDone()'>Mark Done</button>";
+}else{
+html+="<div class='locked-text'>Done at "+new Date(day.doneAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+"</div>";
+}
+html+="</div>";
+
+// STEP 3 CHECK
+html+="<div class='step"+(day.doneAt?"":" disabled")+"'>";
+html+="<div class='step-label'>3. Check</div>";
+html+="<div class='step-sub'>One signal. Did it work?</div>";
+html+="<div class='signal-row'>";
+html+="<div class='signal-btn worked"+(day.signal==="worked"?" active":"")+"' onclick='setSignal(\"worked\")'>Worked</div>";
+html+="<div class='signal-btn unclear"+(day.signal==="unclear"?" active":"")+"' onclick='setSignal(\"unclear\")'>Unclear</div>";
+html+="<div class='signal-btn didnt"+(day.signal==="didnt"?" active":"")+"' onclick='setSignal(\"didnt\")'>Didn&#39;t</div>";
+html+="</div>";
+html+="</div>";
+
+// STEP 4 ACT
+html+="<div class='step"+(day.signal?"":" disabled")+"'>";
+html+="<div class='step-label'>4. Act</div>";
+if(!day.completedAt){
+html+="<div class='verdict-preview'>"+verdictFor(day.signal)+"</div>";
+html+="<input type='text' id='noteInput' placeholder='One line — what did you learn? (optional)'>";
+html+="<button onclick='completeLoop()'>Close the loop</button>";
+}else{
+html+="<div class='locked-text'><b style=\"display:block;margin-bottom:4px\">"+day.verdict+"</b>"+(day.note?escapeHtml(day.note):"Loop closed.")+"</div>";
+}
+html+="</div>";
+
+if(day.completedAt){
+html+="<div class='done-banner'><b>Today's loop is closed.</b>Come back tomorrow and run it again.</div>";
+}
+
+document.getElementById("todayCard").innerHTML=html;
+
+if(!day.planLockedAt){
+document.getElementById("planInput").focus();
+}
+}
+
+function escapeHtml(s){
+const d=document.createElement("div");
+d.innerText=s;
+return d.innerHTML;
+}
+
+function computeStreak(){
+const completed=state.days.filter(d=>d.completedAt).map(d=>d.date).sort();
+if(completed.length===0)return 0;
+let streak=0;
+let cursor=new Date();
+cursor.setHours(0,0,0,0);
+const set=new Set(completed);
+while(true){
+const key=cursor.getFullYear()+"-"+String(cursor.getMonth()+1).padStart(2,"0")+"-"+String(cursor.getDate()).padStart(2,"0");
+if(set.has(key)){
+streak++;
+cursor.setDate(cursor.getDate()-1);
+}else{
+break;
+}
+}
+return streak;
+}
+
+function renderStats(){
+document.getElementById("streakNum").textContent=computeStreak();
+document.getElementById("totalNum").textContent=state.days.filter(d=>d.completedAt).length;
+}
+
+function renderHeatmap(){
+const map={};
+state.days.forEach(d=>{if(d.completedAt)map[d.date]=d.verdict;});
+let html="";
+const days=84;
+const start=new Date();
+start.setDate(start.getDate()-(days-1));
+for(let i=0;i<days;i++){
+const d=new Date(start);
+d.setDate(start.getDate()+i);
+const key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const verdict=map[key];
+let color="#e9e8e3";
+if(verdict==="Keep")color="#2f5d50";
+else if(verdict==="Watch")color="#b8934a";
+else if(verdict==="Change")color="#a4514a";
+html+="<div class='hcell' title='"+key+(verdict?" — "+verdict:"")+"' style='background:"+color+"'></div>";
+}
+document.getElementById("heatmap").innerHTML=html;
+}
+
+function renderHistory(){
+const completed=state.days.filter(d=>d.completedAt).sort((a,b)=>b.date.localeCompare(a.date));
+if(completed.length===0){
+document.getElementById("history").innerHTML="<div class='empty'>No loops closed yet. Close today's to start your history.</div>";
+return;
+}
+let html="";
+completed.forEach(d=>{
+const tagClass=d.verdict==="Keep"?"worked":d.verdict==="Change"?"didnt":"unclear";
+html+="<div class='hist-item'>";
+html+="<div class='hist-date'>"+d.date+"</div>";
+html+="<div class='hist-plan'>"+escapeHtml(d.plan)+"</div>";
+html+="<div class='hist-meta'><span class='tag "+tagClass+"'>"+d.verdict+"</span>"+(d.note?"<span style='color:#8a8a80'>"+escapeHtml(d.note)+"</span>":"")+"</div>";
+html+="</div>";
+});
+document.getElementById("history").innerHTML=html;
+}
+
+function render(){
+renderToday();
+renderStats();
+renderHeatmap();
+renderHistory();
+}
+
+function exportData(){
+const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+const a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="one-loop.json";
+a.click();
+}
+
+function importData(e){
+const file=e.target.files[0];
+if(!file)return;
+const reader=new FileReader();
+reader.onload=function(){
+try{
+state=JSON.parse(reader.result);
+save();
+}catch{
+alert("Invalid file");
+}
+};
+reader.readAsText(file);
+}
+
+render();
+
+</script>
+
+</body>
+</html>
