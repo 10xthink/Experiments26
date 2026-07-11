@@ -1,0 +1,62 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Zen Pomodoro</title>
+<style>
+body{margin:0;height:100vh;display:grid;place-items:center;background:#111;color:#eee;font:20px system-ui}
+main{text-align:center;max-width:420px}h1{margin:0}#t{font-size:64px;margin:20px 0}
+button{padding:10px 18px;margin:4px;border:0;border-radius:8px}ul{text-align:left}
+</style></head><body><main>
+<h1 id=m>Focus</h1><h2 id=task>Ready</h2><div id=t>25:00</div>
+<button onclick=start()>Start</button><button onclick=pause()>Pause</button><button onclick=reset()>Reset</button>
+<h3>Today</h3><ul id=list></ul>
+</main><script>
+let F=25,B=5,L=15,n=0,s=F*60,id=0,mode="Focus",task="",done=JSON.parse(localStorage.done||"[]");
+const t=x=>document.getElementById(x),draw=()=>{t("m").textContent=mode;t("task").textContent=task||"Ready";
+t("t").textContent=`${String(s/60|0).padStart(2,0)}:${String(s%60).padStart(2,0)}`;
+t("list").innerHTML=done.map(x=>`<li>✓ ${x}</li>`).join("")};draw();
+function beep(){let a=new AudioContext(),o=a.createOscillator(),g=a.createGain();
+o.connect(g);g.connect(a.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.5)}
+function notify(x){
+if(Notification.permission=="granted")new Notification(x);
+else Notification.requestPermission();
+document.title=x;beep();
+}
+function tick(){
+if(--s>0)return draw();
+clearInterval(id);id=0;
+if(mode=="Focus"){
+done.push(task);
+localStorage.done=JSON.stringify(done);
+n++;
+notify("🍅 Focus finished");
+mode=n%4?"Break":"Long Break";
+s=(n%4?B:L)*60;
+task="";
+}else{
+notify("💼 Back to work");
+mode="Focus";
+s=F*60;
+}
+draw();
+}
+function start(){
+if(id)return;
+if(mode=="Focus"&&!task){
+task=prompt("What are you working on?","")||"Untitled";
+}
+id=setInterval(tick,1000);
+draw();
+}
+function pause(){
+clearInterval(id);
+id=0;
+}
+function reset(){
+pause();
+mode="Focus";
+s=F*60;
+task="";
+draw();
+}
+document.addEventListener("visibilitychange",()=>{
+if(!document.hidden)document.title="Zen Pomodoro";
+});
+</script></body></html>
