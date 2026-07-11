@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Zen English Writer (Offline)</title>
+  <style>
+    :root{
+      --bg:#0b0c0f; --card:#111318; --muted:#a7b0c0; --text:#e9eef7;
+      --line:#252a35; --accent:#7dd3fc; --good:#86efac; --warn:#fde68a;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(180deg,#0b0c0f,#090a0d);
+      color:var(--text);
+    }
+    .wrap{ max-width:980px; margin:0 auto; padding:24px 16px 48px; }
+    header{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+    h1{ font-size:18px; margin:0; letter-spacing:.2px; font-weight:650; }
+    .sub{ color:var(--muted); font-size:13px; margin-top:6px; line-height:1.35; }
+    .pillrow{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .pill{
+      border:1px solid var(--line); color:var(--muted);
+      padding:6px 10px; border-radius:999px; font-size:12px;
+      background:rgba(255,255,255,0.02);
+    }
+    .grid{ display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; margin-top:16px; }
+    @media (max-width: 900px){ .grid{ grid-template-columns:1fr; } }
+
+    .card{
+      background:rgba(255,255,255,0.03);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      box-shadow: 0 10px 35px rgba(0,0,0,.25);
+    }
+    .card h2{ font-size:13px; margin:0 0 10px; color:var(--muted); font-weight:650; letter-spacing:.2px; }
+    textarea{
+      width:100%; min-height:240px; resize:vertical;
+      background:rgba(0,0,0,.25);
+      border:1px solid var(--line);
+      color:var(--text);
+      border-radius:12px;
+      padding:12px;
+      line-height:1.5;
+      font-size:14px;
+      outline:none;
+    }
+    textarea:focus{ border-color:rgba(125,211,252,.6); box-shadow:0 0 0 3px rgba(125,211,252,.12); }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    button, select, input[type="text"]{
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,0.02);
+      color:var(--text);
+      padding:9px 12px;
+      font-size:13px;
+      outline:none;
+    }
+    button{ cursor:pointer; }
+    button:hover{ border-color:rgba(125,211,252,.55); }
+    .primary{ border-color:rgba(125,211,252,.45); }
+    .primary:hover{ border-color:rgba(125,211,252,.85); }
+    .muted{ color:var(--muted); font-size:12px; }
+    .hr{ height:1px; background:var(--line); margin:12px 0; }
+    ul{ margin:0; padding-left:18px; }
+    li{ margin:6px 0; color:var(--text); }
+    .hint{ color:var(--muted); font-size:12px; line-height:1.45; }
+    .kpi{
+      display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 520px){ .kpi{ grid-template-columns: 1fr; } }
+    .k{ padding:10px; border:1px solid var(--line); border-radius:12px; background:rgba(0,0,0,.18); }
+    .k .label{ color:var(--muted); font-size:11px; }
+    .k .val{ font-size:16px; margin-top:3px; font-weight:650; }
+    .tag{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; border:1px solid var(--line); color:var(--muted); }
+    .good{ color:var(--good); }
+    .warn{ color:var(--warn); }
+    .small{ font-size:12px; }
+    .footer{
+      margin-top:14px; color:var(--muted); font-size:12px; line-height:1.45;
+    }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Zen English Writer</h1>
+        <div class="sub">
+          Offline practice for clear English writing using <span class="tag">First principles</span>
+          <span class="tag">Snowball</span> <span class="tag">Pareto</span> <span class="tag">Minimal</span>.
+        </div>
+        <div class="pillrow">
+          <div class="pill">Rule 1: short sentences</div>
+          <div class="pill">Rule 2: one idea per sentence</div>
+          <div class="pill">Rule 3: strong verbs</div>
+          <div class="pill">Rule 4: remove extra words</div>
+        </div>
+      </div>
+
+      <div class="card" style="max-width:340px; width:100%;">
+        <h2>Mode</h2>
+        <div class="row">
+          <select id="mode">
+            <option value="snowball">Snowball (build step by step)</option>
+            <option value="pareto">Pareto (high-impact patterns)</option>
+            <option value="first">First principles (clarity)</option>
+          </select>
+          <button class="primary" id="newPrompt">New prompt</button>
+        </div>
+        <div class="footer">
+          Goal: write clearly, not fancy.<br/>
+          Save progress in your browser: <span class="mono">Auto-saves</span>.
+        </div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Write</h2>
+        <div class="hint" id="promptText"></div>
+        <div class="hr"></div>
+
+        <textarea id="editor" placeholder="Write here..."></textarea>
+
+        <div class="row">
+          <button class="primary" id="analyze">Analyze</button>
+          <button id="tighten">Tighten (remove fluff)</button>
+          <button id="makeSimple">Make simpler</button>
+          <button id="copy">Copy</button>
+          <button id="reset">Reset</button>
+        </div>
+
+        <div class="kpi">
+          <div class="k">
+            <div class="label">Sentences</div>
+            <div class="val" id="kSent">0</div>
+          </div>
+          <div class="k">
+            <div class="label">Words</div>
+            <div class="val" id="kWords">0</div>
+          </div>
+          <div class="k">
+            <div class="label">Avg words / sentence</div>
+            <div class="val" id="kAvg">0</div>
+          </div>
+        </div>
+
+        <div class="footer">
+          Minimal target: <span class="good">8–14 words per sentence</span> for most practice.
+        </div>
+      </section>
+
+      <aside class="card">
+        <h2>Coach (feedback)</h2>
+        <div id="coach" class="hint">Write something, then press <b>Analyze</b>.</div>
+
+        <div class="hr"></div>
+
+        <h2>Micro-lessons (80/20)</h2>
+        <ul class="small">
+          <li><b>SVO</b>: Subject → Verb → Object. (“I wrote the email.”)</li>
+          <li><b>Strong verbs</b>: avoid “is/are” when possible. (“We <i>decided</i>.”)</li>
+          <li><b>Concrete nouns</b>: “plan”, “steps”, “deadline”.</li>
+          <li><b>Cut fillers</b>: “just”, “really”, “very”, “actually”.</li>
+          <li><b>One idea</b> per sentence.</li>
+        </ul>
+
+        <div class="hr"></div>
+
+        <h2>Snowball ladder</h2>
+        <ol class="small">
+          <li>1 clear sentence.</li>
+          <li>Add 2nd sentence with <b>because</b>.</li>
+          <li>Add an example sentence.</li>
+          <li>Add a conclusion sentence.</li>
+        </ol>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const $ = (id)=>document.getElementById(id);
+
+  const stateKey = "zen_writer_state_v1";
+  const prompts = {
+    snowball: [
+      "Write 1 sentence: What do you want to learn this week?",
+      "Write 2 sentences: 1) a goal, 2) why it matters.",
+      "Write 3 sentences: goal + why + one example.",
+      "Write 4 sentences: goal + why + example + next step."
+    ],
+    pareto: [
+      "Write 5 short sentences (8–12 words). One idea each.",
+      "Rewrite your text using only common words and strong verbs.",
+      "Write an email update: 1) status, 2) risk, 3) next action."
+    ],
+    first: [
+      "Write one sentence in SVO (Subject–Verb–Object).",
+      "Rewrite: remove extra words until meaning stays the same.",
+      "Write: claim + reason + evidence (3 sentences)."
+    ]
+  };
+
+  const fillerWords = [
+    "just","really","very","actually","basically","literally","somewhat",
+    "kind of","sort of","a bit","maybe","perhaps","quite","pretty"
+  ];
+
+  function pickPrompt(mode){
+    const list = prompts[mode] || prompts.snowball;
+    return list[Math.floor(Math.random()*list.length)];
+  }
+
+  function sentences(text){
+    // naive sentence split: good enough for practice
+    return text
+      .replace(/\s+/g," ")
+      .split(/(?<=[.!?])\s+/)
+      .map(s=>s.trim())
+      .filter(Boolean);
+  }
+
+  function words(text){
+    return text
+      .trim()
+      .split(/\s+/)
+      .map(w=>w.trim())
+      .filter(Boolean);
+  }
+
+  function updateKPI(text){
+    const s = sentences(text);
+    const w = words(text);
+    const avg = s.length ? (w.length / s.length) : 0;
+    $("kSent").textContent = s.length;
+    $("kWords").textContent = w.length;
+    $("kAvg").textContent = avg ? avg.toFixed(1) : "0";
+  }
+
+  function analyzeText(text){
+    const s = sentences(text);
+    const w = words(text);
+    const avg = s.length ? (w.length / s.length) : 0;
+
+    const notes = [];
+
+    if (!text.trim()){
+      return ["Write 1–4 sentences. Keep them short."];
+    }
+
+    // Zen: length guidance
+    if (avg > 18) notes.push("Your sentences are long. Split them into shorter ones (8–14 words).");
+    else if (avg > 14) notes.push("Good. Try trimming a little more for clarity.");
+    else if (avg < 6 && w.length > 10) notes.push("Your sentences are very short. Add 1 example sentence.");
+
+    // filler word check
+    const lowered = text.toLowerCase();
+    const foundFillers = fillerWords.filter(f => lowered.includes(" " + f + " ") || lowered.startsWith(f+" ") || lowered.endsWith(" "+f));
+    if (foundFillers.length){
+      notes.push("Cut filler words: " + foundFillers.slice(0,6).join(", ") + (foundFillers.length>6 ? "…" : "") + ".");
+    }
+
+    // weak verb hint
+    const beCount = (lowered.match(/\b(is|are|was|were|be|been|being)\b/g) || []).length;
+    if (beCount >= 3) notes.push("Too many 'be' verbs (is/are/was). Replace some with strong verbs (decide, build, ship, learn, fix).");
+
+    // SVO reminder
+    notes.push("First principles: make each sentence SVO. Ask: Who did what to what?");
+    notes.push("Snowball: add one sentence at a time: goal → reason → example → next step.");
+
+    // simple Pareto checklist
+    notes.push("Pareto check: Do you have (1) a clear goal, (2) a reason, (3) one concrete example?");
+
+    return notes;
+  }
+
+  function tighten(text){
+    let t = " " + text.replace(/\s+/g," ").trim() + " ";
+    // remove common filler words/phrases
+    fillerWords.forEach(f=>{
+      // phrase-safe remove
+      const re = new RegExp("\\b" + f.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + "\\b","gi");
+      t = t.replace(re, "");
+    });
+    // clean spacing
+    t = t.replace(/\s+/g," ").replace(/\s+([,.!?;:])/g,"$1").trim();
+    return t;
+  }
+
+  function makeSimpler(text){
+    // lightweight simplifier: encourage short lines and common connectors
+    const s = sentences(text);
+    const out = s.map(line=>{
+      let x = line;
+      x = x.replace(/\butilize\b/gi,"use")
+           .replace(/\bapproximately\b/gi,"about")
+           .replace(/\badditional\b/gi,"extra")
+           .replace(/\bassist\b/gi,"help")
+           .replace(/\btherefore\b/gi,"so")
+           .replace(/\bhowever\b/gi,"but");
+      return x;
+    }).join(" ");
+    return out;
+  }
+
+  function setCoach(lines){
+    $("coach").innerHTML = "<ul>" + lines.map(l=>"<li>"+escapeHtml(l)+"</li>").join("") + "</ul>";
+  }
+
+  function escapeHtml(str){
+    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  function save(){
+    const data = {
+      mode: $("mode").value,
+      prompt: $("promptText").textContent,
+      text: $("editor").value
+    };
+    localStorage.setItem(stateKey, JSON.stringify(data));
+  }
+
+  function load(){
+    const raw = localStorage.getItem(stateKey);
+    if(!raw) return false;
+    try{
+      const data = JSON.parse(raw);
+      if(data.mode) $("mode").value = data.mode;
+      if(data.prompt) $("promptText").textContent = data.prompt;
+      if(typeof data.text === "string") $("editor").value = data.text;
+      updateKPI($("editor").value);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function newPrompt(){
+    const mode = $("mode").value;
+    const p = pickPrompt(mode);
+    $("promptText").textContent = p;
+    save();
+  }
+
+  // Wire events
+  $("newPrompt").addEventListener("click", ()=>{
+    newPrompt();
+    $("editor").focus();
+  });
+
+  $("analyze").addEventListener("click", ()=>{
+    const text = $("editor").value;
+    updateKPI(text);
+    setCoach(analyzeText(text));
+    save();
+  });
+
+  $("tighten").addEventListener("click", ()=>{
+    $("editor").value = tighten($("editor").value);
+    updateKPI($("editor").value);
+    setCoach(["Tightened. Now re-check SVO and add one example if needed."]);
+    save();
+  });
+
+  $("makeSimple").addEventListener("click", ()=>{
+    $("editor").value = makeSimpler($("editor").value);
+    updateKPI($("editor").value);
+    setCoach(["Simplified wording. Next: shorten any long sentences."]);
+    save();
+  });
+
+  $("copy").addEventListener("click", async ()=>{
+    try{
+      await navigator.clipboard.writeText($("editor").value);
+      setCoach(["Copied to clipboard."]);
+    }catch(e){
+      setCoach(["Copy failed (browser permission). Select text and copy manually."]);
+    }
+  });
+
+  $("reset").addEventListener("click", ()=>{
+    $("editor").value = "";
+    updateKPI("");
+    setCoach(["Reset. Press “New prompt” and write 1 sentence."]);
+    save();
+  });
+
+  $("mode").addEventListener("change", ()=>{
+    newPrompt();
+  });
+
+  $("editor").addEventListener("input", ()=>{
+    updateKPI($("editor").value);
+    save();
+  });
+
+  // Init
+  const loaded = load();
+  if(!loaded || !$("promptText").textContent){
+    newPrompt();
+  }
+  updateKPI($("editor").value);
+})();
+</script>
+</body>
+</html>
