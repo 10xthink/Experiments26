@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#F7F5F0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Lifecycle">
+<title>Lifecycle — the universal playbook</title>
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --paper:#F7F5F0;
+  --paper-raised:#FDFCFA;
+  --ink:#16150F;
+  --stone:#8A867B;
+  --hair:#E4E1D8;
+  --seal:#B3391E;
+  --moss:#5A6B4E;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --nav-h:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{font-size:16px}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.55;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+/* ============ LAYOUT ============ */
+#app{max-width:30rem;margin:0 auto;padding:0 1.25rem calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 2rem);min-height:100vh}
+.view{display:none;animation:fade .35s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ============ TYPE ============ */
+h1{font-family:var(--serif);font-weight:600;font-size:1.9rem;line-height:1.2;letter-spacing:-.01em}
+h2{font-family:var(--serif);font-weight:600;font-size:1.35rem;line-height:1.3}
+.eyebrow{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--stone);font-weight:600}
+.muted{color:var(--stone)}
+.small{font-size:.85rem}
+.serif{font-family:var(--serif)}
+
+/* ============ HEADER ============ */
+.pagehead{padding:2.2rem 0 1.4rem}
+.pagehead .eyebrow{margin-bottom:.35rem}
+
+/* ============ HANKO (seal) ============ */
+.hanko{
+  width:2.4rem;height:2.4rem;flex:0 0 2.4rem;
+  background:var(--seal);color:#fff;
+  border-radius:.55rem;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-weight:700;font-size:1.05rem;
+}
+.hanko.sm{width:1.9rem;height:1.9rem;flex-basis:1.9rem;font-size:.85rem;border-radius:.45rem}
+
+/* ============ BUTTONS ============ */
+button{font-family:var(--sans);cursor:pointer;border:none;background:none;color:inherit;font-size:1rem}
+.btn{
+  display:block;width:100%;
+  background:var(--ink);color:var(--paper);
+  padding:.95rem 1.2rem;border-radius:.7rem;
+  font-weight:600;font-size:1rem;text-align:center;
+  transition:transform .12s ease,opacity .12s ease;
+}
+.btn:active{transform:scale(.98);opacity:.9}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--hair)}
+.btn.danger{background:none;color:var(--seal);border:1px solid var(--hair)}
+.btn.quiet{background:none;color:var(--stone);font-weight:500;padding:.6rem}
+.btnrow{display:flex;gap:.6rem}
+.btnrow .btn{flex:1}
+
+/* ============ LISTS / ROWS ============ */
+.row{display:flex;align-items:center;gap:.9rem;padding:1rem 0;border-bottom:1px solid var(--hair)}
+.row:last-child{border-bottom:none}
+.row .grow{flex:1;min-width:0}
+.row .title{font-weight:600}
+.rowlink{width:100%;text-align:left}
+
+/* ============ CHECK CIRCLE ============ */
+.checkc{
+  width:2.1rem;height:2.1rem;flex:0 0 2.1rem;border-radius:50%;
+  border:1.5px solid var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s ease;
+}
+.checkc svg{opacity:0;transition:opacity .2s ease}
+.checkc.done{background:var(--ink)}
+.checkc.done svg{opacity:1}
+
+/* ============ CARDS (hairline, no shadows) ============ */
+.card{border:1px solid var(--hair);border-radius:.9rem;padding:1.15rem 1.15rem;background:var(--paper-raised);margin-bottom:.85rem}
+.card h2{margin-bottom:.3rem}
+.card .analogy{font-family:var(--serif);font-style:italic;font-size:1.05rem;margin:.4rem 0 .5rem}
+
+/* ============ PHASE PILL ============ */
+.pill{display:inline-block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--stone);border:1px solid var(--hair);padding:.2rem .55rem;border-radius:1rem}
+.pill.compound{color:var(--moss);border-color:var(--moss)}
+.pill.renew{color:var(--seal);border-color:var(--seal)}
+
+/* ============ ENSO ============ */
+.enso-wrap{display:flex;flex-direction:column;align-items:center;padding:1.2rem 0 .4rem}
+.enso{transform:rotate(-90deg)}
+.enso circle{fill:none;stroke:var(--ink);stroke-linecap:round}
+.enso .ghost{stroke:var(--hair);stroke-width:2}
+.enso .arc{stroke-width:5;transition:stroke-dashoffset .9s cubic-bezier(.6,0,.2,1)}
+.enso .arc2{stroke-width:2.5;opacity:.35;transition:stroke-dashoffset .9s cubic-bezier(.6,0,.2,1) .05s}
+.enso-label{margin-top:.6rem;text-align:center}
+
+/* ============ ACTION LIST ============ */
+.actions li{list-style:none;padding:.7rem 0;border-bottom:1px solid var(--hair);display:flex;gap:.7rem;align-items:flex-start}
+.actions li:last-child{border-bottom:none}
+.actions .tick{color:var(--stone);font-size:.8rem;padding-top:.2rem}
+
+/* ============ STATS ============ */
+.stats{display:flex;text-align:center;border:1px solid var(--hair);border-radius:.9rem;overflow:hidden;margin:1rem 0}
+.stats>div{flex:1;padding:.9rem .4rem}
+.stats>div+div{border-left:1px solid var(--hair)}
+.stats .num{font-family:var(--serif);font-size:1.5rem;font-weight:600}
+.stats .lbl{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--stone)}
+.streak-on .num{color:var(--seal)}
+
+/* ============ QUIZ ============ */
+.quiz-q{font-family:var(--serif);font-size:1.4rem;line-height:1.35;margin:1.2rem 0 1.6rem}
+.progressdots{display:flex;gap:.4rem;margin-top:1.5rem}
+.progressdots span{width:.45rem;height:.45rem;border-radius:50%;background:var(--hair)}
+.progressdots span.on{background:var(--ink)}
+
+/* ============ TEMPLATE PICKER ============ */
+.tpl{width:100%;text-align:left;border:1px solid var(--hair);border-radius:.9rem;padding:1rem;margin-bottom:.7rem;background:var(--paper-raised);display:flex;gap:.9rem;align-items:center;transition:border-color .15s}
+.tpl:active{border-color:var(--ink)}
+.tpl .grow{flex:1}
+.tpl .title{font-weight:600}
+
+/* ============ INPUT ============ */
+input[type=text]{
+  width:100%;font-family:var(--sans);font-size:1.1rem;color:var(--ink);
+  background:none;border:none;border-bottom:1.5px solid var(--ink);
+  padding:.6rem 0;outline:none;border-radius:0;
+}
+input[type=text]::placeholder{color:var(--stone)}
+
+/* ============ NAV ============ */
+nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:10;
+  background:rgba(247,245,240,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--hair);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.navin{max-width:30rem;margin:0 auto;display:flex;height:var(--nav-h)}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;color:var(--stone);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+nav button svg{stroke:currentColor}
+nav button.on{color:var(--ink)}
+
+/* ============ ONBOARDING ============ */
+#ob{position:fixed;inset:0;background:var(--paper);z-index:50;display:flex;flex-direction:column;justify-content:center;padding:2rem 1.6rem calc(2rem + env(safe-area-inset-bottom,0px))}
+#ob .slide{display:none;max-width:26rem;margin:0 auto;width:100%}
+#ob .slide.active{display:block;animation:fade .5s ease}
+#ob h1{font-size:2rem;margin:1.2rem 0 .8rem}
+#ob p{color:var(--stone);font-size:1.05rem}
+#ob .foot{position:fixed;left:0;right:0;bottom:calc(1.6rem + env(safe-area-inset-bottom,0px));padding:0 1.6rem}
+#ob .foot .in{max-width:26rem;margin:0 auto}
+
+/* misc */
+.divider{border:none;border-top:1px solid var(--hair);margin:1.4rem 0}
+.notice{font-size:.8rem;color:var(--stone);border:1px dashed var(--hair);border-radius:.7rem;padding:.7rem .9rem;margin-top:.8rem}
+.backbtn{color:var(--stone);font-weight:600;padding:1rem 0 .2rem;display:inline-flex;align-items:center;gap:.3rem}
+.section-gap{height:1.6rem}
+textarea{display:none}
+</style>
+</head>
+<body>
+
+<div id="ob" hidden></div>
+<main id="app">
+  <section class="view" id="view-today"></section>
+  <section class="view" id="view-goals"></section>
+  <section class="view" id="view-goal"></section>
+  <section class="view" id="view-add"></section>
+  <section class="view" id="view-learn"></section>
+  <section class="view" id="view-data"></section>
+</main>
+
+<nav aria-label="Main">
+  <div class="navin">
+    <button data-nav="today" aria-label="Today">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke-width="1.6"><circle cx="10" cy="10" r="7.2"/></svg>
+      Today</button>
+    <button data-nav="goals" aria-label="Goals">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke-width="1.6"><circle cx="10" cy="10" r="7.2"/><circle cx="10" cy="10" r="2.4"/></svg>
+      Goals</button>
+    <button data-nav="learn" aria-label="Learn">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke-width="1.6"><path d="M4 4h9a3 3 0 013 3v9H7a3 3 0 01-3-3V4z"/><path d="M4 4v9a3 3 0 003 3"/></svg>
+      Learn</button>
+    <button data-nav="data" aria-label="Data">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke-width="1.6"><path d="M10 3v9m0 0l-3.2-3.2M10 12l3.2-3.2"/><path d="M4 14v1.5A1.5 1.5 0 005.5 17h9a1.5 1.5 0 001.5-1.5V14"/></svg>
+      Data</button>
+  </div>
+</nav>
+
+<script>
+/* =====================================================
+   LIFECYCLE — the universal playbook, as one offline file
+   No network. No accounts. Your data stays on this device.
+   ===================================================== */
+
+/* ---------- content: the five phases ---------- */
+const PHASES = {
+  sense:    {name:'Sense',    frac:.20, icon:'土', kid:'A gardener touches the soil before planting.',
+             what:'Find what is truly needed next — the one constraint that, if removed, changes everything.'},
+  ignite:   {name:'Ignite',   frac:.40, icon:'火', kid:'Striking a match: one small, quick motion.',
+             what:'Lower the friction until starting takes 2 minutes. Motivation follows action, not the reverse.'},
+  compound: {name:'Compound', frac:.60, icon:'水', kid:'Watering the seed daily, even when nothing shows.',
+             what:'Repeat the vital few actions. Invisible for ~90 days, visible in months, unstoppable in years.'},
+  plateau:  {name:'Plateau',  frac:.80, icon:'山', kid:'The tree has reached its height. Prune, or plant anew.',
+             what:'Same effort, shrinking results. Decide: push harder, pivot the method, or preserve what you built.'},
+  renew:    {name:'Renew',    frac:.97, icon:'空', kid:'A small forest fire clears the ground for new shoots.',
+             what:'Dismantle voluntarily what life would otherwise dismantle for you. Then begin again, wiser.'}
+};
+const PHASE_ORDER = ['sense','ignite','compound','plateau','renew'];
+
+/* ---------- content: the six laws (Learn) ---------- */
+const LAWS = [
+ {t:'Least Resistance', a:'Water', k:'Water never argues with a rock. It flows around it — and still reaches the sea.',
+  m:'Energy goes where friction is lowest. So don\u2019t fight yourself: make good actions downhill (easy, visible, ready) and bad ones uphill (hidden, far, locked away).',
+  u:'Use when starting anything, or breaking a habit.'},
+ {t:'First Principles', a:'LEGO', k:'Any castle breaks down into bricks. From bricks, you can build anything.',
+  m:'Break a goal into its basic true pieces — what it really is made of — then rebuild from those, instead of copying what everyone else does.',
+  u:'Use when confused, stuck, or before big decisions.'},
+ {t:'Compounding', a:'Snowball', k:'Roll a small snowball downhill. Tiny for a long time\u2026 then suddenly a giant.',
+  m:'Small actions repeated daily look like nothing for months. Then the curve bends and results arrive faster than effort. The only rule: don\u2019t stop mid-hill.',
+  u:'Use to stay patient in the invisible early days.'},
+ {t:'Power Law', a:'Giant trees', k:'In a forest, a few tall trees catch most of the sunlight.',
+  m:'A few actions bring most of your results — roughly 20% gives 80%. Find your few tall trees and water only those.',
+  u:'Use when busy but not progressing.'},
+ {t:'Diminishing Returns', a:'Pizza', k:'Slice one is heaven. Slice five is fine. Slice ten hurts.',
+  m:'More of the same eventually gives less and less. When that happens, the method is tired — not necessarily the goal.',
+  u:'Use to detect plateaus honestly.'},
+ {t:'Emergence', a:'Ants', k:'No single ant knows the plan. Together, they build a city.',
+  m:'Simple small actions, repeated by many parts, create intelligence and beauty no single part planned. Design tiny rules; let big results emerge.',
+  u:'Use when a goal feels too large to hold in your head.'}
+];
+
+/* ---------- content: the five templates ---------- */
+const TPL = {
+ body:{name:'Body', tag:'health · energy · vitality', letter:'B',
+  principle:'Body = calories in vs out \u00d7 training stress \u00d7 recovery. Sleep, food, movement — in that order of neglect.',
+  phases:{
+   sense:{a:['Measure, don\u2019t guess: weight weekly, waist monthly, energy 1\u201310 daily','Check the constraint in order: sleep \u2192 food \u2192 movement','One blood panel a year, if available'], done:'You can name your single constraint.'},
+   ignite:{a:['2-minute start: shoes on, out the door','Remove junk food from the house — you can\u2019t eat what isn\u2019t there','Lay out training clothes the night before'], done:'14 straight days of the tiny action.'},
+   compound:{a:['Strength train 3\u00d7 a week','7,000+ steps every day','Protein at every meal · 7\u20138 hours of sleep'], done:'Felt in 60\u201390 days. Visible in 6 months. Identity in 2\u20133 years.'},
+   plateau:{a:['Stalled 4\u20138 weeks? Check sleep first','Then protein, then heavier loads, then life stress','A maintenance plateau is success — keep it'], done:'You chose consciously: push, pivot, or preserve.'},
+   renew:{a:['Change the stimulus every 8\u201312 weeks (program, sport, rep range)','Every few years, rebuild the routine for your changing age','Prune what no longer fits your body'], done:'A fresh cycle has begun, on purpose.'}
+  }},
+ wealth:{name:'Wealth', tag:'money · freedom', letter:'W',
+  principle:'Wealth = (income \u2212 expenses) \u00d7 time \u00d7 return. Only four levers exist. Pull more than one.',
+  phases:{
+   sense:{a:['Know 3 numbers: monthly income, monthly expenses, net worth','Early on, the constraint is usually income','Later, it becomes behavior and invest rate'], done:'You know your three numbers by heart.'},
+   ignite:{a:['Automate one transfer on payday — before you can touch it','A boring broad index fund today beats the perfect one never','Set a decision deadline; act at 80% certainty'], done:'The automatic transfer has run twice.'},
+   compound:{a:['Spend less than you earn — aim to save 20%+','Invest the gap automatically, low-cost and broad','Grow income with skills; never interrupt the compounding'], done:'Felt in ~3 years. Life-changing in 10\u201320. The first milestone is the hardest.'},
+   plateau:{a:['Income ceiling \u2192 negotiate, switch, or own equity','Audit lifestyle inflation once a year','Rebalance yearly, then leave it alone'], done:'The constraint has been re-identified.'},
+   renew:{a:['Re-ask from zero: what is money actually for?','\u201cEnough\u201d is a decision, not a number the world gives you','Simplify: fewer accounts, fewer holdings, clearer mind'], done:'Your definition of enough is written down.'}
+  }},
+ skill:{name:'Mind & Skill', tag:'learning · career · mastery', letter:'S',
+  principle:'Skill = focused practice \u00d7 feedback \u00d7 time. Value = rare \u00d7 useful \u00d7 hard to automate.',
+  phases:{
+   sense:{a:['Ask the market, not your ego: what do people pay for or thank you for?','Pick ONE skill at a time','Find someone two steps ahead of you'], done:'One skill chosen; one guide found.'},
+   ignite:{a:['Open the material and do the smallest real exercise','Stop comparing courses after 30 minutes — start any reputable one','One focused hour, phone in another room'], done:'Ten sessions completed.'},
+   compound:{a:['1 deep hour daily','Build and produce — don\u2019t only consume','Teach what you learn, weekly'], done:'Competent ~6 months. Professional 2\u20133 years. Top of field 7\u201310.'},
+   plateau:{a:['Comfort is the signal — you\u2019re repeating what you know','Practice deliberately at the edge of failure','Stack a second skill: A \u00d7 B = rare combination'], done:'You are uncomfortable again, on purpose.'},
+   renew:{a:['Expect part of your field to expire every 5\u20137 years','Prune old methods willingly','Identity: learner — never expert-of-one-era'], done:'Something old released; something new begun.'}
+  }},
+ relationships:{name:'Relationships', tag:'family · love · friends', letter:'R',
+  principle:'Strength = frequency \u00d7 depth \u00d7 trust. Trust = promises kept, over time. Compounds slowest, breaks fastest.',
+  phases:{
+   sense:{a:['List your 5 most important people','When was the last real (non-logistics) conversation with each?','The longest gap is the constraint'], done:'You know who, and how long the gap is.'},
+   ignite:{a:['Send one honest message today','Appreciation, apology, or invitation — pick one','Awkwardness costs minutes; drift costs years'], done:'The message was sent.'},
+   compound:{a:['Weekly undistracted time with the closest','Keep small promises religiously','Repair fast after conflict — speed matters more than frequency'], done:'Trust felt in months. Deep bonds in years. A 40-year bond is the highest-return asset there is.'},
+   plateau:{a:['Comfortable routine = preserve mode. That is the point, not a problem','Numbness or avoidance? Add shared novelty','Have the honest conversation you\u2019ve postponed'], done:'Preserve chosen consciously — or novelty added.'},
+   renew:{a:['Release, gently, what only extracts','Become new people together, not strangers apart','Let the old teach the young'], done:'The circle is pruned and alive.'}
+  }},
+ meaning:{name:'Meaning', tag:'purpose · peace · contribution', letter:'M',
+  principle:'Meaning = your abilities, in service of something beyond you, felt daily. Made by action — not found by thinking.',
+  phases:{
+   sense:{a:['Where do you lose track of time?','What problem can\u2019t you stop noticing?','What do people thank you for? The overlap is your direction'], done:'You can point at the overlap.'},
+   ignite:{a:['One small act of contribution today — help, create, improve','You don\u2019t need a life purpose. You need the next useful act','5 quiet minutes: journal, prayer, or silence'], done:'Seven days of small acts.'},
+   compound:{a:['Daily 5-minute reflection','Contribute on a rhythm, not on a mood','Gratitude practiced, not just felt'], done:'Grounded in weeks. A coherent life in years.'},
+   plateau:{a:['Empty despite success? The goal was borrowed','Ask: whose scoreboard am I playing on?','Return to first principles'], done:'The scoreboard is yours again.'},
+   renew:{a:['Purpose shifts by season: build \u2192 lead \u2192 give back','Mentor someone','Let an old identity go with thanks'], done:'A new season accepted.'}
+  }},
+ custom:{name:'Custom goal', tag:'anything — same laws', letter:'\u00b7',
+  principle:'Strip it to first principles: what is this goal actually made of? Which single constraint blocks it now?',
+  phases:{
+   sense:{a:['Write the goal as an equation of its true parts','Find the one constraint that changes everything','Decide how you will measure, weekly'], done:'Constraint named. Measure chosen.'},
+   ignite:{a:['Define a 2-minute first action','Make it downhill: prepare the environment tonight','Set a decision deadline — 80% plan today beats 100% never'], done:'14 straight days of the tiny action.'},
+   compound:{a:['Find the 20% of actions giving 80% of results','Repeat them on a schedule, not a mood','Protect the streak; never miss twice'], done:'Invisible ~90 days. Visible in months. Bends in years.'},
+   plateau:{a:['Same effort, shrinking results for 4\u20138 weeks?','Push (basics not maxed) · Pivot (constraint moved) · Preserve (maintain by design)','Re-run first principles before quitting'], done:'Push, pivot, or preserve — chosen consciously.'},
+   renew:{a:['Schedule renewal; don\u2019t wait for collapse','Dismantle what no longer serves — voluntarily','Restart the cycle one level wiser'], done:'The next cycle has begun.'}
+  }}
+};
+
+/* ---------- state ---------- */
+const KEY='lifecycle.v1';
+let mem=null, persistOK=true;
+function load(){
+  try{const raw=localStorage.getItem(KEY); if(raw){return JSON.parse(raw)}}
+  catch(e){persistOK=false}
+  return mem || {v:1,onboarded:false,goals:[]};
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(S)); persistOK=true;}
+  catch(e){persistOK=false; mem=S;}
+}
+let S=load();
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function dkey(d){const x=d||new Date();return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}
+function daysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return dkey(d)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function streak(g){
+  let n=0,i=0;
+  if(!g.checkins[dkey()]) i=1;              // streak may end yesterday
+  while(g.checkins[daysAgo(i)]){n++;i++;}
+  return n;
+}
+function totalDays(g){return Object.keys(g.checkins).length}
+function goal(id){return S.goals.find(g=>g.id===id)}
+function todayLong(){return new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}
+
+/* ---------- enso SVG ---------- */
+function enso(frac,size){
+  size=size||150;
+  const r=size/2-8, C=2*Math.PI*r, off=C*(1-frac);
+  return '<svg class="enso" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" aria-hidden="true">'
+   +'<circle class="ghost" cx="'+size/2+'" cy="'+size/2+'" r="'+r+'"/>'
+   +'<circle class="arc"  cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'"/>'
+   +'<circle class="arc2" cx="'+size/2+'" cy="'+size/2+'" r="'+(r-4)+'" stroke-dasharray="'+(C*0.96)+'" stroke-dashoffset="'+(C*0.96)*(1-frac)+'"/>'
+   +'</svg>';
+}
+
+/* ---------- router ---------- */
+let VIEW='today', PARAM=null;
+function go(v,p){VIEW=v;PARAM=p||null;render();window.scrollTo(0,0)}
+function render(){
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.nav===(VIEW==='goal'||VIEW==='add'?'goals':VIEW)));
+  const el=$('#view-'+VIEW); el.classList.add('active');
+  ({today:rToday,goals:rGoals,goal:rGoal,add:rAdd,learn:rLearn,data:rData}[VIEW])(el);
+}
+
+/* ---------- TODAY ---------- */
+function rToday(el){
+  const done=S.goals.filter(g=>g.checkins[dkey()]).length;
+  let rows='';
+  if(!S.goals.length){
+    rows='<div class="enso-wrap">'+enso(.97,130)
+      +'<p class="muted enso-label" style="max-width:16rem">An empty circle.<br>Begin with one goal.</p></div>'
+      +'<button class="btn" data-act="add">Add your first goal</button>';
+  }else{
+    rows=S.goals.map(g=>{
+      const ck=!!g.checkins[dkey()], st=streak(g);
+      return '<div class="row">'
+       +'<button class="checkc'+(ck?' done':'')+'" data-act="check" data-id="'+g.id+'" aria-label="Check in '+esc(g.name)+'">'
+       +'<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#F7F5F0" stroke-width="2"><path d="M2.5 7.5l3 3 6-7"/></svg></button>'
+       +'<button class="rowlink grow" data-act="open" data-id="'+g.id+'">'
+       +'<div class="title">'+esc(g.name)+'</div>'
+       +'<div class="small muted">'+PHASES[g.phase].name+(st?' · '+st+' day streak':'')+'</div>'
+       +'</button></div>';
+    }).join('');
+  }
+  el.innerHTML='<header class="pagehead"><div class="eyebrow">'+todayLong()+'</div>'
+   +'<h1>'+(S.goals.length? (done===S.goals.length&&done>0?'All done. Rest well.':'The vital few.') :'Begin.')+'</h1></header>'
+   +rows
+   +(S.goals.length?'<div class="section-gap"></div><p class="small muted serif" style="font-style:italic;text-align:center">\u201cThe snowball doesn\u2019t care how you feel today — only that it rolled.\u201d</p>':'');
+}
+
+/* ---------- GOALS ---------- */
+function rGoals(el){
+  let list=S.goals.map(g=>{
+    const t=TPL[g.template]||TPL.custom;
+    return '<div class="row"><div class="hanko sm">'+esc(t.letter)+'</div>'
+     +'<button class="rowlink grow" data-act="open" data-id="'+g.id+'">'
+     +'<div class="title">'+esc(g.name)+'</div>'
+     +'<div class="small muted">'+t.name+' · '+PHASES[g.phase].name+' · '+totalDays(g)+' days total</div>'
+     +'</button>'
+     +'<span class="muted" aria-hidden="true">\u203a</span></div>';
+  }).join('');
+  if(!S.goals.length) list='<p class="muted" style="padding:1rem 0">No goals yet. One is enough to begin.</p>';
+  el.innerHTML='<header class="pagehead"><div class="eyebrow">The cycle</div><h1>Goals</h1></header>'
+   +list+'<div class="section-gap"></div>'
+   +'<button class="btn" data-act="add">Add a goal</button>'
+   +'<p class="notice">Wisdom of the playbook: run <strong>one</strong> goal for 90 days before adding another. All five domains running = a holistic life.</p>';
+}
+
+/* ---------- GOAL DETAIL ---------- */
+function rGoal(el){
+  const g=goal(PARAM); if(!g){go('goals');return}
+  const t=TPL[g.template]||TPL.custom, ph=PHASES[g.phase], pdata=t.phases[g.phase];
+  const st=streak(g);
+  el.innerHTML='<button class="backbtn" data-act="nav" data-nav="goals">\u2039 Goals</button>'
+   +'<div class="enso-wrap">'+enso(ph.frac,170)
+   +'<div class="enso-label"><span class="pill '+g.phase+'">'+ph.name+'</span>'
+   +'<h1 style="margin-top:.5rem">'+esc(g.name)+'</h1>'
+   +'<p class="small muted serif" style="font-style:italic;margin-top:.3rem">'+ph.kid+'</p></div></div>'
+
+   +'<div class="stats'+(st>0?' streak-on':'')+'"><div><div class="num">'+st+'</div><div class="lbl">Streak</div></div>'
+   +'<div><div class="num">'+totalDays(g)+'</div><div class="lbl">Days total</div></div>'
+   +'<div><div class="num">'+(g.best||0)+'</div><div class="lbl">Best streak</div></div></div>'
+
+   +'<button class="btn'+(g.checkins[dkey()]?' ghost':'')+'" data-act="check" data-id="'+g.id+'">'
+   +(g.checkins[dkey()]?'Done today \u2713 (tap to undo)':'Check in for today')+'</button>'
+
+   +'<hr class="divider">'
+   +'<div class="eyebrow">This phase asks</div>'
+   +'<p style="margin:.4rem 0 .8rem">'+ph.what+'</p>'
+   +'<ul class="actions">'+pdata.a.map(x=>'<li><span class="tick">\u25cf</span><span>'+x+'</span></li>').join('')+'</ul>'
+   +'<p class="small muted" style="margin-top:.8rem"><strong>Move on when:</strong> '+pdata.done+'</p>'
+
+   +'<hr class="divider">'
+   +'<div class="eyebrow">First principle of '+esc(t.name)+'</div>'
+   +'<p class="serif" style="font-style:italic;margin-top:.4rem">'+t.principle+'</p>'
+
+   +'<div class="section-gap"></div>'
+   +'<div class="btnrow"><button class="btn ghost" data-act="requiz" data-id="'+g.id+'">Re-diagnose phase</button></div>'
+   +'<div class="section-gap"></div>'
+   +'<button class="btn danger" data-act="del" data-id="'+g.id+'">Release this goal</button>';
+}
+
+/* ---------- ADD FLOW (template → name → quiz → result) ---------- */
+let ADD={step:0,tpl:null,name:'',q:0,phase:null,editing:null};
+const QUIZ=[
+ {q:'Do you know, concretely, the single next action for this goal?', yes:1, no:'sense'},
+ {q:'Have you been acting on it consistently for 2+ weeks?', yes:2, no:'ignite'},
+ {q:'Same effort, but shrinking results — for 4+ weeks?', yes:3, no:'compound'},
+ {q:'Does the whole approach feel exhausted — needing a rebuild, not a tweak?', yes:'renew', no:'plateau'}
+];
+function rAdd(el){
+  if(ADD.step===0){
+    el.innerHTML='<button class="backbtn" data-act="nav" data-nav="goals">\u2039 Cancel</button>'
+     +'<header class="pagehead" style="padding-top:1rem"><div class="eyebrow">Step 1 of 3</div><h1>Choose a domain</h1>'
+     +'<p class="muted small" style="margin-top:.3rem">Five domains cover a holistic life. Same laws in each.</p></header>'
+     +Object.keys(TPL).map(k=>{const t=TPL[k];
+       return '<button class="tpl" data-act="picktpl" data-tpl="'+k+'"><div class="hanko">'+esc(t.letter)+'</div>'
+        +'<div class="grow"><div class="title">'+t.name+'</div><div class="small muted">'+t.tag+'</div></div>'
+        +'<span class="muted">\u203a</span></button>';}).join('');
+  }
+  else if(ADD.step===1){
+    const t=TPL[ADD.tpl];
+    el.innerHTML='<button class="backbtn" data-act="addback">\u2039 Back</button>'
+     +'<header class="pagehead" style="padding-top:1rem"><div class="eyebrow">Step 2 of 3 · '+t.name+'</div><h1>Name it plainly</h1>'
+     +'<p class="muted small" style="margin-top:.3rem">Specific beats noble. \u201cVisible abs\u201d \u00b7 \u201c$1M net worth\u201d \u00b7 \u201cCall Mom weekly\u201d.</p></header>'
+     +'<input type="text" id="gname" placeholder="My goal\u2026" maxlength="60" autocomplete="off">'
+     +'<div class="section-gap"></div>'
+     +'<button class="btn" data-act="namenext">Continue</button>';
+    setTimeout(()=>{const i=$('#gname'); if(i){i.value=ADD.name; i.focus();}},50);
+  }
+  else if(ADD.step===2){
+    const qq=QUIZ[ADD.q];
+    el.innerHTML='<button class="backbtn" data-act="addback">\u2039 Back</button>'
+     +'<header class="pagehead" style="padding-top:1rem"><div class="eyebrow">Step 3 of 3 · Where are you in the cycle?</div></header>'
+     +'<p class="quiz-q">'+qq.q+'</p>'
+     +'<div class="btnrow"><button class="btn ghost" data-act="ans" data-v="no">No</button>'
+     +'<button class="btn" data-act="ans" data-v="yes">Yes</button></div>'
+     +'<div class="progressdots">'+QUIZ.map((_,i)=>'<span class="'+(i<=ADD.q?'on':'')+'"></span>').join('')+'</div>';
+  }
+  else{
+    const ph=PHASES[ADD.phase];
+    el.innerHTML='<div class="enso-wrap" style="padding-top:2.5rem">'+enso(ph.frac,160)
+     +'<div class="enso-label"><span class="pill '+ADD.phase+'">'+ph.name+'</span>'
+     +'<h1 style="margin-top:.5rem">'+esc(ADD.name)+'</h1>'
+     +'<p class="muted serif" style="font-style:italic;margin-top:.4rem;max-width:18rem">'+ph.kid+'</p></div></div>'
+     +'<p style="text-align:center" class="small muted">'+ph.what+'</p>'
+     +'<div class="section-gap"></div>'
+     +'<button class="btn" data-act="confirm">'+(ADD.editing?'Update phase':'Begin')+'</button>';
+  }
+}
+function startAdd(){ADD={step:0,tpl:null,name:'',q:0,phase:null,editing:null};go('add')}
+function startRequiz(id){const g=goal(id);ADD={step:2,tpl:g.template,name:g.name,q:0,phase:null,editing:id};go('add')}
+
+/* ---------- LEARN ---------- */
+function rLearn(el){
+  el.innerHTML='<header class="pagehead"><div class="eyebrow">The school</div><h1>Learn the laws<br>like a child</h1>'
+   +'<p class="muted small" style="margin-top:.4rem">Old laws, everyday pictures. Understand — never follow blindly.</p></header>'
+
+   +'<div class="eyebrow" style="margin:.4rem 0 .8rem">Six laws · six pictures</div>'
+   +LAWS.map(l=>'<div class="card"><div class="eyebrow">'+l.t+'</div>'
+     +'<h2>'+l.a+'</h2><p class="analogy">\u201c'+l.k+'\u201d</p>'
+     +'<p class="small">'+l.m+'</p>'
+     +'<p class="small muted" style="margin-top:.5rem">'+l.u+'</p></div>').join('')
+
+   +'<div class="section-gap"></div>'
+   +'<div class="eyebrow" style="margin:.4rem 0 .8rem">Five phases · one circle</div>'
+   +PHASE_ORDER.map(k=>{const p=PHASES[k];
+     return '<div class="card"><div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.3rem">'
+      +'<span class="serif" style="font-size:1.3rem">'+p.icon+'</span><h2 style="margin:0">'+p.name+'</h2></div>'
+      +'<p class="analogy">\u201c'+p.kid+'\u201d</p><p class="small">'+p.what+'</p></div>';}).join('')
+
+   +'<div class="section-gap"></div>'
+   +'<div class="card"><div class="eyebrow">The whole arc</div>'
+   +'<h2>0 \u2192 1 \u2192 0, or renewal</h2>'
+   +'<p class="small" style="margin-top:.4rem">Everything — a habit, a fortune, a friendship, an empire, a star — follows: <em>nothing \u2192 spark \u2192 ignition \u2192 compounding \u2192 peak \u2192 plateau \u2192 renewal or decline.</em> The 1% (elite bodies, billions, fame, dynasties) use no new laws — only extreme inputs, longer timelines, and steep hidden costs. The only fork you control: <strong>schedule your renewals; don\u2019t wait for your collapses.</strong></p></div>'
+
+   +'<div class="card"><div class="eyebrow">How to practice</div>'
+   +'<h2>The 90-day way</h2>'
+   +'<p class="small" style="margin-top:.4rem">1 · Pick one goal, run its template unchanged for 90 days.<br>2 · Each week, ask which phase you\u2019re in — act only per that phase.<br>3 · After 90 days, customize. You\u2019ve earned the understanding.<br>4 · Add domains one at a time, ~3 months apart.<br>5 · Once a year: push, pivot, preserve, or prune.</p></div>';
+}
+
+/* ---------- DATA ---------- */
+function rData(el){
+  el.innerHTML='<header class="pagehead"><div class="eyebrow">Your data · your device</div><h1>Data</h1></header>'
+   +'<div class="card"><div class="eyebrow">Privacy</div>'
+   +'<p class="small" style="margin-top:.4rem">This file works entirely offline. No network, no account, no analytics. Everything lives in this browser\u2019s storage on your device — and in the backups you export.</p></div>'
+   +(!persistOK?'<p class="notice">Storage is unavailable in this environment (e.g. a preview sandbox). The app runs in memory — <strong>export a backup</strong> before closing, and open the saved file directly in your phone\u2019s browser for automatic saving.</p>':'')
+   +'<div class="section-gap"></div>'
+   +'<button class="btn" data-act="export">Export backup (JSON)</button>'
+   +'<div style="height:.7rem"></div>'
+   +'<button class="btn ghost" data-act="import">Import backup</button>'
+   +'<input type="file" id="importfile" accept=".json,application/json" hidden>'
+   +'<div class="section-gap"></div>'
+   +'<div class="card"><div class="eyebrow">Install on your phone</div>'
+   +'<p class="small" style="margin-top:.4rem">Open this file in your mobile browser \u2192 Share \u2192 <strong>Add to Home Screen</strong>. It opens like an app, forever offline.</p></div>'
+   +'<button class="btn quiet" data-act="replay">Replay the intro</button>'
+   +'<hr class="divider">'
+   +'<button class="btn danger" data-act="wipe">Erase everything</button>'
+   +'<p class="small muted" style="text-align:center;margin-top:1.4rem">Lifecycle · the universal playbook · v1<br>Share freely. Understand, then act.</p>';
+}
+function doExport(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='lifecycle-backup-'+dkey()+'.json';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+function doImport(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d||d.v!==1||!Array.isArray(d.goals)) throw 0;
+      if(confirm('Replace current data with this backup? ('+d.goals.length+' goals)')){S=d;save();render();}
+    }catch(e){alert('That file isn\u2019t a valid Lifecycle backup.')}
+  };
+  r.readAsText(file);
+}
+
+/* ---------- ONBOARDING ---------- */
+const OB=[
+ {e:'Welcome', h:'Everything alive<br>moves in one circle.', p:'A body, a fortune, a skill, a love, an empire — all follow the same five phases. This app walks the circle with you.', f:.2},
+ {e:'The five phases', h:'Sense · Ignite ·<br>Compound · Plateau · Renew', p:'Feel what\u2019s needed. Start small. Repeat the vital few. Notice the slowdown. Renew on purpose — before life renews it for you.', f:.6},
+ {e:'The promise', h:'Understand,<br>never follow blindly.', p:'Every action here comes with its reason and its law — taught in pictures a child would get: water, snowballs, LEGO, ants.', f:.8},
+ {e:'One rule', h:'Begin with one goal.<br>Only one.', p:'Run it for 90 days before adding more. The snowball needs an unbroken hill.', f:.97}
+];
+let obi=0;
+function showOB(){
+  const el=$('#ob'); el.hidden=false; obi=0; drawOB();
+}
+function drawOB(){
+  const s=OB[obi];
+  $('#ob').innerHTML='<div class="slide active">'
+   +'<div style="display:flex;justify-content:center">'+enso(s.f,120)+'</div>'
+   +'<div class="eyebrow" style="margin-top:1.4rem">'+s.e+'</div>'
+   +'<h1>'+s.h+'</h1><p>'+s.p+'</p></div>'
+   +'<div class="foot"><div class="in">'
+   +'<div class="progressdots" style="justify-content:center;margin-bottom:1.1rem">'+OB.map((_,i)=>'<span class="'+(i===obi?'on':'')+'"></span>').join('')+'</div>'
+   +'<button class="btn" data-act="obnext">'+(obi<OB.length-1?'Next':'Begin')+'</button>'
+   +(obi<OB.length-1?'<button class="btn quiet" data-act="obskip" style="margin-top:.4rem">Skip</button>':'')
+   +'</div></div>';
+}
+function endOB(){$('#ob').hidden=true;S.onboarded=true;save();render()}
+
+/* ---------- EVENTS ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act],[data-nav]');
+  if(!b)return;
+  const act=b.dataset.act;
+  if(b.dataset.nav&&!act){go(b.dataset.nav);return}
+  switch(act){
+    case 'nav': go(b.dataset.nav); break;
+    case 'add': startAdd(); break;
+    case 'open': go('goal',b.dataset.id); break;
+    case 'check':{
+      const g=goal(b.dataset.id); if(!g)break;
+      const k=dkey();
+      if(g.checkins[k]) delete g.checkins[k]; else g.checkins[k]=true;
+      g.best=Math.max(g.best||0,streak(g));
+      save(); render(); break;}
+    case 'del':{
+      const g=goal(b.dataset.id);
+      if(g&&confirm('Release \u201c'+g.name+'\u201d? Its history goes with it.')){
+        S.goals=S.goals.filter(x=>x.id!==g.id); save(); go('goals');
+      } break;}
+    case 'requiz': startRequiz(b.dataset.id); break;
+    case 'picktpl': ADD.tpl=b.dataset.tpl; ADD.step=1; render(); break;
+    case 'addback':
+      if(ADD.editing){go('goal',ADD.editing)}
+      else if(ADD.step===2&&ADD.q>0){ADD.q=0;render()}
+      else if(ADD.step>0){ADD.step--;render()}
+      else go('goals');
+      break;
+    case 'namenext':{
+      const v=($('#gname')?.value||'').trim();
+      if(!v){$('#gname')?.focus();break}
+      ADD.name=v; ADD.step=2; ADD.q=0; render(); break;}
+    case 'ans':{
+      const r=QUIZ[ADD.q][b.dataset.v==='yes'?'yes':'no'];
+      if(typeof r==='number'){ADD.q=r;render()}
+      else{ADD.phase=r;ADD.step=3;render()}
+      break;}
+    case 'confirm':{
+      if(ADD.editing){
+        const g=goal(ADD.editing); if(g){g.phase=ADD.phase; g.phaseSetAt=dkey();}
+        save(); go('goal',ADD.editing);
+      }else{
+        S.goals.push({id:uid(),name:ADD.name,template:ADD.tpl,phase:ADD.phase,createdAt:dkey(),phaseSetAt:dkey(),checkins:{},best:0});
+        save(); go('today');
+      } break;}
+    case 'export': doExport(); break;
+    case 'import': $('#importfile').click(); break;
+    case 'wipe':
+      if(confirm('Erase ALL goals and history? Consider exporting a backup first.')
+        && confirm('Final confirmation \u2014 erase everything now? This cannot be undone.')){
+        S={v:1,onboarded:true,goals:[]};save();render();
+      }
+      break;
+    case 'replay': showOB(); break;
+    case 'obnext': obi<OB.length-1?(obi++,drawOB()):endOB(); break;
+    case 'obskip': endOB(); break;
+  }
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='importfile'&&e.target.files[0]){doImport(e.target.files[0]);e.target.value=''}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.id==='gname'){document.querySelector('[data-act=namenext]')?.click()}
+});
+
+/* ---------- boot ---------- */
+render();
+if(!S.onboarded) showOB();
+</script>
+</body>
+</html>
