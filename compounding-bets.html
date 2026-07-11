@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compounding Bets Ledger</title>
+<style>
+  :root{
+    --mist:#EEF3F4;
+    --ink:#1C2B31;
+    --haze:#7E959C;
+    --foam:#CFE0E3;
+    --sea:#33525E;
+    --sea-deep:#22404B;
+    --line:#D8E3E5;
+    --ring:#4A6B77;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--mist);
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    padding:28px clamp(18px,5vw,64px) 60px;
+  }
+
+  header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+  .wordmark{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--haze)}
+  .summary{font-size:11px;letter-spacing:.08em;color:var(--haze)}
+
+  .thesis{
+    margin:42px auto 8px;
+    text-align:center;
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:clamp(20px,3vw,28px);
+    color:var(--ink);
+    max-width:640px;
+    line-height:1.4;
+  }
+  .thesis-sub{
+    text-align:center;
+    font-size:12px;
+    color:var(--haze);
+    margin-bottom:44px;
+  }
+
+  /* ---------- Bet cards ---------- */
+  .grid{
+    max-width:960px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:18px;
+  }
+  .card{
+    background:rgba(255,255,255,.6);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:20px 20px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .rings-wrap{
+    display:flex;
+    justify-content:center;
+    padding:4px 0 2px;
+  }
+  .rings-wrap svg{display:block}
+
+  .card-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .card-name{font-family:var(--serif);font-size:20px;color:var(--ink)}
+  .card-actions{display:flex;gap:10px;flex-shrink:0}
+  .icon-btn{
+    background:none;border:none;cursor:pointer;
+    font-size:11px;color:var(--haze);
+    text-decoration:underline;text-underline-offset:3px;
+    padding:2px;font-family:var(--sans);
+  }
+  .icon-btn:hover{color:var(--sea)}
+  .icon-btn.danger:hover{color:#A34B3C}
+  .icon-btn:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+
+  .tag{
+    display:inline-block;
+    font-size:10px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--sea);
+    border:1px solid var(--foam);
+    border-radius:999px;
+    padding:3px 10px;
+    align-self:flex-start;
+  }
+
+  .why{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:14px;
+    line-height:1.55;
+    color:var(--ink);
+  }
+  .why.empty{color:#AEC2C7}
+
+  .stats{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    font-size:11px;
+    color:var(--haze);
+    letter-spacing:.04em;
+  }
+  .stats b{color:var(--ink);font-weight:600}
+
+  .feed-btn{
+    font-family:var(--serif);
+    font-size:15px;
+    color:var(--mist);
+    background:var(--ink);
+    border:none;
+    border-radius:999px;
+    padding:10px 24px;
+    cursor:pointer;
+    align-self:center;
+    transition:background .25s;
+  }
+  .feed-btn:hover{background:var(--sea-deep)}
+  .feed-btn:focus-visible{outline:2px solid var(--sea);outline-offset:3px}
+
+  .deposit-form{display:flex;flex-direction:column;gap:8px}
+  .deposit-form input[type=text]{
+    width:100%;
+    font-family:var(--sans);
+    font-size:13px;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 10px;
+    outline:none;
+  }
+  .deposit-form input[type=text]:focus{border-color:var(--sea)}
+  .form-row{display:flex;gap:8px;justify-content:flex-end}
+
+  .history{border-top:1px solid var(--line);padding-top:10px}
+  .history-toggle{
+    background:none;border:none;cursor:pointer;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--haze);padding:0;font-family:var(--sans);
+  }
+  .history-toggle:hover{color:var(--sea)}
+  .history-toggle:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+  .history ul{list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:6px}
+  .history li{
+    font-size:12.5px;
+    color:var(--ink);
+    line-height:1.5;
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    align-items:baseline;
+  }
+  .history .d-date{color:var(--haze);font-size:11px;white-space:nowrap}
+  .history .d-del{
+    background:none;border:none;color:var(--line);cursor:pointer;
+    font-size:13px;line-height:1;padding:0 2px;
+  }
+  .history .d-del:hover{color:#A34B3C}
+
+  /* edit mode */
+  .card input.e-text, .card textarea, .card select, .card input[type=date]{
+    width:100%;
+    font-family:var(--sans);
+    font-size:13px;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 10px;
+    outline:none;
+  }
+  .card textarea{resize:vertical;min-height:56px;line-height:1.5}
+  .card input.e-text:focus,.card textarea:focus,.card select:focus,.card input[type=date]:focus{border-color:var(--sea)}
+  .e-name{font-family:var(--serif) !important;font-size:17px !important}
+  .field-label{
+    font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--haze);margin-bottom:3px;
+  }
+  .btn{
+    font-family:var(--sans);font-size:12.5px;border-radius:999px;
+    padding:8px 18px;cursor:pointer;border:1px solid var(--line);
+    background:transparent;color:var(--sea);
+  }
+  .btn:hover{border-color:var(--sea)}
+  .btn.primary{background:var(--ink);border-color:var(--ink);color:var(--mist)}
+  .btn.primary:hover{background:var(--sea-deep)}
+  .btn:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+
+  .add-row{max-width:960px;margin:24px auto 0;text-align:center}
+
+  .empty-state{
+    grid-column:1/-1;text-align:center;color:var(--haze);
+    font-size:13.5px;padding:40px 0;line-height:1.7;
+  }
+
+  footer{
+    margin-top:64px;text-align:center;font-size:11.5px;
+    color:var(--haze);line-height:1.8;
+  }
+  footer .tools{margin-top:8px;display:flex;gap:16px;justify-content:center}
+  #importFile{display:none}
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="wordmark">Compounding Bets Ledger</div>
+    <div class="summary" id="summary"></div>
+  </header>
+
+  <div class="thesis">Time does the heavy lifting. Your job is the deposit.</div>
+  <div class="thesis-sub">Each bet grows a ring every time you feed it. Thin trunks are fine — they only need time.</div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="add-row">
+    <button class="btn primary" id="addBtn">Plant a new bet</button>
+  </div>
+
+  <footer>
+    <div>Feed bets, don't watch them. Rings form slowly on purpose.<br>
+    When depositing becomes something you do without opening this page, the ledger has done its work.</div>
+    <div class="tools">
+      <button class="icon-btn" id="exportBtn">export data</button>
+      <button class="icon-btn" id="importBtn">import data</button>
+      <input type="file" id="importFile" accept="application/json">
+    </div>
+  </footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Storage ---------- */
+  var mem = {};
+  var store = {
+    get: function(k){ try{ return localStorage.getItem(k); }catch(e){ return mem[k]||null; } },
+    set: function(k,v){ try{ localStorage.setItem(k,v); }catch(e){ mem[k]=v; } }
+  };
+  var KEY = "bets.ledger";
+  var CATS = ["Skill","Relationship","Asset","Health","Craft","Other"];
+
+  function uid(){ return "b" + Math.random().toString(36).slice(2,9); }
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+  function seed(){
+    return [
+      { id:uid(), name:"Example: writing daily", cat:"Skill",
+        why:"Clear writing is clear thinking; every field pays for it and it never expires.",
+        started: todayISO(), deposits: [] }
+    ];
+  }
+  function load(){
+    var raw = store.get(KEY);
+    if(!raw) return seed();
+    try{ var d = JSON.parse(raw); return Array.isArray(d) ? d : seed(); }
+    catch(e){ return seed(); }
+  }
+  function save(){ store.set(KEY, JSON.stringify(bets)); }
+
+  var bets = load();
+  var ui = {};  /* id -> {editing, feeding, history} */
+
+  var grid = document.getElementById("grid");
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function u(id){ return ui[id] || (ui[id] = {}); }
+
+  function daysBetween(iso, iso2){
+    var a = new Date(iso + "T00:00:00"), b = new Date((iso2||todayISO()) + "T00:00:00");
+    return Math.max(0, Math.round((b - a) / 86400000));
+  }
+  function ageLabel(days){
+    if(days < 1) return "planted today";
+    if(days < 60) return days + " days old";
+    if(days < 730) return Math.round(days/30) + " months old";
+    return (days/365).toFixed(1) + " years old";
+  }
+  function fedLabel(bet){
+    if(bet.deposits.length === 0) return "never fed yet";
+    var last = bet.deposits[bet.deposits.length-1].date;
+    var d = daysBetween(last);
+    if(d === 0) return "fed today";
+    if(d === 1) return "fed yesterday";
+    return "resting " + d + " days";
+  }
+
+  /* ---------- Rings: deposits made visible ---------- */
+  function ringsSVG(bet){
+    var n = bet.deposits.length;
+    var size = 120, c = size/2;
+    var svg = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" role="img" aria-label="'+n+' deposits">';
+    /* seed dot at the heart */
+    svg += '<circle cx="'+c+'" cy="'+c+'" r="3.5" fill="var(--sea-deep)"/>';
+    if(n > 0){
+      var maxR = 52, minR = 8;
+      var span = maxR - minR;
+      /* deterministic wobble so each trunk looks organic but stable */
+      var hash = 0;
+      for(var h=0; h<bet.id.length; h++){ hash = (hash*31 + bet.id.charCodeAt(h)) % 997; }
+      for(var i=0; i<n; i++){
+        var r = minR + span * ((i+1) / Math.max(n, 10));
+        var wob = ((hash + i*37) % 100) / 100;           /* 0..1 */
+        var op = 0.28 + 0.5 * ((i+1)/n);                  /* newer rings slightly stronger */
+        var rx = r * (1 + (wob-0.5)*0.03);
+        var ry = r * (1 - (wob-0.5)*0.03);
+        var rot = ((hash*13 + i*53) % 180);
+        svg += '<ellipse cx="'+c+'" cy="'+c+'" rx="'+rx.toFixed(2)+'" ry="'+ry.toFixed(2)+'" transform="rotate('+rot+' '+c+' '+c+')" fill="none" stroke="var(--ring)" stroke-width="1.1" opacity="'+op.toFixed(2)+'"/>';
+      }
+    }
+    svg += '</svg>';
+    return svg;
+  }
+
+  /* ---------- Summary ---------- */
+  function renderSummary(){
+    var el = document.getElementById("summary");
+    if(bets.length === 0){ el.textContent = ""; return; }
+    var totalDeposits = bets.reduce(function(a,b){ return a + b.deposits.length; }, 0);
+    var oldest = bets.reduce(function(a,b){ return Math.max(a, daysBetween(b.started)); }, 0);
+    el.textContent = bets.length + (bets.length===1?" bet":" bets") + " · " + totalDeposits + " deposits · oldest " + ageLabel(oldest);
+  }
+
+  /* ---------- Cards ---------- */
+  function renderCard(bet){
+    var card = document.createElement("div");
+    card.className = "card";
+    card.id = "card-" + bet.id;
+    var st = u(bet.id);
+
+    if(st.editing){
+      card.innerHTML =
+        '<div><div class="field-label">Bet name</div>' +
+        '<input type="text" class="e-text e-name" id="name-'+bet.id+'" maxlength="40" value="'+esc(bet.name)+'"></div>' +
+        '<div><div class="field-label">Kind</div>' +
+        '<select id="cat-'+bet.id+'">' + CATS.map(function(c){
+          return '<option' + (c===bet.cat?' selected':'') + '>' + c + '</option>';
+        }).join('') + '</select></div>' +
+        '<div><div class="field-label">Why it compounds</div>' +
+        '<textarea id="why-'+bet.id+'" maxlength="240" placeholder="What makes this grow on its own once fed? e.g. Trust deepens; skills stack; capital earns.">'+esc(bet.why)+'</textarea></div>' +
+        '<div><div class="field-label">Planted on</div>' +
+        '<input type="date" id="started-'+bet.id+'" value="'+esc(bet.started)+'" max="'+todayISO()+'"></div>' +
+        '<div class="form-row">' +
+          '<button class="btn" data-cancel="'+bet.id+'">Cancel</button>' +
+          '<button class="btn primary" data-save="'+bet.id+'">Save</button>' +
+        '</div>';
+      return card;
+    }
+
+    var age = ageLabel(daysBetween(bet.started));
+    var html =
+      '<div class="rings-wrap">' + ringsSVG(bet) + '</div>' +
+      '<div class="card-top">' +
+        '<div class="card-name">' + esc(bet.name) + '</div>' +
+        '<div class="card-actions">' +
+          '<button class="icon-btn" data-edit="'+bet.id+'">edit</button>' +
+          '<button class="icon-btn danger" data-del="'+bet.id+'">delete</button>' +
+        '</div>' +
+      '</div>' +
+      '<span class="tag">' + esc(bet.cat) + '</span>' +
+      '<div class="why' + (bet.why?'':' empty') + '">' + (bet.why ? esc(bet.why) : 'Why does this compound? A bet without a thesis is a hope.') + '</div>' +
+      '<div class="stats">' +
+        '<span><b>' + bet.deposits.length + '</b> ' + (bet.deposits.length===1?'ring':'rings') + '</span>' +
+        '<span>' + age + '</span>' +
+        '<span>' + fedLabel(bet) + '</span>' +
+      '</div>';
+
+    if(st.feeding){
+      html +=
+        '<div class="deposit-form">' +
+          '<input type="text" id="dep-'+bet.id+'" maxlength="120" placeholder="What did you feed it? e.g. 40 min practice, called her back, added $200" autocomplete="off">' +
+          '<div class="form-row">' +
+            '<button class="btn" data-feedcancel="'+bet.id+'">Cancel</button>' +
+            '<button class="btn primary" data-feedsave="'+bet.id+'">Add ring</button>' +
+          '</div>' +
+        '</div>';
+    } else {
+      html += '<button class="feed-btn" data-feed="'+bet.id+'">Feed this bet</button>';
+    }
+
+    if(bet.deposits.length > 0){
+      html += '<div class="history">' +
+        '<button class="history-toggle" data-history="'+bet.id+'">' +
+          (st.history ? 'hide deposits' : 'show ' + bet.deposits.length + (bet.deposits.length===1?' deposit':' deposits')) +
+        '</button>';
+      if(st.history){
+        html += '<ul>' + bet.deposits.slice().reverse().map(function(d, ri){
+          var idx = bet.deposits.length - 1 - ri;
+          return '<li><span>' + (d.note ? esc(d.note) : '<em>deposit</em>') + '</span>' +
+            '<span class="d-date">' + esc(d.date) + '</span>' +
+            '<button class="d-del" data-depdel="'+bet.id+':'+idx+'" aria-label="Delete deposit" title="delete">×</button></li>';
+        }).join('') + '</ul>';
+      }
+      html += '</div>';
+    }
+
+    card.innerHTML = html;
+    return card;
+  }
+
+  function renderAll(){
+    renderSummary();
+    grid.innerHTML = "";
+    if(bets.length === 0){
+      grid.innerHTML = '<div class="empty-state">No bets planted.<br>A compounding bet is anything that grows while you sleep once it\u2019s fed:<br>a skill, a friendship, an asset, your health. Plant the first one.</div>';
+      return;
+    }
+    bets.forEach(function(b){ grid.appendChild(renderCard(b)); });
+  }
+
+  /* ---------- Events ---------- */
+  grid.addEventListener("click", function(e){
+    var t = e.target;
+    var id;
+
+    if(t.dataset.edit){ u(t.dataset.edit).editing = true; renderAll(); }
+    if(t.dataset.cancel){ u(t.dataset.cancel).editing = false; renderAll(); }
+    if(t.dataset.save){
+      id = t.dataset.save;
+      var b = bets.find(function(x){ return x.id === id; });
+      if(b){
+        var name = document.getElementById("name-"+id).value.trim();
+        b.name = name || b.name || "Untitled bet";
+        b.cat = document.getElementById("cat-"+id).value;
+        b.why = document.getElementById("why-"+id).value.trim();
+        var started = document.getElementById("started-"+id).value;
+        if(started && started <= todayISO()) b.started = started;
+        u(id).editing = false;
+        save(); renderAll();
+      }
+    }
+    if(t.dataset.del){
+      id = t.dataset.del;
+      var bd = bets.find(function(x){ return x.id === id; });
+      if(bd && confirm('Uproot "' + bd.name + '"? All its rings go with it.')){
+        bets = bets.filter(function(x){ return x.id !== id; });
+        delete ui[id];
+        save(); renderAll();
+      }
+    }
+    if(t.dataset.feed){
+      id = t.dataset.feed;
+      u(id).feeding = true;
+      renderAll();
+      var input = document.getElementById("dep-" + id);
+      if(input) input.focus();
+    }
+    if(t.dataset.feedcancel){ u(t.dataset.feedcancel).feeding = false; renderAll(); }
+    if(t.dataset.feedsave){
+      id = t.dataset.feedsave;
+      addDeposit(id);
+    }
+    if(t.dataset.history){
+      id = t.dataset.history;
+      u(id).history = !u(id).history;
+      renderAll();
+    }
+    if(t.dataset.depdel){
+      var parts = t.dataset.depdel.split(":");
+      var bid = parts[0], idx = parseInt(parts[1],10);
+      var bb = bets.find(function(x){ return x.id === bid; });
+      if(bb && bb.deposits[idx] && confirm("Remove this deposit?")){
+        bb.deposits.splice(idx,1);
+        save(); renderAll();
+      }
+    }
+  });
+
+  function addDeposit(id){
+    var b = bets.find(function(x){ return x.id === id; });
+    if(!b) return;
+    var input = document.getElementById("dep-" + id);
+    var note = input ? input.value.trim() : "";
+    b.deposits.push({ date: todayISO(), note: note });
+    u(id).feeding = false;
+    save(); renderAll();
+  }
+
+  grid.addEventListener("keydown", function(e){
+    if(e.key === "Enter" && e.target.id && e.target.id.indexOf("dep-") === 0){
+      addDeposit(e.target.id.slice(4));
+    }
+  });
+
+  document.getElementById("addBtn").addEventListener("click", function(){
+    var b = { id:uid(), name:"New bet", cat:"Skill", why:"", started:todayISO(), deposits:[] };
+    bets.push(b);
+    u(b.id).editing = true;
+    save(); renderAll();
+    var nameInput = document.getElementById("name-" + b.id);
+    if(nameInput){ nameInput.focus(); nameInput.select(); }
+  });
+
+  /* ---------- Export / import ---------- */
+  document.getElementById("exportBtn").addEventListener("click", function(){
+    var blob = new Blob([JSON.stringify(bets, null, 2)], {type:"application/json"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "compounding-bets.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  document.getElementById("importBtn").addEventListener("click", function(){
+    document.getElementById("importFile").click();
+  });
+  document.getElementById("importFile").addEventListener("change", function(e){
+    var f = e.target.files[0];
+    if(!f) return;
+    var r = new FileReader();
+    r.onload = function(){
+      try{
+        var d = JSON.parse(r.result);
+        if(Array.isArray(d) && d.every(function(x){ return x && typeof x.name === "string"; })){
+          bets = d.map(function(x){
+            return {
+              id: x.id || uid(),
+              name: String(x.name).slice(0,40),
+              cat: CATS.indexOf(x.cat) >= 0 ? x.cat : "Other",
+              why: String(x.why || "").slice(0,240),
+              started: /^\d{4}-\d{2}-\d{2}$/.test(x.started||"") ? x.started : todayISO(),
+              deposits: Array.isArray(x.deposits) ? x.deposits.map(function(dep){
+                return {
+                  date: /^\d{4}-\d{2}-\d{2}$/.test((dep&&dep.date)||"") ? dep.date : todayISO(),
+                  note: String((dep&&dep.note) || "").slice(0,120)
+                };
+              }) : []
+            };
+          });
+          save(); renderAll();
+        } else {
+          alert("That file doesn't look like a Compounding Bets export.");
+        }
+      }catch(err){
+        alert("Couldn't read that file — it isn't valid JSON.");
+      }
+    };
+    r.readAsText(f);
+    e.target.value = "";
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
