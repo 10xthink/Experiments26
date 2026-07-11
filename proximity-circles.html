@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proximity Circles</title>
+<style>
+  :root{
+    --mist:#EEF3F4;
+    --ink:#1C2B31;
+    --haze:#7E959C;
+    --foam:#CFE0E3;
+    --sea:#33525E;
+    --sea-deep:#22404B;
+    --line:#D8E3E5;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--mist);
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    padding:28px clamp(14px,4vw,64px) 60px;
+  }
+
+  header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+  .wordmark{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--haze)}
+  .summary{font-size:11px;letter-spacing:.08em;color:var(--haze)}
+
+  .thesis{
+    margin:38px auto 8px;
+    text-align:center;
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:clamp(20px,3vw,28px);
+    color:var(--ink);
+    max-width:640px;
+    line-height:1.4;
+  }
+  .thesis-sub{
+    text-align:center;font-size:12px;color:var(--haze);margin-bottom:34px;
+  }
+
+  /* ---------- The map ---------- */
+  .map-outer{display:flex;justify-content:center}
+  #map{
+    position:relative;
+    width:min(92vw, 640px);
+    aspect-ratio:1/1;
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+  .ring{
+    position:absolute;
+    left:50%;top:50%;
+    transform:translate(-50%,-50%);
+    border:1px solid var(--line);
+    border-radius:50%;
+    pointer-events:none;
+  }
+  .ring-label{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:9.5px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--haze);
+    background:var(--mist);
+    padding:0 8px;
+    pointer-events:none;
+    white-space:nowrap;
+  }
+  .you{
+    position:absolute;
+    left:50%;top:50%;
+    transform:translate(-50%,-50%);
+    width:14px;height:14px;
+    border-radius:50%;
+    background:var(--ink);
+    pointer-events:none;
+  }
+  .you::after{
+    content:"you";
+    position:absolute;
+    top:16px;left:50%;
+    transform:translateX(-50%);
+    font-size:9.5px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--haze);
+  }
+
+  .chip{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    font-size:12px;
+    padding:5px 12px;
+    border-radius:999px;
+    border:1px solid var(--sea);
+    background:#fff;
+    color:var(--sea-deep);
+    cursor:grab;
+    white-space:nowrap;
+    max-width:120px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    transition:left .35s cubic-bezier(.45,.05,.35,1), top .35s cubic-bezier(.45,.05,.35,1), background .25s;
+    box-shadow:0 1px 3px rgba(28,43,49,.08);
+    z-index:2;
+  }
+  .chip.r0{background:var(--ink);border-color:var(--ink);color:var(--mist);font-weight:600}
+  .chip.r1{background:var(--sea);border-color:var(--sea);color:var(--mist)}
+  .chip.r2{background:#fff;border-color:var(--sea)}
+  .chip.r3{background:transparent;border-color:var(--haze);color:var(--haze)}
+  .chip.dragging{transition:none;cursor:grabbing;z-index:5;box-shadow:0 6px 18px rgba(28,43,49,.2)}
+  .chip.selected{outline:2px solid var(--sea);outline-offset:2px}
+
+  .crowd-note{
+    text-align:center;
+    font-size:12px;
+    color:var(--haze);
+    font-style:italic;
+    min-height:1.4em;
+    margin-top:12px;
+  }
+
+  /* ---------- Editor panel ---------- */
+  .panel{
+    max-width:560px;
+    margin:26px auto 0;
+    background:rgba(255,255,255,.6);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:20px;
+    display:none;
+    flex-direction:column;
+    gap:12px;
+  }
+  .panel.open{display:flex}
+  .panel-title{font-family:var(--serif);font-size:18px}
+  .field-label{
+    font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--haze);margin-bottom:3px;
+  }
+  .panel input[type=text], .panel textarea, .panel select{
+    width:100%;
+    font-family:var(--sans);
+    font-size:13px;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 10px;
+    outline:none;
+  }
+  .panel textarea{resize:vertical;min-height:52px;line-height:1.5}
+  .panel input:focus,.panel textarea:focus,.panel select:focus{border-color:var(--sea)}
+  .panel-row{display:flex;gap:8px;justify-content:space-between;align-items:center}
+  .panel-row .right{display:flex;gap:8px}
+  .btn{
+    font-family:var(--sans);font-size:12.5px;border-radius:999px;
+    padding:8px 18px;cursor:pointer;border:1px solid var(--line);
+    background:transparent;color:var(--sea);
+  }
+  .btn:hover{border-color:var(--sea)}
+  .btn.primary{background:var(--ink);border-color:var(--ink);color:var(--mist)}
+  .btn.primary:hover{background:var(--sea-deep)}
+  .btn.danger{color:#A34B3C}
+  .btn.danger:hover{border-color:#A34B3C}
+  .btn:focus-visible,.chip:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+
+  .add-row{text-align:center;margin-top:26px}
+
+  /* ---------- Reflection ---------- */
+  .reflect{
+    max-width:560px;
+    margin:44px auto 0;
+    border-top:1px solid var(--line);
+    padding-top:22px;
+  }
+  .reflect h2{
+    font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--haze);font-weight:600;margin-bottom:12px;text-align:center;
+  }
+  .reflect p{
+    font-family:var(--serif);font-style:italic;
+    font-size:15px;line-height:1.7;color:var(--sea-deep);
+    text-align:center;
+  }
+
+  footer{
+    margin-top:56px;text-align:center;font-size:11.5px;
+    color:var(--haze);line-height:1.8;
+  }
+  footer .tools{margin-top:8px;display:flex;gap:16px;justify-content:center}
+  .icon-btn{
+    background:none;border:none;cursor:pointer;
+    font-size:11px;color:var(--haze);
+    text-decoration:underline;text-underline-offset:3px;
+    font-family:var(--sans);
+  }
+  .icon-btn:hover{color:var(--sea)}
+  #importFile{display:none}
+
+  @media (prefers-reduced-motion: reduce){
+    .chip{transition:none}
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="wordmark">Proximity Circles</div>
+    <div class="summary" id="summary"></div>
+  </header>
+
+  <div class="thesis">You become your closest ring.</div>
+  <div class="thesis-sub">Drag people between rings. Where they sit is a fact about your attention, not their worth.</div>
+
+  <div class="map-outer">
+    <div id="map"><!-- rings + chips injected --></div>
+  </div>
+  <div class="crowd-note" id="crowdNote"></div>
+
+  <div class="panel" id="panel">
+    <div class="panel-title" id="panelTitle">Edit person</div>
+    <div>
+      <div class="field-label">Name</div>
+      <input type="text" id="pName" maxlength="24" autocomplete="off">
+    </div>
+    <div>
+      <div class="field-label">Ring</div>
+      <select id="pRing">
+        <option value="0">Core — the few you'd call at 3am</option>
+        <option value="1">Close — regular, real conversations</option>
+        <option value="2">Village — your wider trusted world</option>
+        <option value="3">Orbit — present, but distant</option>
+      </select>
+    </div>
+    <div>
+      <div class="field-label">Note — what do I invest here?</div>
+      <textarea id="pNote" maxlength="160" placeholder="e.g. weekly call · owe him a visit · drifted since March"></textarea>
+    </div>
+    <div class="panel-row">
+      <button class="btn danger" id="pDelete">Delete</button>
+      <div class="right">
+        <button class="btn" id="pCancel">Close</button>
+        <button class="btn primary" id="pSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="add-row">
+    <button class="btn primary" id="addBtn">Add a person</button>
+  </div>
+
+  <div class="reflect">
+    <h2>Seasonal questions</h2>
+    <p id="reflectText"></p>
+  </div>
+
+  <footer>
+    <div>Rings drift silently — that's why you draw them. Review each season, not each day.<br>
+    When you can sketch this map from memory and your calendar already agrees with it, you've graduated.</div>
+    <div class="tools">
+      <button class="icon-btn" id="exportBtn">export data</button>
+      <button class="icon-btn" id="importBtn">import data</button>
+      <input type="file" id="importFile" accept="application/json">
+    </div>
+  </footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Storage ---------- */
+  var mem = {};
+  var store = {
+    get: function(k){ try{ return localStorage.getItem(k); }catch(e){ return mem[k]||null; } },
+    set: function(k,v){ try{ localStorage.setItem(k,v); }catch(e){ mem[k]=v; } }
+  };
+  var KEY = "circles.people";
+
+  var RINGS = [
+    { name:"Core",    cap:5,  r:13 },
+    { name:"Close",   cap:15, r:24 },
+    { name:"Village", cap:50, r:35 },
+    { name:"Orbit",   cap:0,  r:46 }
+  ]; /* r = % of map width from center */
+
+  function uid(){ return "p" + Math.random().toString(36).slice(2,9); }
+
+  function load(){
+    var raw = store.get(KEY);
+    if(!raw) return [];
+    try{ var d = JSON.parse(raw); return Array.isArray(d) ? d : []; }
+    catch(e){ return []; }
+  }
+  function save(){ store.set(KEY, JSON.stringify(people)); }
+
+  var people = load();
+  var selectedId = null;
+
+  var map = document.getElementById("map");
+  var panel = document.getElementById("panel");
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  /* ---------- Static rings ---------- */
+  function buildRings(){
+    RINGS.forEach(function(rg){
+      var d = rg.r * 2;
+      var ring = document.createElement("div");
+      ring.className = "ring";
+      ring.style.width = d + "%";
+      ring.style.height = d + "%";
+      map.appendChild(ring);
+      var label = document.createElement("div");
+      label.className = "ring-label";
+      label.style.top = "calc(" + (50 - rg.r) + "% - 6px)";
+      label.textContent = rg.name + (rg.cap ? " · ~" + rg.cap : "");
+      map.appendChild(label);
+    });
+    var you = document.createElement("div");
+    you.className = "you";
+    map.appendChild(you);
+  }
+  buildRings();
+
+  /* ---------- Chips ---------- */
+  function chipPos(p){
+    var rg = RINGS[p.ring];
+    var rad = (p.angle * Math.PI) / 180;
+    return {
+      left: 50 + rg.r * Math.cos(rad),
+      top:  50 + rg.r * Math.sin(rad)
+    };
+  }
+
+  function renderChips(){
+    map.querySelectorAll(".chip").forEach(function(c){ c.remove(); });
+    people.forEach(function(p){
+      var chip = document.createElement("button");
+      chip.className = "chip r" + p.ring + (p.id === selectedId ? " selected" : "");
+      chip.textContent = p.name;
+      chip.title = p.note || p.name;
+      chip.dataset.id = p.id;
+      var pos = chipPos(p);
+      chip.style.left = pos.left + "%";
+      chip.style.top = pos.top + "%";
+      map.appendChild(chip);
+      wireDrag(chip, p);
+    });
+    renderSummary();
+  }
+
+  function renderSummary(){
+    var counts = [0,0,0,0];
+    people.forEach(function(p){ counts[p.ring]++; });
+    document.getElementById("summary").textContent =
+      people.length === 0 ? "" :
+      counts[0] + " core · " + counts[1] + " close · " + counts[2] + " village · " + counts[3] + " orbit";
+
+    var note = document.getElementById("crowdNote");
+    if(counts[0] > RINGS[0].cap + 1){
+      note.textContent = "Your core holds " + counts[0] + " — intimacy divides by headcount. Is each one truly 3am-close?";
+    } else if(people.length === 0){
+      note.textContent = "The map is empty. Start with the people you spoke to this week.";
+    } else {
+      note.textContent = "";
+    }
+
+    var prompts = [
+      "Who sits in Core by history, but Orbit by attention?",
+      "Who in Close would move inward if you invested one hour a week?",
+      "Is anyone here only because leaving feels rude?",
+      "Which ring did you feed most this month — and did you choose that?"
+    ];
+    var seasonIdx = Math.floor((new Date().getMonth()) / 3) % prompts.length;
+    document.getElementById("reflectText").textContent = "\u201C" + prompts[seasonIdx] + "\u201D";
+  }
+
+  /* ---------- Drag (pointer events; click = edit) ---------- */
+  function wireDrag(chip, p){
+    var startX, startY, moved, rect;
+
+    chip.addEventListener("pointerdown", function(e){
+      e.preventDefault();
+      chip.setPointerCapture(e.pointerId);
+      startX = e.clientX; startY = e.clientY;
+      moved = false;
+      rect = map.getBoundingClientRect();
+    });
+
+    chip.addEventListener("pointermove", function(e){
+      if(startX === undefined) return;
+      if(!moved && Math.abs(e.clientX - startX) + Math.abs(e.clientY - startY) < 6) return;
+      moved = true;
+      chip.classList.add("dragging");
+      var x = ((e.clientX - rect.left) / rect.width) * 100;
+      var y = ((e.clientY - rect.top) / rect.height) * 100;
+      chip.style.left = Math.max(2, Math.min(98, x)) + "%";
+      chip.style.top = Math.max(2, Math.min(98, y)) + "%";
+    });
+
+    function release(e){
+      if(startX === undefined) return;
+      chip.classList.remove("dragging");
+      if(moved){
+        var x = ((e.clientX - rect.left) / rect.width) * 100 - 50;
+        var y = ((e.clientY - rect.top) / rect.height) * 100 - 50;
+        var dist = Math.sqrt(x*x + y*y);
+        var best = 0, bestDiff = Infinity;
+        RINGS.forEach(function(rg, i){
+          var diff = Math.abs(dist - rg.r);
+          if(diff < bestDiff){ bestDiff = diff; best = i; }
+        });
+        p.ring = best;
+        p.angle = Math.round((Math.atan2(y, x) * 180) / Math.PI);
+        save();
+        renderChips();
+        if(selectedId === p.id) fillPanel(p); /* keep panel in sync */
+      } else {
+        openPanel(p.id);
+      }
+      startX = undefined;
+    }
+    chip.addEventListener("pointerup", release);
+    chip.addEventListener("pointercancel", function(){ startX = undefined; chip.classList.remove("dragging"); renderChips(); });
+
+    /* keyboard: Enter opens editor */
+    chip.addEventListener("keydown", function(e){
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openPanel(p.id); }
+    });
+  }
+
+  /* ---------- Editor panel ---------- */
+  function fillPanel(p){
+    document.getElementById("panelTitle").textContent = p.name || "New person";
+    document.getElementById("pName").value = p.name;
+    document.getElementById("pRing").value = String(p.ring);
+    document.getElementById("pNote").value = p.note || "";
+  }
+  function openPanel(id){
+    selectedId = id;
+    var p = people.find(function(x){ return x.id === id; });
+    if(!p) return;
+    fillPanel(p);
+    panel.classList.add("open");
+    renderChips();
+    panel.scrollIntoView({behavior:"smooth", block:"nearest"});
+    document.getElementById("pName").focus();
+  }
+  function closePanel(){
+    selectedId = null;
+    panel.classList.remove("open");
+    renderChips();
+  }
+
+  document.getElementById("pSave").addEventListener("click", function(){
+    var p = people.find(function(x){ return x.id === selectedId; });
+    if(!p) return;
+    var name = document.getElementById("pName").value.trim();
+    p.name = name || p.name || "Unnamed";
+    var newRing = parseInt(document.getElementById("pRing").value, 10);
+    if(newRing !== p.ring){ p.ring = newRing; }
+    p.note = document.getElementById("pNote").value.trim();
+    save();
+    closePanel();
+  });
+  document.getElementById("pCancel").addEventListener("click", closePanel);
+  document.getElementById("pDelete").addEventListener("click", function(){
+    var p = people.find(function(x){ return x.id === selectedId; });
+    if(p && confirm('Remove "' + p.name + '" from the map? (They leave the map, not your life.)')){
+      people = people.filter(function(x){ return x.id !== selectedId; });
+      save();
+      closePanel();
+    }
+  });
+
+  /* ---------- Add ---------- */
+  var GOLDEN = 137.5;
+  document.getElementById("addBtn").addEventListener("click", function(){
+    var countOrbit = people.filter(function(x){ return x.ring === 3; }).length;
+    var p = {
+      id: uid(),
+      name: "New person",
+      ring: 3,
+      angle: Math.round((countOrbit * GOLDEN + 20) % 360),
+      note: ""
+    };
+    people.push(p);
+    save();
+    renderChips();
+    openPanel(p.id);
+    document.getElementById("pName").select();
+  });
+
+  /* ---------- Export / import ---------- */
+  document.getElementById("exportBtn").addEventListener("click", function(){
+    var blob = new Blob([JSON.stringify(people, null, 2)], {type:"application/json"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "proximity-circles.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  document.getElementById("importBtn").addEventListener("click", function(){
+    document.getElementById("importFile").click();
+  });
+  document.getElementById("importFile").addEventListener("change", function(e){
+    var f = e.target.files[0];
+    if(!f) return;
+    var r = new FileReader();
+    r.onload = function(){
+      try{
+        var d = JSON.parse(r.result);
+        if(Array.isArray(d) && d.every(function(x){ return x && typeof x.name === "string"; })){
+          people = d.map(function(x, i){
+            return {
+              id: x.id || uid(),
+              name: String(x.name).slice(0,24),
+              ring: (x.ring >= 0 && x.ring <= 3) ? x.ring : 3,
+              angle: (typeof x.angle === "number") ? x.angle : Math.round((i * GOLDEN) % 360),
+              note: String(x.note || "").slice(0,160)
+            };
+          });
+          save();
+          closePanel();
+        } else {
+          alert("That file doesn't look like a Proximity Circles export.");
+        }
+      }catch(err){
+        alert("Couldn't read that file — it isn't valid JSON.");
+      }
+    };
+    r.readAsText(f);
+    e.target.value = "";
+  });
+
+  renderChips();
+})();
+</script>
+</body>
+</html>
