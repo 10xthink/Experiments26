@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>True North</title>
+<style>
+  :root{
+    --ink:#2C2C2B; --ink2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --soft2:#F0EFED;
+    --line:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --green:#46A171; --green-soft:#E8F1EC;
+    --orange:#D5803B; --orange-soft:#FBEBDE; --red:#E56458; --red-soft:#FCE9E7;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--canvas); font-size:16px; line-height:1.5;
+  }
+  .wrap{max-width:720px; margin:0 auto; padding:0 24px 96px;}
+  header{padding:40px 0 8px; text-align:center;}
+  .mark{font-size:13px; letter-spacing:.22em; text-transform:uppercase; color:var(--ink2);}
+  h1.display{font-size:34px; font-weight:700; letter-spacing:-.02em; margin-top:6px;}
+  .sub{color:var(--ink2); font-size:16px; margin-top:4px;}
+  nav{display:flex; justify-content:center; gap:4px; margin:28px 0 32px; border:1px solid var(--line); border-radius:12px; padding:4px; background:var(--soft);}
+  nav button{
+    flex:1; min-height:44px; border:0; background:transparent; border-radius:8px;
+    font-size:15px; font-weight:600; color:var(--ink2); cursor:pointer;
+  }
+  nav button.on{background:var(--canvas); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.04);}
+  section{display:none;} section.on{display:block;}
+  .card{border:1px solid var(--line); border-radius:12px; padding:24px; margin-bottom:16px; background:var(--canvas);}
+  .card.soft{background:var(--soft); border-color:var(--soft2);}
+  .k{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink2); font-weight:600; margin-bottom:8px;}
+  h2{font-size:22px; font-weight:700; letter-spacing:-.01em; margin-bottom:8px;}
+  h3{font-size:17px; font-weight:600;}
+  p.muted{color:var(--ink2);}
+  .quote{font-size:20px; font-weight:600; letter-spacing:-.01em; line-height:1.35;}
+  input[type=text], textarea{
+    width:100%; font:inherit; color:var(--ink); border:1px solid var(--line); border-radius:8px;
+    padding:12px 14px; background:var(--canvas); outline:none;
+  }
+  input[type=text]:focus, textarea:focus{border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-soft);}
+  label.f{display:block; font-size:13px; font-weight:600; color:var(--ink2); margin:16px 0 6px;}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 20px;
+    border-radius:8px; border:1px solid var(--line); background:var(--canvas); color:var(--ink);
+    font:inherit; font-weight:600; font-size:15px; cursor:pointer;
+  }
+  .btn:hover{background:var(--soft);}
+  .btn.primary{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .btn.primary:hover{opacity:.9; background:var(--ink);}
+  .btn.small{min-height:36px; padding:0 12px; font-size:13px;}
+  .btn.danger{color:var(--red);}
+  .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .chips{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;}
+  .chip{
+    border:1px solid var(--line); background:var(--canvas); border-radius:999px; padding:10px 16px;
+    font:inherit; font-size:14px; font-weight:600; color:var(--ink2); cursor:pointer; min-height:44px;
+  }
+  .chip.on{border-color:var(--blue); color:var(--blue); background:var(--blue-soft);}
+  ul.list{list-style:none;}
+  ul.list li{
+    display:flex; align-items:center; gap:12px; padding:14px 0; border-top:1px solid var(--line);
+  }
+  ul.list li:first-child{border-top:0;}
+  .grow{flex:1; min-width:0;}
+  .floor-name{font-weight:600;}
+  .toggle{
+    min-width:88px; min-height:44px; border-radius:8px; border:1px solid var(--line); background:var(--canvas);
+    font:inherit; font-size:13px; font-weight:600; cursor:pointer; color:var(--ink2);
+  }
+  .toggle.ok{background:var(--green-soft); color:var(--green); border-color:var(--green-soft);}
+  .toggle.bad{background:var(--orange-soft); color:var(--orange); border-color:var(--orange-soft);}
+  .x{
+    width:44px; height:44px; border-radius:8px; border:1px solid var(--line); background:var(--canvas);
+    color:var(--ink2); font-size:16px; cursor:pointer; flex:none;
+  }
+  .x:hover{color:var(--red); border-color:var(--red);}
+  .banner{border-radius:12px; padding:20px 24px; margin-bottom:16px;}
+  .banner.calm{background:var(--blue-soft);}
+  .banner.warn{background:var(--orange-soft);}
+  .banner .k{color:inherit; opacity:.7;}
+  .loop{display:flex; justify-content:center; gap:8px; flex-wrap:wrap; color:var(--ink2); font-size:14px; font-weight:600; padding:24px 0 8px;}
+  .loop span.step{background:var(--soft); border:1px solid var(--line); border-radius:999px; padding:6px 14px;}
+  details.bite{border:1px solid var(--line); border-radius:12px; margin-bottom:12px; background:var(--canvas);}
+  details.bite summary{
+    list-style:none; cursor:pointer; padding:18px 24px; display:flex; align-items:center; gap:12px; min-height:44px;
+  }
+  details.bite summary::-webkit-details-marker{display:none;}
+  details.bite summary .t{font-weight:600; font-size:16px; flex:1;}
+  details.bite summary .v{color:var(--ink2); font-size:14px; display:none;}
+  details.bite summary::after{content:"+"; color:var(--ink2); font-size:20px; font-weight:400;}
+  details.bite[open] summary::after{content:"\2212";}
+  details.bite .body{padding:0 24px 20px; color:var(--ink); border-top:1px solid var(--line); padding-top:16px;}
+  details.bite .body p{margin-bottom:8px;}
+  details.bite .body .act{display:inline-block; margin-top:4px; background:var(--blue-soft); color:var(--blue); font-weight:600; font-size:14px; border-radius:999px; padding:6px 14px;}
+  .entry{border:1px solid var(--line); border-radius:12px; padding:18px 24px; margin-bottom:12px;}
+  .entry .d{font-size:13px; color:var(--ink2); font-weight:600; margin-bottom:4px;}
+  .entry .s{font-size:16px;}
+  .entry.done .s{color:var(--ink2);}
+  .tag{font-size:12px; font-weight:700; border-radius:999px; padding:4px 10px;}
+  .tag.done{background:var(--green-soft); color:var(--green);}
+  .tag.open{background:var(--soft2); color:var(--ink2);}
+  .empty{text-align:center; color:var(--ink2); padding:48px 24px;}
+  .divider{height:1px; background:var(--line); margin:24px 0;}
+  @media (max-width:480px){
+    .wrap{padding:0 16px 80px;}
+    header{padding:28px 0 4px;}
+    h1.display{font-size:28px;}
+    nav button{font-size:13px;}
+    .card{padding:18px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark">True North</div>
+    <h1 class="display" id="todayTitle">One direction. One step.</h1>
+    <p class="sub" id="todayDate"></p>
+  </header>
+
+  <nav>
+    <button data-v="today" class="on">Today</button>
+    <button data-v="north">North</button>
+    <button data-v="learn">Learn</button>
+    <button data-v="journal">Journal</button>
+  </nav>
+
+  <!-- TODAY -->
+  <section id="v-today" class="on">
+    <div class="card soft">
+      <div class="k">Your true north</div>
+      <p class="quote" id="northQuote"></p>
+    </div>
+
+    <div class="card">
+      <div class="k">Step 1 · Check the floors</div>
+      <p class="muted" style="margin-bottom:8px;">Floors are maintained, never optimized. Is each one intact today?</p>
+      <ul class="list" id="floorCheck"></ul>
+    </div>
+
+    <div id="nextStepArea"></div>
+
+    <div class="loop" aria-label="Daily loop">
+      <span class="step">See</span><span>→</span><span class="step">Name</span><span>→</span><span class="step">Ask</span><span>→</span><span class="step">Act small</span>
+    </div>
+  </section>
+
+  <!-- NORTH -->
+  <section id="v-north">
+    <div class="card">
+      <div class="k">Pathway</div>
+      <p class="muted" style="margin-bottom:12px;">Start from a template, then make it yours. Decide once — stop re-deciding daily.</p>
+      <div class="chips" id="pathChips"></div>
+      <label class="f" for="fNorth">True north — one sentence that survives with no audience</label>
+      <input type="text" id="fNorth">
+      <label class="f" for="fDomain">Primary domain — the one thing you compound for years</label>
+      <input type="text" id="fDomain">
+      <label class="f" for="fRule">Daily next-step rule</label>
+      <input type="text" id="fRule">
+      <label class="f" for="fTest">Switching test — before chasing anything new</label>
+      <input type="text" id="fTest">
+    </div>
+
+    <div class="card">
+      <div class="k">Floors — minimums you protect, not goals you chase</div>
+      <ul class="list" id="floorList"></ul>
+      <div class="row" style="margin-top:12px;">
+        <input type="text" id="newFloor" placeholder="Add a floor, e.g. Sleep 7 hours" style="flex:1; min-width:200px;">
+        <button class="btn" id="addFloor">Add</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEARN -->
+  <section id="v-learn">
+    <div class="card soft">
+      <div class="k">Why this works</div>
+      <p class="quote">You don't balance competing goals. You rank them once, then let the ranking decide every next step.</p>
+    </div>
+    <div id="biteList"></div>
+    <div class="card">
+      <div class="k">Add your own bite</div>
+      <label class="f" for="biteT">Title</label>
+      <input type="text" id="biteT">
+      <label class="f" for="biteB">Insight</label>
+      <textarea id="biteB" rows="2"></textarea>
+      <div style="margin-top:12px;"><button class="btn" id="addBite">Add bite</button></div>
+    </div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section id="v-journal">
+    <div class="row" style="justify-content:space-between; margin-bottom:16px;">
+      <h2>Small steps, one direction</h2>
+      <button class="btn" id="exportBtn">Export</button>
+    </div>
+    <div id="entryList"></div>
+  </section>
+</div>
+
+<script>
+"use strict";
+const KEY = "truenorth-v1";
+
+const PATHWAYS = {
+  builder:{label:"Builder", north:"Build one thing people rely on.", domain:"My craft and one offer, compounded", rule:"What is today's smallest act that deepens the one offer?", test:"Does the new idea serve the same offer? If not, drop it.", floors:["Sleep 7+ hours","Move 30 minutes","Runway ≥ 6 months","One weekly family block"]},
+  healer:{label:"Healer / Teacher", north:"Reduce the suffering I can reach.", domain:"My skill and the people I serve", rule:"Who is in front of me today?", test:"Does the new method serve the same people?", floors:["My own health first","Finances kept simple","One full rest day"]},
+  provider:{label:"Provider", north:"My people are safe and growing.", domain:"Stable income and real presence", rule:"Earn calmly, then be fully home.", test:"Does the new job improve stability, not status?", floors:["My own health","One personal pursuit kept alive"]},
+  creator:{label:"Creator", north:"Make the thing only I can make.", domain:"The body of work", rule:"Touch the work before anything else.", test:"Does the new project feed the same body of work?", floors:["Day job as patron","Health","One relationship tended"]},
+  custom:{label:"Custom", north:"", domain:"", rule:"", test:"", floors:[]}
+};
+
+const DEFAULT_BITES = [
+  {id:"b1", t:"Rank, don't balance", v:"Goals compete only when they are all equally important. Pick one primary domain to climb. Everything else becomes a floor — maintained, never optimized.", act:"Name your one primary domain", d:true},
+  {id:"b2", t:"Floors, not goals", v:"Minimum viable health, money, and presence in each role. A floor only needs to hold. If a floor breaks, fixing it IS today's next step.", act:"Check your floors each morning", d:true},
+  {id:"b3", t:"The next step is always small", v:"Never plan beyond one step. Floors intact? Do the smallest action that moves the primary domain. Ten years of small daily steps beats ten redesigned life plans.", act:"One small act, today", d:true},
+  {id:"b4", t:"Change methods, never direction", v:"Switch tactics freely. But never change the direction without a written first-principles case, reviewed after 30 days. This kills impulsive switching.", act:"Run the switching test", d:true},
+  {id:"b5", t:"Persona — the mask", v:"\"I must look effortless. I must keep the peace. I must fit in.\" Masks are useful, but they are not you.", act:"Drop one small 'must' today", d:true},
+  {id:"b6", t:"Shadow — the mirror", v:"Who irritated you most this week? Who do you admire most? Both point at something of yours, unowned.", act:"Say silently: that's mine too", d:true},
+  {id:"b7", t:"Anima — flow and care", v:"Where do you outsource tenderness, rest, and feeling to someone else?", act:"One nurturing act, yourself", d:true},
+  {id:"b8", t:"Animus — choice and courage", v:"Where do you wait for someone else to decide, protect, or structure your life?", act:"Decide once, hold it", d:true},
+  {id:"b9", t:"Old feelings, fresh triggers", v:"When you overreact, the feeling is usually older than the moment. Ask: how old is this feeling?", act:"Write one line about it", d:true},
+  {id:"b10", t:"Big stories", v:"Hero, victim, rescuer, ruler — universal moulds we all live inside. Naming the story loosens its grip.", act:"Name your story in one word", d:true},
+  {id:"b11", t:"The Self — the quiet watcher", v:"Criticized, you feel the sting, watch the sting, don't fire back. That gap is the Self. The lotus grows toward the same light through whatever mud today brings.", act:"Three watching breaths, twice daily", d:true}
+];
+
+function defaults(){
+  const p = PATHWAYS.builder;
+  return {
+    pathway:"builder",
+    north:p.north, domain:p.domain, rule:p.rule, test:p.test,
+    floors:p.floors.map((n,i)=>({id:"f"+i, name:n})),
+    bites:[],
+    entries:[],
+    checks:{} // date -> {floorId:true/false}
+  };
+}
+
+let S;
+try{ S = JSON.parse(localStorage.getItem(KEY)) || defaults(); }catch(e){ S = defaults(); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const todayKey = () => new Date().toISOString().slice(0,10);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- nav ---------- */
+const views = ["today","north","learn","journal"];
+function show(v){
+  views.forEach(x=>{
+    document.getElementById("v-"+x).classList.toggle("on", x===v);
+  });
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on", b.dataset.v===v));
+  if(history.replaceState) history.replaceState(null,"","#"+v);
+}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.v)));
+
+/* ---------- today ---------- */
+function renderToday(){
+  const d = new Date();
+  document.getElementById("todayDate").textContent = d.toLocaleDateString(undefined,{weekday:"long", day:"numeric", month:"long"});
+  document.getElementById("northQuote").textContent = S.north || "Set your true north — one sentence.";
+
+  const tk = todayKey();
+  if(!S.checks[tk]) S.checks[tk] = {};
+  const checks = S.checks[tk];
+
+  const ul = document.getElementById("floorCheck");
+  ul.innerHTML = "";
+  if(S.floors.length === 0){
+    ul.innerHTML = '<li><span class="muted" style="color:var(--ink2)">No floors yet — add them in North.</span></li>';
+  }
+  S.floors.forEach(f=>{
+    const li = document.createElement("li");
+    const state = checks[f.id]; // undefined | true (intact) | false (breached)
+    li.innerHTML = '<span class="grow floor-name">'+esc(f.name)+'</span>';
+    const btn = document.createElement("button");
+    btn.className = "toggle " + (state===true ? "ok" : state===false ? "bad" : "");
+    btn.textContent = state===true ? "Intact" : state===false ? "Breached" : "Check";
+    btn.addEventListener("click", ()=>{
+      checks[f.id] = state===undefined ? true : state===true ? false : undefined;
+      save(); renderToday();
+    });
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+
+  const area = document.getElementById("nextStepArea");
+  const breached = S.floors.filter(f=>checks[f.id]===false);
+  const allChecked = S.floors.length>0 && S.floors.every(f=>checks[f.id]!==undefined);
+  const entry = S.entries.find(e=>e.date===tk);
+
+  let html = "";
+  if(breached.length){
+    html += '<div class="banner warn"><div class="k">Step 2 · Fix the floor first</div><p class="quote">'+esc(breached[0].name)+'</p><p style="margin-top:4px;">That IS today\u2019s next step. Nothing else comes before it.</p></div>';
+  } else if(allChecked){
+    html += '<div class="banner calm"><div class="k">Step 2 · Move the primary domain</div><p class="quote">'+esc(S.rule || "What is the smallest action that moves " + (S.domain||"your primary domain") + "?")+'</p></div>';
+  } else {
+    html += '<div class="card soft"><div class="k">Step 2 · Waiting</div><p class="muted">Check every floor above to unlock today\u2019s next step.</p></div>';
+  }
+  area.innerHTML = html;
+
+  if(breached.length || allChecked){
+    const card = document.createElement("div");
+    card.className = "card";
+    if(entry){
+      card.innerHTML = '<div class="k">Today\u2019s one step</div>'+
+        '<div class="row" style="justify-content:space-between;">'+
+        '<p class="quote grow" style="font-size:18px;'+(entry.done?"color:var(--ink2);text-decoration:line-through;":"")+'">'+esc(entry.step)+'</p>'+
+        '</div><div class="row" style="margin-top:16px;">'+
+        '<button class="btn '+(entry.done?"":"primary")+'" id="doneBtn">'+(entry.done?"Mark as not done":"Done")+'</button>'+
+        '<button class="btn" id="editStep">Edit</button></div>';
+      area.appendChild(card);
+      card.querySelector("#doneBtn").addEventListener("click",()=>{ entry.done=!entry.done; save(); renderToday(); renderJournal(); });
+      card.querySelector("#editStep").addEventListener("click",()=>{
+        const n = prompt("Edit today's step:", entry.step);
+        if(n!==null && n.trim()){ entry.step=n.trim(); save(); renderToday(); renderJournal(); }
+      });
+    } else {
+      card.innerHTML = '<div class="k">Commit to one small step</div>'+
+        '<div class="row"><input type="text" id="stepInput" placeholder="'+(breached.length?"How will you restore the floor today?":"The smallest act toward your domain\u2026")+'" style="flex:1; min-width:200px;">'+
+        '<button class="btn primary" id="commitBtn">Commit</button></div>';
+      area.appendChild(card);
+      const commit = ()=>{
+        const v = card.querySelector("#stepInput").value.trim();
+        if(!v) return;
+        S.entries.unshift({id:uid(), date:tk, step:v, done:false, floorFix:breached.length>0});
+        save(); renderToday(); renderJournal();
+      };
+      card.querySelector("#commitBtn").addEventListener("click", commit);
+      card.querySelector("#stepInput").addEventListener("keydown", e=>{ if(e.key==="Enter") commit(); });
+    }
+  }
+}
+
+/* ---------- north ---------- */
+function renderNorth(){
+  const chips = document.getElementById("pathChips");
+  chips.innerHTML = "";
+  Object.keys(PATHWAYS).forEach(k=>{
+    const c = document.createElement("button");
+    c.className = "chip" + (S.pathway===k ? " on" : "");
+    c.textContent = PATHWAYS[k].label;
+    c.addEventListener("click", ()=>{
+      const p = PATHWAYS[k];
+      S.pathway = k;
+      if(k!=="custom"){
+        S.north=p.north; S.domain=p.domain; S.rule=p.rule; S.test=p.test;
+        S.floors = p.floors.map(n=>({id:uid(), name:n}));
+      }
+      save(); renderNorth(); renderToday();
+    });
+    chips.appendChild(c);
+  });
+
+  [["fNorth","north"],["fDomain","domain"],["fRule","rule"],["fTest","test"]].forEach(([id,key])=>{
+    const el = document.getElementById(id);
+    el.value = S[key] || "";
+    el.oninput = ()=>{ S[key]=el.value; S.pathway="custom"; save(); renderToday();
+      document.querySelectorAll("#pathChips .chip").forEach(c=>c.classList.toggle("on", c.textContent==="Custom")); };
+  });
+
+  const ul = document.getElementById("floorList");
+  ul.innerHTML = "";
+  if(S.floors.length===0){ ul.innerHTML = '<li><span style="color:var(--ink2)">No floors yet. Add your first minimum below.</span></li>'; }
+  S.floors.forEach(f=>{
+    const li = document.createElement("li");
+    li.innerHTML = '<span class="grow floor-name">'+esc(f.name)+'</span>';
+    const edit = document.createElement("button");
+    edit.className="btn small"; edit.textContent="Edit";
+    edit.addEventListener("click",()=>{
+      const n = prompt("Edit floor:", f.name);
+      if(n!==null && n.trim()){ f.name=n.trim(); save(); renderNorth(); renderToday(); }
+    });
+    const del = document.createElement("button");
+    del.className="x"; del.textContent="\u00d7"; del.setAttribute("aria-label","Delete "+f.name);
+    del.addEventListener("click",()=>{ S.floors=S.floors.filter(x=>x.id!==f.id); save(); renderNorth(); renderToday(); });
+    li.appendChild(edit); li.appendChild(del);
+    ul.appendChild(li);
+  });
+
+  document.getElementById("addFloor").onclick = ()=>{
+    const el = document.getElementById("newFloor");
+    const v = el.value.trim(); if(!v) return;
+    S.floors.push({id:uid(), name:v}); el.value="";
+    save(); renderNorth(); renderToday();
+  };
+}
+
+/* ---------- learn ---------- */
+function renderLearn(){
+  const box = document.getElementById("biteList");
+  box.innerHTML = "";
+  const all = DEFAULT_BITES.concat(S.bites);
+  all.forEach(b=>{
+    const d = document.createElement("details");
+    d.className = "bite";
+    d.innerHTML = '<summary><span class="t">'+esc(b.t)+'</span></summary>'+
+      '<div class="body"><p>'+esc(b.v)+'</p>'+
+      (b.act?'<span class="act">'+esc(b.act)+'</span>':'')+
+      (b.d?'':'<div style="margin-top:12px;"><button class="btn small danger" data-del="'+b.id+'">Delete</button></div>')+
+      '</div>';
+    box.appendChild(d);
+  });
+  box.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      S.bites = S.bites.filter(x=>x.id!==btn.dataset.del);
+      save(); renderLearn();
+    });
+  });
+  document.getElementById("addBite").onclick = ()=>{
+    const t = document.getElementById("biteT").value.trim();
+    const v = document.getElementById("biteB").value.trim();
+    if(!t || !v) return;
+    S.bites.push({id:uid(), t:t, v:v, act:"", d:false});
+    document.getElementById("biteT").value=""; document.getElementById("biteB").value="";
+    save(); renderLearn();
+  };
+}
+
+/* ---------- journal ---------- */
+function renderJournal(){
+  const box = document.getElementById("entryList");
+  box.innerHTML = "";
+  if(S.entries.length===0){
+    box.innerHTML = '<div class="empty">No steps yet.<br>Commit to your first small step on the Today tab.</div>';
+    return;
+  }
+  S.entries.forEach(e=>{
+    const div = document.createElement("div");
+    div.className = "entry" + (e.done?" done":"");
+    const dt = new Date(e.date+"T12:00:00");
+    div.innerHTML = '<div class="row" style="justify-content:space-between;">'+
+      '<span class="d">'+dt.toLocaleDateString(undefined,{weekday:"short", day:"numeric", month:"short"})+(e.floorFix?" · floor fix":"")+'</span>'+
+      '<span class="tag '+(e.done?"done":"open")+'">'+(e.done?"Done":"Open")+'</span></div>'+
+      '<p class="s">'+esc(e.step)+'</p>'+
+      '<div class="row" style="margin-top:12px;">'+
+      '<button class="btn small" data-a="toggle">'+(e.done?"Reopen":"Mark done")+'</button>'+
+      '<button class="btn small" data-a="edit">Edit</button>'+
+      '<button class="btn small danger" data-a="del">Delete</button></div>';
+    div.querySelector('[data-a=toggle]').addEventListener("click",()=>{ e.done=!e.done; save(); renderJournal(); renderToday(); });
+    div.querySelector('[data-a=edit]').addEventListener("click",()=>{
+      const n = prompt("Edit step:", e.step);
+      if(n!==null && n.trim()){ e.step=n.trim(); save(); renderJournal(); renderToday(); }
+    });
+    div.querySelector('[data-a=del]').addEventListener("click",()=>{
+      S.entries = S.entries.filter(x=>x.id!==e.id); save(); renderJournal(); renderToday();
+    });
+    box.appendChild(div);
+  });
+}
+
+/* ---------- export ---------- */
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const out = {
+    exportedAt:new Date().toISOString(),
+    trueNorth:S.north, primaryDomain:S.domain, dailyRule:S.rule, switchingTest:S.test,
+    floors:S.floors.map(f=>f.name),
+    customBites:S.bites.map(b=>({title:b.t, insight:b.v})),
+    journal:S.entries.map(e=>({date:e.date, step:e.step, done:e.done, floorFix:!!e.floorFix}))
+  };
+  const blob = new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "true-north-export-"+todayKey()+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+});
+
+/* ---------- init ---------- */
+renderToday(); renderNorth(); renderLearn(); renderJournal();
+const h = location.hash.replace("#","");
+if(views.includes(h)) show(h);
+</script>
+</body>
+</html>
