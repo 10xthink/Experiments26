@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meridian — AI Governance, Australia</title>
+<meta name="description" content="You adopted AI. Can you prove it's under control? AI governance services for Australian boards, executives, and public sector teams.">
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!--  EDIT ME  ·  This is the ONLY block you need to change.             -->
+<!--  Change the values between the quotes. Do not remove the quotes.    -->
+<!--  Everything else on the page is fixed design — leave it alone.      -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<script>
+  window.SITE = {
+    company:       "Meridian",                        // your business name
+    descriptor:    "AI Governance · Australia",       // the small line under the name
+    email:         "hello@meridian.com.au",           // contact email
+    phone:         "+61 2 8000 0000",                 // phone, shown as-is
+    phoneDial:     "+61280000000",                    // same number, digits only, for the call button
+    whatsapp:      "61400000000",                     // WhatsApp number, country code first, digits only (no +, no spaces)
+    location:      "Sydney · serving all of Australia",
+    flagshipPrice: "A$9,500",                         // the big price on the offering
+    legalName:     "Meridian Governance Pty Ltd",     // footer legal line
+    year:          "2026"
+  };
+</script>
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap">
+
+<style>
+  :root {
+    --ink-900: oklch(0.19 0.006 55);
+    --ink-800: oklch(0.27 0.006 55);
+    --ink-700: oklch(0.36 0.005 55);
+    --ink-600: oklch(0.46 0.005 58);
+    --ink-500: oklch(0.56 0.004 60);
+    --ink-400: oklch(0.67 0.004 65);
+    --ink-300: oklch(0.78 0.003 70);
+    --ink-200: oklch(0.87 0.003 75);
+    --ink-100: oklch(0.93 0.003 80);
+    --paper-100: oklch(0.965 0.004 85);
+    --paper-50: oklch(0.98 0.004 85);
+    --paper-0: oklch(0.995 0.002 85);
+    --pure-white: oklch(1 0 0);
+    --font-display: 'Cormorant Garamond', 'Georgia', 'Times New Roman', serif;
+    --font-sans: 'Helvetica Neue', 'Helvetica', 'Arial', system-ui, sans-serif;
+    --font-mono: 'Space Mono', ui-monospace, 'SF Mono', 'Menlo', monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; background: var(--paper-50); }
+  body { color: var(--ink-900); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: var(--ink-900); text-decoration: none; }
+  a:hover { color: var(--ink-600); }
+  ::selection { background: var(--ink-900); color: var(--paper-50); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-left: 32px; padding-right: 32px; }
+  .mono { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.22em; }
+  .btn-ink { background: var(--ink-900); color: var(--paper-50); border-radius: 2px; font-weight: 500; display: inline-block; transition: background .24s cubic-bezier(.22,1,.36,1); }
+  .btn-ink:hover { background: var(--ink-700); color: var(--paper-50); }
+  .btn-out { border: 1px solid var(--ink-900); color: var(--ink-900); border-radius: 2px; font-weight: 500; display: inline-block; transition: background .24s cubic-bezier(.22,1,.36,1); }
+  .btn-out:hover { background: var(--paper-100); }
+  .btn-paper { background: var(--paper-50); color: var(--ink-900); border-radius: 2px; font-weight: 500; display: inline-block; transition: background .24s cubic-bezier(.22,1,.36,1); }
+  .btn-paper:hover { background: var(--pure-white); color: var(--ink-900); }
+  @media (max-width: 860px) {
+    .grid-2 { grid-template-columns: 1fr !important; gap: 40px !important; }
+    .hero-h1 { font-size: 54px !important; }
+    .nav-links { display: none !important; }
+    .svc-row { grid-template-columns: auto 1fr !important; }
+    .svc-price { grid-column: 2 !important; padding-top: 6px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===================== HEADER ===================== -->
+  <header style="position: sticky; top: 0; z-index: 50; background: var(--paper-50); border-bottom: 1px solid var(--ink-200);">
+    <div class="wrap" style="padding-top: 18px; padding-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+      <a href="#top" style="display: flex; flex-direction: column; gap: 2px;">
+        <span data-cfg="company" style="font-family: var(--font-display); font-weight: 500; font-size: 26px; letter-spacing: -0.01em; line-height: 1;">Meridian</span>
+        <span data-cfg="descriptor" class="mono" style="font-size: 10px; color: var(--ink-500);">AI Governance · Australia</span>
+      </a>
+      <nav class="nav-links" style="display: flex; align-items: center; gap: 28px; font-size: 14px; color: var(--ink-700);">
+        <a href="#offering" style="color: var(--ink-700);">Offering</a>
+        <a href="#pricing" style="color: var(--ink-700);">Pricing</a>
+        <a href="#services" style="color: var(--ink-700);">Services</a>
+        <a href="#contact" class="btn-ink" style="padding: 9px 18px; letter-spacing: .01em;">Book a call</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section id="top" class="wrap" style="padding-top: 128px; padding-bottom: 112px;">
+    <p data-cfg="descriptor" class="mono" style="font-size: 12px; color: var(--ink-500); margin: 0 0 40px;">AI Governance · Australia</p>
+    <h1 class="hero-h1" style="font-family: var(--font-display); font-weight: 400; font-size: 82px; line-height: 1.04; letter-spacing: -0.02em; margin: 0 0 40px; max-width: 16ch;">You adopted AI. Can you prove it's under control?</h1>
+    <p style="font-size: 20px; line-height: 1.6; color: var(--ink-700); margin: 0 0 48px; max-width: 60ch;">Your organisation is already using AI. Your board is already accountable for it. We make that AI governable — documented, compliant, and ready for the question you haven't been asked yet.</p>
+    <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+      <a href="#contact" class="btn-ink" style="padding: 15px 30px; font-size: 18px; letter-spacing: .01em;">Book a governance call</a>
+      <a href="#offering" class="btn-out" style="padding: 15px 30px; font-size: 18px; letter-spacing: .01em;">See the offering</a>
+    </div>
+  </section>
+
+  <div class="wrap"><div style="height: 1px; background: var(--ink-200);"></div></div>
+
+  <!-- ===================== THE PROBLEM ===================== -->
+  <section id="problem" class="wrap" style="padding-top: 112px; padding-bottom: 112px;">
+    <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 64px; align-items: start;">
+      <div>
+        <p class="mono" style="font-size: 12px; color: var(--ink-500); margin: 0 0 24px;">The problem · 001</p>
+        <h2 style="font-family: var(--font-display); font-weight: 400; font-size: 46px; line-height: 1.1; letter-spacing: -0.02em; margin: 0; max-width: 14ch;">AI moved faster than your governance.</h2>
+      </div>
+      <div>
+        <p style="font-size: 18px; line-height: 1.75; color: var(--ink-800); margin: 0 0 24px; max-width: 60ch;">Tools were adopted team by team. No one wrote the policy. No one ran the audit. No one can say, with evidence, which systems are in use, what data they touch, or whether they meet the standards regulators now expect.</p>
+        <p style="font-size: 18px; line-height: 1.75; color: var(--ink-800); margin: 0 0 40px; max-width: 60ch;">It is not a technology problem. It is a governance gap — and it widens every week it is ignored.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--ink-200);">
+          <div style="padding: 18px 0; border-bottom: 1px solid var(--ink-200);"><span class="mono" style="font-size: 12px; letter-spacing: .16em; color: var(--ink-600);">No owner</span></div>
+          <div style="padding: 18px 0 18px 24px; border-bottom: 1px solid var(--ink-200);"><span class="mono" style="font-size: 12px; letter-spacing: .16em; color: var(--ink-600);">No policy</span></div>
+          <div style="padding: 18px 0; border-bottom: 1px solid var(--ink-200);"><span class="mono" style="font-size: 12px; letter-spacing: .16em; color: var(--ink-600);">No training</span></div>
+          <div style="padding: 18px 0 18px 24px; border-bottom: 1px solid var(--ink-200);"><span class="mono" style="font-size: 12px; letter-spacing: .16em; color: var(--ink-600);">No record</span></div>
+          <div style="padding: 18px 0;"><span class="mono" style="font-size: 12px; letter-spacing: .16em; color: var(--ink-600);">No proof</span></div>
+          <div style="padding: 18px 0 18px 24px;"><span class="mono" style="font-size: 12px; letter-spacing: .16em; color: var(--ink-600);">No starting point</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== THE OFFERING (INK) ===================== -->
+  <section id="offering" style="background: var(--ink-900); color: var(--paper-50);">
+    <div class="wrap" style="padding-top: 112px; padding-bottom: 112px;">
+      <p class="mono" style="font-size: 12px; color: var(--ink-300); margin: 0 0 32px;">The offering · Start here</p>
+      <div class="grid-2" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 72px; align-items: start;">
+        <div>
+          <h2 style="font-family: var(--font-display); font-weight: 400; font-size: 62px; line-height: 1.06; letter-spacing: -0.02em; margin: 0 0 24px;">The Governance Baseline</h2>
+          <p style="font-size: 21px; line-height: 1.55; color: var(--ink-200); margin: 0 0 56px; max-width: 44ch;">In three weeks, know exactly where your AI stands — and what to do next.</p>
+          <div style="border-top: 1px solid var(--ink-700);">
+            <div style="display: flex; gap: 28px; padding: 28px 0; border-bottom: 1px solid var(--ink-700);">
+              <span style="font-family: var(--font-mono); font-size: 13px; color: var(--ink-400); padding-top: 4px;">01</span>
+              <div><h3 style="font-family: var(--font-display); font-weight: 500; font-size: 26px; margin: 0 0 6px;">Map</h3><p style="font-size: 16px; line-height: 1.6; color: var(--ink-300); margin: 0; max-width: 46ch;">Every AI system in use, the data it touches, and who owns it.</p></div>
+            </div>
+            <div style="display: flex; gap: 28px; padding: 28px 0; border-bottom: 1px solid var(--ink-700);">
+              <span style="font-family: var(--font-mono); font-size: 13px; color: var(--ink-400); padding-top: 4px;">02</span>
+              <div><h3 style="font-family: var(--font-display); font-weight: 500; font-size: 26px; margin: 0 0 6px;">Assess</h3><p style="font-size: 16px; line-height: 1.6; color: var(--ink-300); margin: 0; max-width: 46ch;">Measured against ISO/IEC 42001, the NIST AI RMF, and Australia's AI Ethics Principles.</p></div>
+            </div>
+            <div style="display: flex; gap: 28px; padding: 28px 0; border-bottom: 1px solid var(--ink-700);">
+              <span style="font-family: var(--font-mono); font-size: 13px; color: var(--ink-400); padding-top: 4px;">03</span>
+              <div><h3 style="font-family: var(--font-display); font-weight: 500; font-size: 26px; margin: 0 0 6px;">Report</h3><p style="font-size: 16px; line-height: 1.6; color: var(--ink-300); margin: 0; max-width: 46ch;">One board-ready document: a risk register and a prioritised roadmap.</p></div>
+            </div>
+          </div>
+        </div>
+        <div id="pricing" style="scroll-margin-top: 84px; border: 1px solid var(--ink-700); border-radius: 4px; padding: 40px; background: var(--ink-800);">
+          <p class="mono" style="font-size: 11px; color: var(--ink-400); margin: 0 0 28px;">Fixed scope · Three weeks</p>
+          <div style="display: flex; align-items: baseline; gap: 10px; margin: 0 0 8px;">
+            <span style="font-family: var(--font-mono); font-size: 15px; color: var(--ink-300);">From</span>
+            <span data-cfg="flagshipPrice" style="font-family: var(--font-display); font-weight: 400; font-size: 72px; line-height: 1; letter-spacing: -0.02em;">A$9,500</span>
+          </div>
+          <p style="font-size: 16px; line-height: 1.6; color: var(--ink-300); margin: 0 0 32px; max-width: 34ch;">One report your board can trust. No retainer. No surprises.</p>
+          <div style="height: 1px; background: var(--ink-700); margin: 0 0 28px;"></div>
+          <ul style="list-style: none; padding: 0; margin: 0 0 36px; display: flex; flex-direction: column; gap: 14px;">
+            <li style="font-size: 15px; color: var(--ink-200); display: flex; gap: 12px;"><span style="color: var(--ink-400);">—</span> Full AI system inventory</li>
+            <li style="font-size: 15px; color: var(--ink-200); display: flex; gap: 12px;"><span style="color: var(--ink-400);">—</span> Gap analysis across three frameworks</li>
+            <li style="font-size: 15px; color: var(--ink-200); display: flex; gap: 12px;"><span style="color: var(--ink-400);">—</span> Risk register, ranked by exposure</li>
+            <li style="font-size: 15px; color: var(--ink-200); display: flex; gap: 12px;"><span style="color: var(--ink-400);">—</span> 90-minute board readout</li>
+          </ul>
+          <a href="#contact" class="btn-paper" style="display: block; text-align: center; padding: 15px 24px; font-size: 17px;">Start with the Baseline</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FRAMEWORKS ===================== -->
+  <section class="wrap" style="padding-top: 88px; padding-bottom: 88px;">
+    <p class="mono" style="font-size: 12px; color: var(--ink-500); margin: 0 0 40px; text-align: center;">Measured against the standards that matter</p>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 56px;">
+      <span style="font-family: var(--font-display); font-size: 30px; color: var(--ink-800);">ISO/IEC 42001</span>
+      <span style="color: var(--ink-300);">·</span>
+      <span style="font-family: var(--font-display); font-size: 30px; color: var(--ink-800);">NIST AI RMF</span>
+      <span style="color: var(--ink-300);">·</span>
+      <span style="font-family: var(--font-display); font-size: 30px; color: var(--ink-800);">Australia's AI Ethics Principles</span>
+      <span style="color: var(--ink-300);">·</span>
+      <span style="font-family: var(--font-display); font-size: 30px; color: var(--ink-800);">OECD AI Principles</span>
+    </div>
+  </section>
+
+  <div class="wrap"><div style="height: 1px; background: var(--ink-200);"></div></div>
+
+  <!-- ===================== SERVICES MENU ===================== -->
+  <section id="services" class="wrap" style="padding-top: 112px; padding-bottom: 112px;">
+    <div style="display: flex; justify-content: space-between; align-items: end; gap: 32px; margin: 0 0 56px; flex-wrap: wrap;">
+      <div>
+        <p class="mono" style="font-size: 12px; color: var(--ink-500); margin: 0 0 20px;">The full menu</p>
+        <h2 style="font-family: var(--font-display); font-weight: 400; font-size: 46px; line-height: 1.08; letter-spacing: -0.02em; margin: 0; max-width: 20ch;">Start with the Baseline. Continue with the rest.</h2>
+      </div>
+      <p style="font-size: 16px; line-height: 1.6; color: var(--ink-600); max-width: 34ch; margin: 0;">Every engagement is fixed-scope and priced up front. Governance without the open-ended invoice.</p>
+    </div>
+    <div style="border-top: 1px solid var(--ink-900);" id="svc-list"></div>
+  </section>
+
+  <!-- ===================== CONTACT ===================== -->
+  <section id="contact" style="background: var(--ink-900); color: var(--paper-50);">
+    <div class="wrap grid-2" style="padding-top: 112px; padding-bottom: 112px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;">
+      <div>
+        <p class="mono" style="font-size: 12px; color: var(--ink-300); margin: 0 0 32px;">Start the conversation</p>
+        <h2 style="font-family: var(--font-display); font-weight: 400; font-size: 62px; line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 28px; max-width: 12ch;">Know where you stand.</h2>
+        <p style="font-size: 19px; line-height: 1.6; color: var(--ink-200); margin: 0 0 48px; max-width: 42ch;">Tell us where your AI stands today. We'll tell you the fastest way to make it defensible — no obligation.</p>
+        <div style="display: flex; flex-direction: column; gap: 18px; font-size: 15px;">
+          <div style="display: flex; gap: 14px; align-items: center;"><span class="mono" style="font-size: 11px; letter-spacing: .16em; color: var(--ink-400); width: 88px;">EMAIL</span><a data-link="email" href="#" style="color: var(--paper-50);">hello@meridian.com.au</a></div>
+          <div style="display: flex; gap: 14px; align-items: center;"><span class="mono" style="font-size: 11px; letter-spacing: .16em; color: var(--ink-400); width: 88px;">PHONE</span><a data-link="phone" href="#" style="color: var(--paper-50);">+61 2 8000 0000</a></div>
+          <div style="display: flex; gap: 14px; align-items: center;"><span class="mono" style="font-size: 11px; letter-spacing: .16em; color: var(--ink-400); width: 88px;">BASED</span><span data-cfg="location" style="color: var(--paper-50);">Sydney · serving all of Australia</span></div>
+        </div>
+      </div>
+      <div style="border: 1px solid var(--ink-700); border-radius: 4px; padding: 40px; background: var(--ink-800);">
+        <p class="mono" style="font-size: 11px; color: var(--ink-400); margin: 0 0 28px;">Reach us directly</p>
+        <h3 style="font-family: var(--font-display); font-weight: 400; font-size: 34px; line-height: 1.1; margin: 0 0 12px;">Three ways to start.</h3>
+        <p style="font-size: 15px; line-height: 1.6; color: var(--ink-300); margin: 0 0 36px; max-width: 34ch;">No forms. Pick whichever is easiest — we reply within one business day.</p>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <a data-link="email" href="#" class="btn-paper" style="text-align: center; padding: 15px 24px; font-size: 17px;">Email us</a>
+          <a data-link="phone" href="#" class="btn-out" style="text-align: center; padding: 15px 24px; font-size: 17px; border-color: var(--ink-500); color: var(--paper-50);">Call us</a>
+          <a data-link="whatsapp" href="#" target="_blank" rel="noopener" class="btn-out" style="text-align: center; padding: 15px 24px; font-size: 17px; border-color: var(--ink-500); color: var(--paper-50);">Message on WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer style="background: var(--paper-50); border-top: 1px solid var(--ink-200);">
+    <div class="wrap" style="padding-top: 64px; padding-bottom: 48px; display: flex; justify-content: space-between; align-items: start; gap: 48px; flex-wrap: wrap;">
+      <div>
+        <span data-cfg="company" style="font-family: var(--font-display); font-weight: 500; font-size: 26px; letter-spacing: -0.01em;">Meridian</span>
+        <p data-cfg="descriptor" class="mono" style="font-size: 10px; color: var(--ink-500); margin: 6px 0 0;">AI Governance · Australia</p>
+      </div>
+      <nav style="display: flex; gap: 24px; font-size: 14px; flex-wrap: wrap;">
+        <a href="#offering" style="color: var(--ink-700);">Offering</a>
+        <a href="#services" style="color: var(--ink-700);">Services</a>
+        <a href="#pricing" style="color: var(--ink-700);">Pricing</a>
+        <a href="#contact" style="color: var(--ink-700);">Contact</a>
+      </nav>
+    </div>
+    <div class="wrap" style="padding-bottom: 48px; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap;">
+      <span data-cfg="legal" class="mono" style="font-size: 11px; letter-spacing: .12em; color: var(--ink-400);">© 2026 MERIDIAN GOVERNANCE PTY LTD</span>
+      <span class="mono" style="font-size: 11px; letter-spacing: .12em; color: var(--ink-400);">MADE IN AUSTRALIA</span>
+    </div>
+  </footer>
+
+  <!-- Baked service list + config injector. Do not edit — change values in the EDIT ME block at the top. -->
+  <script>
+    (function () {
+      var S = window.SITE || {};
+
+      // Services are fixed content — edit here only if you add/remove an offering.
+      var SERVICES = [
+        ["01", "The Governance Baseline", "Your three-week assessment across the three frameworks. The place everyone starts.", "From A$9,500"],
+        ["02", "AI Policy & Framework", "The AI policy your organisation will actually follow — not a document that sits in a drawer.", "From A$6,500"],
+        ["03", "ISO 42001 Readiness", "Get audit-ready for certification. Evidence, controls, and the paperwork auditors ask for.", "From A$14,000"],
+        ["04", "Independent AI Risk Audit", "An outside review of a specific model or system, and a defensible verdict on its risk.", "From A$12,000"],
+        ["05", "Board & Executive Briefings", "Ninety minutes that change the conversation. What the board must know, in plain language.", "A$3,500"],
+        ["06", "Team Training & Enablement", "Practical governance for the people who build. Half-day and full-cohort formats.", "From A$4,500"],
+        ["07", "Fractional Governance Officer", "Ongoing governance, retained. Senior oversight without a full-time hire.", "From A$4,000/mo"],
+        ["08", "Public Sector Advisory", "Governance aligned to Commonwealth and state expectations, for agencies adopting AI.", "Contact us"]
+      ];
+      var list = document.getElementById('svc-list');
+      if (list) {
+        SERVICES.forEach(function (s) {
+          var row = document.createElement('div');
+          row.className = 'svc-row';
+          row.style.cssText = 'display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:baseline;padding:32px 0;border-bottom:1px solid var(--ink-200);';
+          row.innerHTML =
+            '<span style="font-family:var(--font-mono);font-size:12px;color:var(--ink-400);">' + s[0] + '</span>' +
+            '<div><h3 style="font-family:var(--font-display);font-weight:500;font-size:30px;margin:0 0 6px;letter-spacing:-0.01em;">' + s[1] + '</h3>' +
+            '<p style="font-size:16px;color:var(--ink-600);margin:0;max-width:56ch;">' + s[2] + '</p></div>' +
+            '<span class="svc-price" style="font-family:var(--font-mono);font-size:15px;color:var(--ink-800);white-space:nowrap;">' + s[3] + '</span>';
+          list.appendChild(row);
+        });
+      }
+
+      // Inject the editable config values.
+      function setText(key, val) {
+        if (val == null) return;
+        document.querySelectorAll('[data-cfg="' + key + '"]').forEach(function (el) { el.textContent = val; });
+      }
+      setText('company', S.company);
+      setText('descriptor', S.descriptor);
+      setText('location', S.location);
+      setText('flagshipPrice', S.flagshipPrice);
+      if (S.legalName && S.year) {
+        document.querySelectorAll('[data-cfg="legal"]').forEach(function (el) {
+          el.textContent = '© ' + S.year + ' ' + String(S.legalName).toUpperCase();
+        });
+      }
+      if (S.company) document.title = S.company + ' — AI Governance, Australia';
+
+      // Build the contact links.
+      document.querySelectorAll('[data-link="email"]').forEach(function (a) {
+        if (!S.email) return;
+        a.href = 'mailto:' + S.email + '?subject=' + encodeURIComponent('AI governance enquiry');
+        if (a.tagName === 'A' && a.children.length === 0 && a.textContent.indexOf('@') > -1) a.textContent = S.email;
+      });
+      document.querySelectorAll('[data-link="phone"]').forEach(function (a) {
+        if (S.phoneDial) a.href = 'tel:' + S.phoneDial;
+        if (a.children.length === 0 && /\d/.test(a.textContent) && S.phone) a.textContent = S.phone;
+      });
+      document.querySelectorAll('[data-link="whatsapp"]').forEach(function (a) {
+        if (!S.whatsapp) return;
+        a.href = 'https://wa.me/' + S.whatsapp + '?text=' + encodeURIComponent("Hi, I'd like to talk about AI governance.");
+      });
+    })();
+  </script>
+
+</body>
+</html>
