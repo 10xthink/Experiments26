@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Roll · Daily Checklist</title>
+<style>
+:root{
+  --ink:#1c1a17;--parchment:#f0e9dc;--parchment-deep:#e4d9c4;--card:#fbf6ea;
+  --stone:#8a7f6d;--clay:#b5613d;--gold:#c99a3f;--sky:#4a6b7a;--moss:#5a6b4a;--moss-bright:#7a9163;
+  --done:#5a6b4a;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;background:var(--parchment);color:var(--ink);line-height:1.5;padding:20px 16px 60px}
+.wrap{max-width:520px;margin:0 auto}
+
+header{text-align:center;margin-bottom:20px}
+.eyebrow{font-family:'Trebuchet MS',sans-serif;letter-spacing:.3em;text-transform:uppercase;font-size:.6rem;color:var(--stone)}
+h1{font-size:1.9rem;font-weight:400;margin-top:4px}
+h1 em{font-style:italic;color:var(--clay)}
+.date{font-family:'Trebuchet MS',sans-serif;font-size:.72rem;color:var(--stone);margin-top:4px;letter-spacing:.08em}
+
+/* streak bar */
+.streak{display:flex;justify-content:center;gap:22px;background:var(--card);border:1px solid var(--parchment-deep);border-radius:10px;padding:14px;margin-bottom:22px}
+.streak .cell{text-align:center}
+.streak .num{font-size:1.7rem;color:var(--clay);line-height:1}
+.streak .lbl{font-family:'Trebuchet MS',sans-serif;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--stone);margin-top:4px}
+
+.section-label{font-family:'Trebuchet MS',sans-serif;letter-spacing:.22em;text-transform:uppercase;font-size:.62rem;color:var(--clay);margin:24px 0 10px;display:flex;align-items:center;gap:10px}
+.section-label::before{content:"";width:22px;height:1px;background:var(--clay)}
+
+/* active picker */
+.pick-note{font-size:.85rem;color:var(--stone);font-style:italic;margin-bottom:12px}
+.balls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ball-pick{border:1px solid var(--parchment-deep);border-left-width:5px;border-radius:8px;padding:12px 14px;background:var(--card);cursor:pointer;transition:transform .15s,box-shadow .2s}
+.ball-pick:active{transform:scale(.97)}
+.ball-pick.b1{border-left-color:var(--clay)}
+.ball-pick.b2{border-left-color:var(--gold)}
+.ball-pick.b3{border-left-color:var(--sky)}
+.ball-pick.b4{border-left-color:var(--moss-bright)}
+.ball-pick.active{box-shadow:0 0 0 2px var(--ink) inset;background:#fff}
+.ball-pick h4{font-size:1.05rem;font-weight:400;display:flex;justify-content:space-between;align-items:center}
+.ball-pick h4 .star{color:var(--gold);opacity:0;font-size:.9rem}
+.ball-pick.active h4 .star{opacity:1}
+.ball-pick small{font-family:'Trebuchet MS',sans-serif;font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;color:var(--stone)}
+
+/* checklist items */
+.check{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--parchment-deep);border-radius:10px;padding:15px 16px;margin-bottom:10px;cursor:pointer;transition:background .2s,transform .12s}
+.check:active{transform:scale(.99)}
+.check.done{background:#eaf0e2;border-color:#cfdcc0}
+.box{min-width:26px;height:26px;border-radius:6px;border:2px solid var(--stone);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.check.done .box{background:var(--done);border-color:var(--done)}
+.box svg{width:15px;height:15px;stroke:#fff;stroke-width:3.5;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity .2s}
+.check.done .box svg{opacity:1}
+.check .body{flex:1}
+.check .body .t{font-size:1.02rem}
+.check.done .body .t{text-decoration:line-through;color:var(--stone)}
+.check .body .sub{font-size:.78rem;color:var(--stone);font-style:italic}
+.check .tag{font-family:'Trebuchet MS',sans-serif;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--stone);padding:3px 7px;border:1px solid var(--parchment-deep);border-radius:20px}
+.check.star-item .tag{color:var(--clay);border-color:var(--clay)}
+
+/* the one law reminder */
+.law{background:var(--ink);color:var(--parchment);border-radius:10px;padding:16px 18px;margin-top:22px;text-align:center}
+.law .big{font-size:1.05rem}
+.law .big em{color:var(--gold);font-style:italic}
+.law .small{font-size:.8rem;color:#b7ad9a;font-style:italic;margin-top:4px}
+
+/* finish states */
+.banner{border-radius:10px;padding:16px;text-align:center;margin-top:22px;font-size:.95rem}
+.banner.win{background:#eaf0e2;border:1px solid #cfdcc0;color:var(--moss)}
+.banner.win b{color:var(--ink)}
+.banner.miss{background:#f3e6de;border:1px solid #e4c9b8;color:var(--clay)}
+
+/* footer controls */
+.foot{display:flex;gap:10px;margin-top:24px}
+.foot button{flex:1;font-family:'Trebuchet MS',sans-serif;letter-spacing:.08em;text-transform:uppercase;font-size:.66rem;padding:11px;border:1px solid var(--stone);background:transparent;color:var(--ink);border-radius:6px;cursor:pointer}
+.foot button:active{background:var(--parchment-deep)}
+.foot button.warn{border-color:var(--clay);color:var(--clay)}
+
+.weekdots{display:flex;justify-content:center;gap:8px;margin-top:16px}
+.wd{width:14px;height:14px;border-radius:50%;border:2px solid var(--parchment-deep);background:transparent}
+.wd.done{background:var(--done);border-color:var(--done)}
+.wd.miss{background:var(--clay);border-color:var(--clay);opacity:.5}
+.wd.today{box-shadow:0 0 0 2px var(--ink)}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">The Way of the Roll</div>
+    <h1>Today's <em>Roll</em></h1>
+    <div class="date" id="dateLine"></div>
+  </header>
+
+  <div class="streak">
+    <div class="cell"><div class="num" id="streakNum">0</div><div class="lbl">day streak</div></div>
+    <div class="cell"><div class="num" id="bestNum">0</div><div class="lbl">best</div></div>
+    <div class="cell"><div class="num" id="rateNum">—</div><div class="lbl">last 7 days</div></div>
+  </div>
+  <div class="weekdots" id="weekDots"></div>
+
+  <div class="section-label">Step 1 · choose today's one ball</div>
+  <div class="pick-note">Push one with care. The rest you'll only keep from melting.</div>
+  <div class="balls" id="ballPicker">
+    <div class="ball-pick b1" data-ball="body"><h4>Body <span class="star">★</span></h4><small>the carrier</small></div>
+    <div class="ball-pick b2" data-ball="means"><h4>Means <span class="star">★</span></h4><small>the shelter</small></div>
+    <div class="ball-pick b3" data-ball="skill"><h4>Skill <span class="star">★</span></h4><small>the craft</small></div>
+    <div class="ball-pick b4" data-ball="bonds"><h4>Bonds <span class="star">★</span></h4><small>the hearth</small></div>
+  </div>
+
+  <div class="section-label">Step 2 · check as you go</div>
+  <div id="checklist"></div>
+
+  <div class="law">
+    <div class="big">The only rule: <em>never miss twice.</em></div>
+    <div class="small">One miss is weather. Two is a slide. Step back on tomorrow.</div>
+  </div>
+
+  <div id="banner"></div>
+
+  <div class="foot">
+    <button id="resetDay">Reset today</button>
+    <button id="clearAll" class="warn">Start over</button>
+  </div>
+</div>
+
+<script>
+const BALLS={
+  body:{star:"Walk while you count ten breaths", keep:"Stand & stretch once"},
+  means:{star:"Set aside one small coin, before spending", keep:"Glance at what you saved"},
+  skill:{star:"Learn one small piece of your craft", keep:"Read for two minutes"},
+  bonds:{star:"Send one kind word to one person", keep:"Think of someone with thanks"}
+};
+const ORDER=["body","means","skill","bonds"];
+const NAMES={body:"Body",means:"Means",skill:"Skill",bonds:"Bonds"};
+
+const todayKey=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+function load(){try{return JSON.parse(localStorage.getItem("rollData"))||{days:{},best:0}}catch(e){return{days:{},best:0}}}
+function save(d){localStorage.setItem("rollData",JSON.stringify(d))}
+let data=load();
+let day=data.days[todayKey()]||{active:null,checks:{}};
+
+function setDate(){
+  const d=new Date();
+  document.getElementById("dateLine").textContent=d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+}
+
+function renderPicker(){
+  document.querySelectorAll(".ball-pick").forEach(el=>{
+    el.classList.toggle("active",el.dataset.ball===day.active);
+    el.onclick=()=>{day.active=el.dataset.ball;day.checks={};persist();renderPicker();renderList()};
+  });
+}
+
+function renderList(){
+  const box=document.getElementById("checklist");
+  if(!day.active){box.innerHTML='<div style="text-align:center;color:var(--stone);font-style:italic;padding:20px 0">Pick your one ball above to see today\'s list ↑</div>';renderBanner();return}
+  let html="";
+  // the active roll (star)
+  html+=item("roll", BALLS[day.active].star, "Your one real roll — the protected minutes", "roll", true);
+  // keep-alive for the other three
+  ORDER.filter(b=>b!==day.active).forEach(b=>{
+    html+=item("keep_"+b, BALLS[b].keep, NAMES[b]+" — just don't let it melt", "keep-alive", false);
+  });
+  box.innerHTML=html;
+  box.querySelectorAll(".check").forEach(el=>{
+    el.onclick=()=>{day.checks[el.dataset.id]=!day.checks[el.dataset.id];persist();renderList()};
+  });
+  renderBanner();
+}
+function item(id,text,sub,tag,star){
+  const done=day.checks[id]?"done":"";
+  return `<div class="check ${done} ${star?'star-item':''}" data-id="${id}">
+    <div class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></div>
+    <div class="body"><div class="t">${text}</div><div class="sub">${sub}</div></div>
+    <div class="tag">${tag}</div></div>`;
+}
+
+function renderBanner(){
+  const b=document.getElementById("banner");
+  if(!day.active){b.innerHTML="";return}
+  const rollDone=day.checks["roll"];
+  if(rollDone){
+    b.innerHTML='<div class="banner win">✓ <b>The ball rolled today.</b> That\'s the day won. Rest easy.</div>';
+  }else{
+    b.innerHTML="";
+  }
+}
+
+function computeStreak(){
+  // streak = consecutive days up to today where roll was done
+  let streak=0;
+  let d=new Date();
+  for(let i=0;i<400;i++){
+    const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    const rec=data.days[k];
+    const done=(k===todayKey()? day.checks["roll"] : rec&&rec.checks&&rec.checks["roll"]);
+    if(done){streak++}
+    else{
+      if(k===todayKey()){/* today not done yet, don't break */}
+      else break;
+    }
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+function computeRate(){
+  let done=0,total=0;let d=new Date();
+  for(let i=0;i<7;i++){
+    const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    total++;
+    const rec=data.days[k];
+    const isDone=(k===todayKey()? day.checks["roll"] : rec&&rec.checks&&rec.checks["roll"]);
+    if(isDone)done++;
+    d.setDate(d.getDate()-1);
+  }
+  return {done,total};
+}
+function renderStats(){
+  const s=computeStreak();
+  if(s>(data.best||0)){data.best=s;save(data)}
+  document.getElementById("streakNum").textContent=s;
+  document.getElementById("bestNum").textContent=data.best||0;
+  const r=computeRate();
+  document.getElementById("rateNum").textContent=r.done+"/"+r.total;
+  // week dots (oldest→today, last 7)
+  const dots=document.getElementById("weekDots");dots.innerHTML="";
+  const arr=[];let d=new Date();
+  for(let i=0;i<7;i++){
+    const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    const rec=data.days[k];
+    const isToday=k===todayKey();
+    const isDone=(isToday? day.checks["roll"] : rec&&rec.checks&&rec.checks["roll"]);
+    const attempted=rec||isToday;
+    arr.unshift({isDone,isToday,attempted});
+    d.setDate(d.getDate()-1);
+  }
+  arr.forEach(o=>{
+    const el=document.createElement("div");
+    el.className="wd"+(o.isDone?" done":(o.attempted&&!o.isToday?" miss":""))+(o.isToday?" today":"");
+    dots.appendChild(el);
+  });
+}
+
+function persist(){
+  data.days[todayKey()]=day;
+  save(data);
+  renderStats();
+}
+
+document.getElementById("resetDay").onclick=()=>{day={active:day.active,checks:{}};persist();renderList()};
+document.getElementById("clearAll").onclick=()=>{
+  if(confirm("Clear all history and start fresh?")){localStorage.removeItem("rollData");data={days:{},best:0};day={active:null,checks:{}};persist();renderPicker();renderList();renderStats()}
+};
+
+setDate();renderPicker();renderList();renderStats();
+</script>
+</body>
+</html>
