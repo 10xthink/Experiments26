@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commitment Tracker — Precision & Presence</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f5f0 0%, #ebe5e0 100%);
+            color: #2c2c2a;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 2px solid rgba(44, 44, 42, 0.1);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #888780;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .setup-section, .commitment-section {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #534ab7;
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #3d3d3a;
+        }
+
+        input[type="text"], input[type="time"], textarea, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d3d1c7;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #fafaf8;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus, input[type="time"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #534ab7;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(83, 74, 183, 0.1);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: 1px solid #534ab7;
+            background: #534ab7;
+            color: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #3c3489;
+            border-color: #3c3489;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-secondary {
+            background: transparent;
+            color: #534ab7;
+            border: 1px solid #d3d1c7;
+        }
+
+        .button-secondary:hover {
+            background: #f5f5f0;
+            border-color: #534ab7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .commitment-display {
+            background: linear-gradient(135deg, #534ab7 0%, #3c3489 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .commitment-name {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .commitment-meta {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .commitment-why {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-style: italic;
+        }
+
+        .rhythm-visual {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .rhythm-block {
+            padding: 12px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.3;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rhythm-active {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .today-tracker {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .day-box {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 2px solid #d3d1c7;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: #fafaf8;
+        }
+
+        .day-box:hover {
+            border-color: #534ab7;
+        }
+
+        .day-box.completed {
+            background: #534ab7;
+            color: white;
+            border-color: #534ab7;
+        }
+
+        .day-box.skipped {
+            background: #f5f5f0;
+            color: #888780;
+            border-color: #d3d1c7;
+            text-decoration: line-through;
+        }
+
+        .streak-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f5f5f0;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #534ab7;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888780;
+            font-weight: 500;
+        }
+
+        .check-in-form {
+            background: #f5f5f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .quality-rating {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .quality-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border: 2px solid #d3d1c7;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: #3d3d3a;
+        }
+
+        .quality-btn:hover {
+            border-color: #534ab7;
+            background: #f5f5f0;
+        }
+
+        .quality-btn.selected {
+            background: #534ab7;
+            color: white;
+            border-color: #534ab7;
+        }
+
+        .quality-btn.shallow {
+            border-color: #d85a30;
+            color: #d85a30;
+        }
+
+        .quality-btn.shallow:hover {
+            background: #fce1da;
+        }
+
+        .quality-btn.shallow.selected {
+            background: #d85a30;
+            color: white;
+            border-color: #d85a30;
+        }
+
+        .quality-btn.deep {
+            border-color: #185fa5;
+            color: #185fa5;
+        }
+
+        .quality-btn.deep:hover {
+            background: #b8e1f0;
+        }
+
+        .quality-btn.deep.selected {
+            background: #185fa5;
+            color: white;
+            border-color: #185fa5;
+        }
+
+        .quality-btn.partial {
+            border-color: #ba7517;
+            color: #ba7517;
+        }
+
+        .quality-btn.partial:hover {
+            background: #fae8d1;
+        }
+
+        .quality-btn.partial.selected {
+            background: #ba7517;
+            color: white;
+            border-color: #ba7517;
+        }
+
+        .diagnostic-btn {
+            padding: 10px 8px;
+            border: 1px solid #d3d1c7;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            color: #3d3d3a;
+            transition: all 0.2s;
+        }
+
+        .diagnostic-btn:hover {
+            border-color: #d85a30;
+            background: #fce1da;
+        }
+
+        .diagnostic-btn.selected {
+            background: #d85a30;
+            color: white;
+            border-color: #d85a30;
+        }
+
+        .check-in-input {
+            margin-bottom: 12px;
+        }
+
+        .check-in-input textarea {
+            font-size: 13px;
+        }
+
+        .journal-entry {
+            background: white;
+            border-left: 4px solid #534ab7;
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .entry-date {
+            font-size: 12px;
+            color: #888780;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .entry-quality {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+            margin-right: 8px;
+        }
+
+        .quality-deep {
+            background: #ceebf6;
+            color: #185fa5;
+        }
+
+        .quality-shallow {
+            background: #fde2e0;
+            color: #d85a30;
+        }
+
+        .page-section {
+            margin-top: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #d3d1c7;
+        }
+
+        .tab-btn {
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: #888780;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: #534ab7;
+        }
+
+        .tab-btn.active {
+            color: #534ab7;
+            border-bottom-color: #534ab7;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .principle-card {
+            background: #f5f5f0;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #534ab7;
+        }
+
+        .principle-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .principle-text {
+            font-size: 13px;
+            color: #5f5e5a;
+            line-height: 1.5;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .reset-btn {
+            background: #a32d2d;
+            border-color: #a32d2d;
+        }
+
+        .reset-btn:hover {
+            background: #791f1f;
+            border-color: #791f1f;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 0;
+            }
+
+            .setup-section, .commitment-section, .today-tracker {
+                padding: 20px;
+            }
+
+            .rhythm-visual {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            .rhythm-block {
+                font-size: 11px;
+                padding: 10px 6px;
+            }
+
+            .tracker-grid {
+                grid-template-columns: repeat(7, 1fr);
+            }
+
+            .day-box {
+                font-size: 11px;
+            }
+
+            .streak-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Commitment Tracker</h1>
+            <p class="subtitle">From intention to precision</p>
+        </header>
+
+        <!-- Setup Section -->
+        <div id="setupSection" class="setup-section">
+            <div class="section-title">
+                <span class="step-number">1</span>
+                Define your commitment
+            </div>
+
+            <div class="form-group">
+                <label>What will you do? (Your X)</label>
+                <input type="text" id="commitmentName" placeholder="e.g., Deep writing, Meditation, Piano practice">
+            </div>
+
+            <div class="form-group">
+                <label>Why does this matter to you?</label>
+                <textarea id="commitmentWhy" placeholder="Be specific. This is your north star when motivation fades..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>What time of day?</label>
+                <input type="time" id="commitmentTime" value="09:00">
+            </div>
+
+            <div class="form-group">
+                <label>How long? (minutes)</label>
+                <input type="text" id="commitmentDuration" placeholder="e.g., 25" value="25">
+            </div>
+
+            <div class="form-group">
+                <label>What does 'deep focus' look like for you?</label>
+                <textarea id="commitmentDepth" placeholder="No phone. No checking email. Just you and the thing. Describe what that presence feels like..."></textarea>
+            </div>
+
+            <button onclick="startCommitment()" id="submitBtn">Begin commitment</button>
+        </div>
+
+        <!-- Active Commitment Section -->
+        <div id="commitmentSection" class="commitment-section hidden">
+            <button class="button-secondary" onclick="editCommitment()" style="margin-bottom: 20px;">← Edit commitment</button>
+
+            <div class="commitment-display">
+                <div class="commitment-name" id="displayName">—</div>
+                <div class="commitment-meta">
+                    <div class="meta-item">
+                        <span>⏰</span>
+                        <span id="displayTime">—</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>⌛</span>
+                        <span id="displayDuration">—</span>
+                    </div>
+                </div>
+                <div class="commitment-why" id="displayWhy">—</div>
+                <div style="font-size: 13px; font-weight: 500; margin-bottom: 8px;">Suggested daily rhythm (flexible):</div>
+                <div style="font-size: 12px; color: rgba(255,255,255,0.85); margin-bottom: 12px; line-height: 1.4;">You choose when X happens. This shows one way to structure your day—X first (or whenever works best), rest after, reactive tasks in their own slots.</div>
+                <div class="rhythm-visual" id="rhythmVisual"></div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 12px;">The key: the time slot is protected. The order is yours.</div>
+            </div>
+
+            <!-- Today's Tracker -->
+            <div class="today-tracker">
+                <div class="section-title">
+                    <span class="step-number">2</span>
+                    Log today
+                </div>
+
+                <div class="streak-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="currentStreak">0</div>
+                        <div class="stat-label">Current streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalDays">0</div>
+                        <div class="stat-label">Days tracked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="deepRatio">—</div>
+                        <div class="stat-label">Deep sessions</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">This morning</div>
+                    <div class="check-in-form">
+                        <div style="margin-bottom: 12px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 13px;">Quality of presence</label>
+                            <div class="quality-rating">
+                                <button class="quality-btn shallow" data-quality="shallow" onclick="selectQuality(this)">Shallow</button>
+                                <button class="quality-btn partial" data-quality="partial" onclick="selectQuality(this)">Partial</button>
+                                <button class="quality-btn deep" data-quality="deep" onclick="selectQuality(this)">Deep focus</button>
+                                <button class="quality-btn" data-quality="skip" onclick="selectQuality(this)">Skipped</button>
+                            </div>
+                        </div>
+                        <div id="skipDiagnostics" class="hidden" style="background: #fde2e0; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #d85a30;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: #d85a30;">Why did you skip?</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;">
+                                <button class="diagnostic-btn" data-reason="friction" onclick="selectSkipReason(this)">Friction</button>
+                                <button class="diagnostic-btn" data-reason="priority" onclick="selectSkipReason(this)">Not priority</button>
+                                <button class="diagnostic-btn" data-reason="fear" onclick="selectSkipReason(this)">Fear/resistance</button>
+                                <button class="diagnostic-btn" data-reason="energy" onclick="selectSkipReason(this)">No energy</button>
+                                <button class="diagnostic-btn" data-reason="environment" onclick="selectSkipReason(this)">Environment</button>
+                                <button class="diagnostic-btn" data-reason="other" onclick="selectSkipReason(this)">Other</button>
+                            </div>
+                        </div>
+                        <div class="check-in-input">
+                            <label style="font-size: 13px;">What happened?</label>
+                            <textarea id="todayNote" placeholder="What did you notice? What got in the way? What felt good?"></textarea>
+                        </div>
+                        <button onclick="logToday()" style="width: 100%;">Log today</button>
+                    </div>
+                </div>
+
+                <div class="tracker-grid" id="trackerGrid"></div>
+            </div>
+
+            <!-- Tabs Section -->
+            <div class="page-section">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('journal')">Journal</button>
+                    <button class="tab-btn" onclick="switchTab('principles')">Principles</button>
+                </div>
+
+                <!-- Journal Tab -->
+                <div id="journal" class="tab-content active">
+                    <div style="margin-bottom: 20px;">
+                        <div id="journalEntries"></div>
+                        <div id="emptyState" style="text-align: center; color: #888780; padding: 40px 20px;">
+                            <div style="font-size: 14px; margin-bottom: 8px;">No entries yet.</div>
+                            <div style="font-size: 13px;">Log your first session to begin the record.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Principles Tab -->
+                <div id="principles" class="tab-content">
+                    <div class="principle-card">
+                        <div class="principle-title">🎯 Time slot, not outcome</div>
+                        <div class="principle-text">Protect the slot. Some days you'll do deep work, some days just 2 minutes. Both count. The slot is sacred, not the output.</div>
+                    </div>
+                    <div class="principle-card">
+                        <div class="principle-title">🔄 Active-rest rhythm</div>
+                        <div class="principle-text">Work 25–90 min, then rest 5–15 min. Your nervous system needs the reset. Reactive tasks get their own container. You activate fully each time.</div>
+                    </div>
+                    <div class="principle-card">
+                        <div class="principle-title">📊 Quality over completion</div>
+                        <div class="principle-text">Log deep focus, not tick boxes. "Shallow" is honest. "Deep" is real. Skipped is data. Over time, you'll see where presence lives.</div>
+                    </div>
+                    <div class="principle-card">
+                        <div class="principle-title">🛡️ Friction removal</div>
+                        <div class="principle-text">Make starting easier than anything else. Phone away. Everything ready. The first 2 minutes are 80% of the work.</div>
+                    </div>
+                    <div class="principle-card">
+                        <div class="principle-title">👁️ Visibility</div>
+                        <div class="principle-text">Seeing the chain matters. Public commitment matters. This tracker is your witness. Precision means others believe you.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button onclick="exportData()" style="background: #185fa5; border-color: #185fa5;">Export data</button>
+                <button onclick="importData()" style="background: #185fa5; border-color: #185fa5;">Import data</button>
+                <button class="reset-btn" onclick="startOver()">Start over</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="importFile" accept=".json" style="display: none;">
+    
+    <script>
+        let selectedQuality = null;
+        let selectedSkipReason = null;
+
+        function selectQuality(btn) {
+            document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedQuality = btn.dataset.quality;
+            
+            const diagnosticsDiv = document.getElementById('skipDiagnostics');
+            if (selectedQuality === 'skip') {
+                diagnosticsDiv.classList.remove('hidden');
+            } else {
+                diagnosticsDiv.classList.add('hidden');
+                selectedSkipReason = null;
+                document.querySelectorAll('.diagnostic-btn').forEach(b => b.classList.remove('selected'));
+            }
+        }
+
+        function selectSkipReason(btn) {
+            document.querySelectorAll('.diagnostic-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedSkipReason = btn.dataset.reason;
+        }
+
+        function startCommitment() {
+            const name = document.getElementById('commitmentName').value.trim();
+            const why = document.getElementById('commitmentWhy').value.trim();
+            const time = document.getElementById('commitmentTime').value;
+            const duration = document.getElementById('commitmentDuration').value.trim();
+            const depth = document.getElementById('commitmentDepth').value.trim();
+
+            if (!name || !why || !duration) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            const isEditing = !!localStorage.getItem('commitment');
+            const commitment = { name, why, time, duration, depth, startDate: new Date().toISOString() };
+            localStorage.setItem('commitment', JSON.stringify(commitment));
+            
+            showCommitmentSection();
+            alert(isEditing ? 'Commitment updated.' : 'Commitment created. Let\'s go.');
+        }
+
+        function showCommitmentSection() {
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('commitmentSection').classList.remove('hidden');
+            renderCommitment();
+            renderTracker();
+            renderJournal();
+            updateStats();
+        }
+
+        function editCommitment() {
+            const commitment = JSON.parse(localStorage.getItem('commitment'));
+            if (!commitment) return;
+            
+            document.getElementById('commitmentName').value = commitment.name;
+            document.getElementById('commitmentWhy').value = commitment.why;
+            document.getElementById('commitmentTime').value = commitment.time;
+            document.getElementById('commitmentDuration').value = commitment.duration;
+            document.getElementById('commitmentDepth').value = commitment.depth;
+            
+            document.getElementById('setupSection').classList.remove('hidden');
+            document.getElementById('commitmentSection').classList.add('hidden');
+        }
+
+        function renderCommitment() {
+            const commitment = JSON.parse(localStorage.getItem('commitment'));
+            if (!commitment) return;
+
+            document.getElementById('displayName').textContent = commitment.name;
+            document.getElementById('displayTime').textContent = commitment.time;
+            document.getElementById('displayDuration').textContent = `${commitment.duration} min`;
+            document.getElementById('displayWhy').textContent = commitment.why;
+
+            const rhythmHtml = `
+                <div class="rhythm-block rhythm-active" title="Your commitment time">Your X<br>(${commitment.duration} min)</div>
+                <div class="rhythm-block" title="Recharge">Rest</div>
+                <div class="rhythm-block" title="Emails, tasks, reactive work">Reactive</div>
+                <div class="rhythm-block" title="Another focused session">Active</div>
+                <div class="rhythm-block" title="Recharge">Rest</div>
+                <div class="rhythm-block" title="Meetings, reactive">Meetings</div>
+            `;
+            document.getElementById('rhythmVisual').innerHTML = rhythmHtml;
+        }
+
+        function selectQuality(btn) {
+            document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedQuality = btn.dataset.quality;
+            
+            const diagnosticsDiv = document.getElementById('skipDiagnostics');
+            if (selectedQuality === 'skip') {
+                diagnosticsDiv.classList.remove('hidden');
+            } else {
+                diagnosticsDiv.classList.add('hidden');
+                selectedSkipReason = null;
+                document.querySelectorAll('.diagnostic-btn').forEach(b => b.classList.remove('selected'));
+            }
+        }
+
+        function logToday() {
+            if (!selectedQuality) {
+                alert('Select a quality level.');
+                return;
+            }
+
+            if (selectedQuality === 'skip' && !selectedSkipReason) {
+                alert('Tell us why you skipped—this helps you see patterns.');
+                return;
+            }
+
+            const note = document.getElementById('todayNote').value.trim();
+            const entry = {
+                date: new Date().toISOString().split('T')[0],
+                quality: selectedQuality,
+                skipReason: selectedSkipReason,
+                note
+            };
+
+            let entries = JSON.parse(localStorage.getItem('entries') || '[]');
+            entries = entries.filter(e => e.date !== entry.date);
+            entries.push(entry);
+            localStorage.setItem('entries', JSON.stringify(entries));
+
+            selectedQuality = null;
+            selectedSkipReason = null;
+            document.getElementById('todayNote').value = '';
+            document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.diagnostic-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('skipDiagnostics').classList.add('hidden');
+
+            renderTracker();
+            renderJournal();
+            updateStats();
+            alert('Logged. This data will show you patterns.');
+        }
+
+        function renderTracker() {
+            const entries = JSON.parse(localStorage.getItem('entries') || '[]');
+            const today = new Date();
+            const html = [];
+
+            for (let i = 13; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                const entry = entries.find(e => e.date === dateStr);
+                const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
+
+                let classes = 'day-box';
+                if (entry) {
+                    if (entry.quality === 'skip') classes += ' skipped';
+                    else classes += ' completed';
+                }
+
+                html.push(`<div class="${classes}" title="${dateStr}">${dayName.charAt(0)}</div>`);
+            }
+
+            document.getElementById('trackerGrid').innerHTML = html.join('');
+        }
+
+        function updateStats() {
+            const entries = JSON.parse(localStorage.getItem('entries') || '[]');
+            const today = new Date().toISOString().split('T')[0];
+
+            let streak = 0;
+            for (let i = 0; i < 365; i++) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                const entry = entries.find(e => e.date === dateStr);
+                if (!entry || entry.quality === 'skip') break;
+                streak++;
+            }
+
+            const deepCount = entries.filter(e => e.quality === 'deep').length;
+            const totalCount = entries.filter(e => e.quality !== 'skip').length;
+            const deepRatio = totalCount === 0 ? '—' : `${Math.round((deepCount / totalCount) * 100)}%`;
+
+            document.getElementById('currentStreak').textContent = streak;
+            document.getElementById('totalDays').textContent = entries.length;
+            document.getElementById('deepRatio').textContent = deepRatio;
+        }
+
+        function renderJournal() {
+            const entries = JSON.parse(localStorage.getItem('entries') || '[]').reverse();
+            const journalDiv = document.getElementById('journalEntries');
+            const emptyDiv = document.getElementById('emptyState');
+
+            if (entries.length === 0) {
+                journalDiv.innerHTML = '';
+                emptyDiv.style.display = 'block';
+                return;
+            }
+
+            emptyDiv.style.display = 'none';
+            
+            const skipReasons = {};
+            entries.forEach(e => {
+                if (e.skipReason) {
+                    skipReasons[e.skipReason] = (skipReasons[e.skipReason] || 0) + 1;
+                }
+            });
+
+            let summaryHtml = '';
+            if (Object.keys(skipReasons).length > 0) {
+                const topReason = Object.keys(skipReasons).reduce((a, b) => skipReasons[a] > skipReasons[b] ? a : b);
+                summaryHtml = `
+                    <div style="background: #fde2e0; border-left: 4px solid #d85a30; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+                        <div style="font-size: 12px; color: #d85a30; font-weight: 600; margin-bottom: 6px;">Pattern detected</div>
+                        <div style="font-size: 13px; color: #5f5e5a;">Your top blocker: <strong>${topReason}</strong></div>
+                    </div>
+                `;
+            }
+
+            journalDiv.innerHTML = summaryHtml + entries.map(e => `
+                <div class="journal-entry">
+                    <div class="entry-date">${e.date}</div>
+                    <div style="margin-bottom: 8px;">
+                        <span class="entry-quality quality-${e.quality === 'deep' ? 'deep' : e.quality === 'skip' ? 'shallow' : 'deep'}">
+                            ${e.quality === 'deep' ? 'Deep focus' : e.quality === 'shallow' ? 'Shallow' : e.quality === 'skip' ? 'Skipped' : 'Partial'}
+                        </span>
+                        ${e.skipReason ? `<span style="display: inline-block; font-size: 11px; background: #fde2e0; color: #d85a30; padding: 3px 8px; border-radius: 3px; margin-left: 8px;">${e.skipReason}</span>` : ''}
+                    </div>
+                    ${e.note ? `<div style="color: #5f5e5a; font-size: 13px; line-height: 1.5; margin-top: 8px;">${e.note.replace(/\n/g, '<br>')}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function startOver() {
+            if (confirm('This will erase your commitment and all log entries. Start fresh?')) {
+                if (confirm('Are you absolutely sure? This cannot be undone.')) {
+                    localStorage.clear();
+                    document.getElementById('setupSection').classList.remove('hidden');
+                    document.getElementById('commitmentSection').classList.add('hidden');
+                    document.getElementById('commitmentName').value = '';
+                    document.getElementById('commitmentWhy').value = '';
+                    document.getElementById('commitmentTime').value = '09:00';
+                    document.getElementById('commitmentDuration').value = '25';
+                    document.getElementById('commitmentDepth').value = '';
+                    alert('Everything cleared. Starting fresh.');
+                }
+            }
+        }
+
+        function exportData() {
+            const commitment = localStorage.getItem('commitment');
+            const entries = localStorage.getItem('entries');
+            
+            if (!commitment) {
+                alert('No commitment to export yet.');
+                return;
+            }
+            
+            const data = {
+                commitment: JSON.parse(commitment),
+                entries: JSON.parse(entries || '[]'),
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `commitment-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            if (localStorage.getItem('commitment')) {
+                alert('You already have a commitment. Start over first if you want to import new data.');
+                return;
+            }
+            document.getElementById('importFile').click();
+        }
+
+        document.getElementById('importFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    
+                    if (!data.commitment || !data.entries) {
+                        alert('Invalid backup file format.');
+                        return;
+                    }
+                    
+                    if (confirm(`Import commitment "${data.commitment.name}" with ${data.entries.length} log entries?`)) {
+                        localStorage.setItem('commitment', JSON.stringify(data.commitment));
+                        localStorage.setItem('entries', JSON.stringify(data.entries));
+                        alert('Data imported successfully. Reloading...');
+                        location.reload();
+                    }
+                } catch (err) {
+                    alert('Error reading file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Load on start
+        if (localStorage.getItem('commitment')) {
+            showCommitmentSection();
+        }
+    </script>
+</body>
+</html>
