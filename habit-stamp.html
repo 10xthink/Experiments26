@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EBEEF3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Habit Stamp</title>
+<style>
+/* ---------- tokens ---------- */
+:root{
+  --paper:#EBEEF3; --sheet:#FCFDFE; --ink:#151A24; --graphite:#6B7686; --rule:#DCE1E9;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --display:"Avenir Next","Segoe UI Semibold",system-ui,-apple-system,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper)}
+body{font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;
+  min-height:100vh;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3px}
+
+.wrap{max-width:540px;margin:0 auto;padding:26px 20px calc(112px + env(safe-area-inset-bottom))}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--graphite)}
+h1.display{font-family:var(--display);font-weight:800;font-size:34px;line-height:1.04;
+  letter-spacing:-.03em;margin-top:10px}
+.meter{height:2px;background:var(--rule);margin:20px 0 4px;position:relative;overflow:hidden}
+.meter i{position:absolute;top:0;bottom:0;left:0;background:var(--ink);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:14px}
+.rows{margin-top:22px}
+.row{display:flex;align-items:center;gap:13px;padding:12px 14px;background:var(--sheet);
+  border:1px solid var(--rule);border-radius:14px;margin-bottom:8px}
+.row-main{flex:1;min-width:0;text-align:left}
+.row-name{font-weight:500;font-size:15.5px;letter-spacing:-.01em;display:flex;gap:8px;align-items:center}
+.row-name .em{font-size:15px}
+.row-sub{font-family:var(--mono);font-size:11px;color:var(--graphite);letter-spacing:.03em;
+  margin-top:5px;display:flex;align-items:center;gap:9px}
+
+/* ---------- the stamp ---------- */
+.stamp{position:relative;width:46px;height:46px;flex:none;border-radius:8px;
+  border:1.5px solid var(--rule);display:grid;place-items:center;
+  font-family:var(--mono);font-weight:600;font-size:15px;color:var(--rule);
+  transition:border-color .18s,background .18s}
+.stamp:hover{border-color:var(--graphite)}
+.stamp.on .mark{animation:press .34s cubic-bezier(.2,1.5,.4,1)}
+@keyframes press{0%{transform:scale(1.9) rotate(0deg);opacity:.15}60%{opacity:1}100%{transform:scale(1)}}
+
+.ribbon{display:inline-flex;gap:2.5px;align-items:flex-end}
+.ribbon i{width:4px;height:11px;border-radius:1px;background:var(--rule);display:block}
+.ribbon i.f{height:14px}
+.ribbon i.now{box-shadow:0 3px 0 -1px var(--graphite)}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(235,238,243,.94);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--rule);
+  padding-bottom:env(safe-area-inset-bottom)}
+.nav-in{max-width:540px;margin:0 auto;display:flex}
+.nav button{flex:1;padding:13px 0 18px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--graphite)}
+.nav button::before{content:'';display:block;width:5px;height:5px;border-radius:50%;margin:0 auto 6px}
+.nav button.sel{color:var(--ink)}
+.nav button.sel::before{background:var(--ink)}
+
+/* ---------- controls ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 18px;
+  border-radius:10px;background:var(--ink);color:var(--sheet);font-size:14px;font-weight:500}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.btn.wide{width:100%}
+.btn:active{transform:translateY(1px)}
+.field{display:block;margin-bottom:16px}
+.field>span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--graphite);display:block;margin-bottom:7px}
+.field input[type=text],.field input[type=time]{width:100%;padding:11px 13px;border-radius:10px;
+  border:1px solid var(--rule);background:var(--sheet);font-size:16px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;padding:0}
+.sw.sel{border-color:var(--ink)}
+.sw i{display:block;width:100%;height:100%;border-radius:50%}
+.emojis{display:flex;flex-wrap:wrap;gap:6px}
+.emo{width:36px;height:36px;border-radius:9px;border:1px solid var(--rule);font-size:17px;background:var(--sheet)}
+.emo.sel{border-color:var(--ink);border-width:2px}
+
+/* ---------- sheet ---------- */
+.scrim{position:fixed;inset:0;background:rgba(21,26,36,.34);display:flex;align-items:flex-end;
+  justify-content:center;z-index:20}
+.sheet{background:var(--paper);width:100%;max-width:540px;border-radius:18px 18px 0 0;
+  padding:22px 20px calc(30px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;
+  animation:up .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(24px);opacity:0}}
+.sheet h2{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.025em;margin-bottom:18px}
+
+/* ---------- month grid ---------- */
+.month{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dow{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--graphite);
+  text-align:center;padding-bottom:4px;text-transform:uppercase}
+.cell{aspect-ratio:1;display:grid;place-items:center;border-radius:8px;padding:0;
+  font-family:var(--mono);font-size:12.5px;color:var(--rule);border:1.5px solid transparent}
+.cell.past{color:var(--graphite)}
+.cell.on{font-weight:600}
+.cell.today{box-shadow:inset 0 0 0 1px var(--graphite)}
+
+/* ---------- ledger ---------- */
+.ledger{padding:4px 16px}
+.line{display:flex;justify-content:space-between;align-items:baseline;padding:13px 0;
+  border-bottom:1px solid var(--rule)}
+.line:last-child{border-bottom:none}
+.line dt{font-size:14px;color:var(--graphite)}
+.line dd{font-family:var(--mono);font-weight:500;font-size:16px}
+
+.empty{text-align:center;padding:44px 8px}
+.empty p{color:var(--graphite);font-size:14.5px;line-height:1.55;margin:10px 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.chip{padding:8px 13px;border-radius:999px;border:1px solid var(--rule);background:var(--sheet);font-size:13.5px}
+.note{font-size:12.5px;color:var(--graphite);line-height:1.55;margin-top:10px}
+.sec{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--graphite);margin:26px 0 10px}
+.back{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--graphite)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:88px;background:var(--ink);
+  color:var(--sheet);padding:10px 16px;border-radius:999px;font-size:13px;z-index:30;
+  animation:up .2s ease}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav class="nav"><div class="nav-in" id="nav"></div></nav>
+<input type="file" id="importer" accept="application/json,.json" hidden>
+
+<script>
+"use strict";
+
+/* ================= storage =================
+   Tries the sandbox's persistent store, then localStorage (the normal
+   case for a file on disk), then memory. Never throws. */
+const KEY = "habitstamp:v1";
+const Store = (() => {
+  let memory = null;
+  const hasWin = typeof window.storage !== "undefined" && window.storage;
+  const hasLocal = (() => {
+    try { localStorage.setItem("__t", "1"); localStorage.removeItem("__t"); return true; }
+    catch (e) { return false; }
+  })();
+  return {
+    mode: hasWin ? "sandbox" : hasLocal ? "local" : "memory",
+    async get() {
+      if (hasWin) { try { const r = await window.storage.get(KEY); return r ? r.value : null; } catch (e) {} }
+      if (hasLocal) { try { return localStorage.getItem(KEY); } catch (e) {} }
+      return memory;
+    },
+    async set(v) {
+      memory = v;
+      if (hasWin) { try { await window.storage.set(KEY, v); return; } catch (e) {} }
+      if (hasLocal) { try { localStorage.setItem(KEY, v); } catch (e) {} }
+    }
+  };
+})();
+
+/* ================= data ================= */
+const BLANK = { habits: [], logs: [], settings: { reminderTime: "20:00" } };
+let data = BLANK;
+let view = { name: "today" };
+let draft = null;          // open habit editor
+let toastTimer = null;
+
+const uid = () => Math.random().toString(36).slice(2, 10);
+const K = (h, d) => h + "|" + d;
+
+async function load() {
+  const raw = await Store.get();
+  if (!raw) return BLANK;
+  try {
+    const p = JSON.parse(raw);
+    return { habits: p.habits || [], logs: p.logs || [], settings: Object.assign({}, BLANK.settings, p.settings) };
+  } catch (e) { return BLANK; }
+}
+function save() { Store.set(JSON.stringify(data)); }
+
+/* ================= dates ================= */
+const iso = d => { const t = new Date(d.getTime() - d.getTimezoneOffset() * 6e4); return t.toISOString().slice(0, 10); };
+const today = () => iso(new Date());
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const shift = (s, n) => { const [y, m, d] = s.split("-").map(Number); return iso(new Date(y, m - 1, d + n)); };
+const between = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
+
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DOW = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const WORDS = ["none","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve"];
+const word = n => n < WORDS.length ? WORDS[n] : String(n);
+const cap = s => s[0].toUpperCase() + s.slice(1);
+
+/* ================= stats ================= */
+let DONE = new Set();
+function reindex() {
+  DONE = new Set();
+  data.logs.forEach(l => { if (l.count > 0) DONE.add(K(l.habitId, l.date)); });
+}
+function streak(h) {
+  // an unstamped today doesn't break the run — you still have the day
+  let c = DONE.has(K(h.id, today())) ? today() : shift(today(), -1), n = 0;
+  while (DONE.has(K(h.id, c))) { n++; c = shift(c, -1); }
+  return n;
+}
+function best(dates) {
+  const s = [...dates].sort(); let b = 0, run = 0, prev = null;
+  for (const d of s) { run = prev && between(prev, d) === 1 ? run + 1 : 1; prev = d; if (run > b) b = run; }
+  return b;
+}
+function completion(h, win) {
+  const elapsed = Math.min(win, between(h.createdAt.slice(0, 10), today()) + 1);
+  if (elapsed <= 0) return { pct: 0, hit: 0, of: 0 };
+  let hit = 0;
+  for (let i = 0; i < elapsed; i++) if (DONE.has(K(h.id, shift(today(), -i)))) hit++;
+  return { pct: Math.round(hit / elapsed * 100), hit, of: elapsed };
+}
+const hash = s => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
+const tilt = s => (hash(s) % 9) - 4;
+
+const INKS = ["#5B4BE0","#0E8C8B","#D0384C","#B86C05","#2563C9","#2E7D3A","#A8338C","#455266"];
+const EMOJI = ["✳️","🏃","📖","💧","🧘","🛏️","🍎","🎸","✍️","🧹","☎️","🌱","🥬","🧠","🎧","🚭"];
+
+/* ================= view helpers ================= */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function stampHTML(h, date) {
+  const on = DONE.has(K(h.id, date));
+  const d = Number(date.slice(8, 10));
+  const style = on ? `border-color:${h.color};background:${h.color}14;color:${h.color}` : "";
+  const mark = on ? `transform:rotate(${tilt(h.id + date)}deg);text-shadow:1px 1px 0 ${h.color}33` : "";
+  return `<button class="stamp${on ? " on" : ""}" style="${style}" data-act="toggle" data-id="${h.id}" data-date="${date}"
+    aria-pressed="${on}" aria-label="${on ? "Unstamp" : "Stamp"} ${esc(h.name)}">
+    <span class="mark" style="${mark}">${on ? d : "·"}</span></button>`;
+}
+function ribbonHTML(h, days) {
+  let out = '<span class="ribbon" aria-hidden="true">';
+  for (let i = (days || 7) - 1; i >= 0; i--) {
+    const date = shift(today(), -i), on = DONE.has(K(h.id, date));
+    out += `<i class="${on ? "f " : ""}${i === 0 ? "now" : ""}" style="${on ? "background:" + h.color : ""}"></i>`;
+  }
+  return out + "</span>";
+}
+
+/* ================= screens ================= */
+function todayScreen() {
+  const live = data.habits.filter(h => !h.isArchived);
+  const t = today(), dt = parse(t);
+  const eyebrow = `${DOW[(dt.getDay() + 6) % 7]} · ${String(dt.getDate()).padStart(2, "0")} ${MONTHS[dt.getMonth()].slice(0, 3)} ${dt.getFullYear()}`;
+
+  if (!live.length) return `
+    <div class="eyebrow">${eyebrow}</div>
+    <div class="empty">
+      <h1 class="display" style="font-size:28px">An empty card.</h1>
+      <p>Every habit starts as a blank column of dates.<br>Name one thing you want to do daily.</p>
+      <button class="btn" data-act="new">Add your first habit</button>
+      <div class="chips">
+        ${["Read 20 minutes","Walk outside","Stretch","No phone in bed"]
+          .map(s => `<button class="chip" data-act="new" data-name="${s}">${s}</button>`).join("")}
+      </div>
+    </div>`;
+
+  const n = live.filter(h => DONE.has(K(h.id, t))).length;
+  const head = n === 0 ? "Nothing stamped yet."
+    : n === live.length ? `All ${word(live.length)}, stamped.`
+    : `${cap(word(n))} of ${word(live.length)} stamped.`;
+
+  return `
+    <div class="eyebrow">${eyebrow}</div>
+    <h1 class="display">${head}</h1>
+    <div class="meter"><i style="width:${n / live.length * 100}%"></i></div>
+    <div class="rows">
+      ${live.map(h => {
+        const s = streak(h);
+        return `<div class="row">
+          ${stampHTML(h, t)}
+          <button class="row-main" data-act="detail" data-id="${h.id}">
+            <div class="row-name"><span class="em">${h.emoji}</span>${esc(h.name)}</div>
+            <div class="row-sub">${ribbonHTML(h, 7)}${s > 0 ? s + " day" + (s === 1 ? "" : "s") + " running" : "not running"}</div>
+          </button></div>`;
+      }).join("")}
+    </div>
+    <button class="btn ghost wide" style="margin-top:6px" data-act="new">+ Add habit</button>`;
+}
+
+function habitRow(h) {
+  return `<div class="row">
+    <button class="row-main" data-act="detail" data-id="${h.id}">
+      <div class="row-name" ${h.isArchived ? 'style="color:var(--graphite)"' : ""}>
+        <span class="em">${h.emoji}</span>${esc(h.name)}</div>
+      <div class="row-sub">
+        <span style="width:8px;height:8px;border-radius:9px;display:inline-block;background:${h.color}"></span>
+        daily · since ${h.createdAt.slice(0, 10)}</div>
+    </button>
+    <button class="back" data-act="edit" data-id="${h.id}">Edit</button>
+    <button class="back" data-act="archive" data-id="${h.id}">${h.isArchived ? "Restore" : "Archive"}</button>
+  </div>`;
+}
+
+function habitsScreen() {
+  const live = data.habits.filter(h => !h.isArchived);
+  const filed = data.habits.filter(h => h.isArchived);
+  return `
+    <div class="eyebrow">Manage</div>
+    <h1 class="display">Habits.</h1>
+    <div class="rows">
+      ${live.length ? live.map(habitRow).join("") : '<p class="note">No active habits. Add one to start a card.</p>'}
+    </div>
+    <button class="btn wide" data-act="new">+ Add habit</button>
+    ${filed.length ? `<div class="sec">Archived</div><div class="rows">${filed.map(habitRow).join("")}</div>` : ""}`;
+}
+
+function detailScreen() {
+  const h = data.habits.find(x => x.id === view.id);
+  if (!h) return habitsScreen();
+  const dates = [];
+  DONE.forEach(k => { if (k.slice(0, k.indexOf("|")) === h.id) dates.push(k.split("|")[1]); });
+
+  const y = view.y, m = view.m;
+  const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+  const len = new Date(y, m + 1, 0).getDate();
+  let cells = DOW.map(d => `<div class="dow">${d[0]}</div>`).join("");
+  for (let i = 0; i < lead; i++) cells += "<div></div>";
+  for (let d = 1; d <= len; d++) {
+    const date = iso(new Date(y, m, d));
+    const on = DONE.has(K(h.id, date)), past = date <= today();
+    const st = on ? `border-color:${h.color};color:${h.color};background:${h.color}12;transform:rotate(${tilt(h.id + date)}deg)` : "";
+    cells += `<button class="cell${past ? " past" : ""}${on ? " on" : ""}${date === today() ? " today" : ""}"
+      style="${st}" ${past ? `data-act="toggle" data-id="${h.id}" data-date="${date}"` : "disabled"}
+      aria-label="${date}${on ? " done" : " not done"}">${d}</button>`;
+  }
+
+  const s = streak(h), w7 = completion(h, 7), w30 = completion(h, 30);
+  return `
+    <button class="back" data-act="nav" data-view="today">← Back</button>
+    <h1 class="display" style="margin-top:14px"><span style="margin-right:8px">${h.emoji}</span>${esc(h.name)}</h1>
+    <div class="eyebrow" style="margin-top:10px;color:${h.color}">
+      ${s > 0 ? s + " day" + (s === 1 ? "" : "s") + " running" : "Streak broken — stamp today to restart"}</div>
+
+    <div class="sec">${MONTHS[m]} ${y}</div>
+    <div class="card" style="padding:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+        <button class="back" data-act="month" data-n="-1">← Prev</button>
+        <button class="back" data-act="month" data-n="1">Next →</button>
+      </div>
+      <div class="month">${cells}</div>
+    </div>
+    <p class="note">Tap any past day to correct the record.</p>
+
+    <div class="sec">Consistency</div>
+    <dl class="card ledger">
+      <div class="line"><dt>Current streak</dt><dd>${s} d</dd></div>
+      <div class="line"><dt>Best streak</dt><dd>${best(dates)} d</dd></div>
+      <div class="line"><dt>Last 7 days</dt><dd>${w7.pct}% · ${w7.hit}/${w7.of}</dd></div>
+      <div class="line"><dt>Last 30 days</dt><dd>${w30.pct}% · ${w30.hit}/${w30.of}</dd></div>
+      <div class="line"><dt>Total stamps</dt><dd>${dates.length}</dd></div>
+    </dl>`;
+}
+
+function settingsScreen() {
+  const where = Store.mode === "local" ? "this browser on this device"
+    : Store.mode === "sandbox" ? "this preview" : "memory only — this session will not be kept";
+  return `
+    <div class="eyebrow">Preferences</div>
+    <h1 class="display">Settings.</h1>
+
+    <div class="sec">Reminder</div>
+    <div class="card" style="padding:16px">
+      <label class="field" style="margin-bottom:12px"><span>Nudge me at</span>
+        <input type="time" id="rtime" value="${data.settings.reminderTime}"></label>
+      <button class="btn ghost" data-act="notify">Enable notifications</button>
+      <p class="note">The nudge fires while this page is open — a page can't wake itself once closed.
+      Add it to your home screen and it behaves like an app.</p>
+    </div>
+
+    <div class="sec">Your data</div>
+    <div class="card" style="padding:16px">
+      <p class="note" style="margin:0 0 14px">
+        ${data.logs.length} stamps across ${data.habits.length} habits, stored in ${where}.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button class="btn ghost" data-act="csv">Export CSV</button>
+        <button class="btn ghost" data-act="backup">Save backup</button>
+        <button class="btn ghost" data-act="restore">Restore backup</button>
+      </div>
+      <p class="note">Clearing your browser data erases your habits. Save a backup now and then.</p>
+    </div>
+
+    <div class="sec">Danger</div>
+    <div class="card" style="padding:16px">
+      <button class="btn ghost" data-act="wipe" style="color:#D0384C;border-color:#D0384C33">Erase everything</button>
+    </div>`;
+}
+
+function editorHTML() {
+  return `<div class="scrim" data-act="close">
+    <div class="sheet" data-stop>
+      <h2>${draft.id ? "Edit habit" : "New habit"}</h2>
+      <label class="field"><span>Name</span>
+        <input type="text" id="hname" value="${esc(draft.name)}" placeholder="Read 20 minutes"></label>
+      <label class="field"><span>Ink</span><div class="swatches">
+        ${INKS.map(c => `<button class="sw${c === draft.color ? " sel" : ""}" data-act="color" data-v="${c}"
+          aria-label="colour ${c}"><i style="background:${c}"></i></button>`).join("")}
+      </div></label>
+      <label class="field"><span>Icon</span><div class="emojis">
+        ${EMOJI.map(e => `<button class="emo${e === draft.emoji ? " sel" : ""}" data-act="emoji" data-v="${e}">${e}</button>`).join("")}
+      </div></label>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="btn ghost" data-act="close">Cancel</button>
+        <button class="btn" style="flex:1" data-act="save">Save habit</button>
+      </div>
+    </div></div>`;
+}
+
+/* ================= render ================= */
+const TABS = [["today", "Today"], ["habits", "Habits"], ["settings", "Settings"]];
+
+function render() {
+  reindex();
+  const app = document.getElementById("app");
+  const screen = view.name === "habits" ? habitsScreen()
+    : view.name === "detail" ? detailScreen()
+    : view.name === "settings" ? settingsScreen()
+    : todayScreen();
+  app.innerHTML = `<div class="wrap">${screen}</div>` + (draft ? editorHTML() : "");
+
+  document.getElementById("nav").innerHTML = TABS.map(([id, label]) => {
+    const sel = view.name === id || (id === "today" && view.name === "detail");
+    return `<button class="${sel ? "sel" : ""}" data-act="nav" data-view="${id}">${label}</button>`;
+  }).join("");
+
+  const n = document.getElementById("hname");
+  if (n && !draft.focused) { draft.focused = true; n.focus(); n.setSelectionRange(n.value.length, n.value.length); }
+}
+
+function toast(msg) {
+  document.querySelectorAll(".toast").forEach(t => t.remove());
+  const el = document.createElement("div");
+  el.className = "toast"; el.textContent = msg; el.setAttribute("role", "status");
+  document.body.appendChild(el);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.remove(), 2200);
+}
+
+/* ================= actions ================= */
+function toggle(habitId, date) {
+  const i = data.logs.findIndex(l => l.habitId === habitId && l.date === date);
+  if (i >= 0) data.logs.splice(i, 1);
+  else data.logs.push({ id: uid(), habitId, date, count: 1 });
+  save(); render();
+}
+
+function openEditor(h) {
+  draft = h
+    ? { id: h.id, name: h.name, emoji: h.emoji, color: h.color }
+    : { name: "", emoji: EMOJI[0], color: INKS[data.habits.length % INKS.length] };
+  render();
+}
+
+function saveHabit() {
+  const input = document.getElementById("hname");
+  const name = (input ? input.value : draft.name).trim();
+  if (!name) { input && input.focus(); return; }
+  if (draft.id) {
+    const h = data.habits.find(x => x.id === draft.id);
+    Object.assign(h, { name, emoji: draft.emoji, color: draft.color });
+  } else {
+    data.habits.push({ id: uid(), name, emoji: draft.emoji, color: draft.color,
+      createdAt: new Date().toISOString(), isArchived: false, schedule: "daily", targetPerDay: 1 });
+  }
+  draft = null; save(); render();
+}
+
+function csvText() {
+  const names = {}; data.habits.forEach(h => names[h.id] = h.name);
+  const rows = [["habit_id", "habit_name", "date", "count"]].concat(
+    data.logs.slice().sort((a, b) => a.date.localeCompare(b.date))
+      .map(l => [l.habitId, '"' + String(names[l.habitId] || "").replace(/"/g, '""') + '"', l.date, l.count]));
+  return rows.map(r => r.join(",")).join("\n");
+}
+
+function download(text, filename, type) {
+  try {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast("Saved " + filename);
+  } catch (e) {
+    navigator.clipboard && navigator.clipboard.writeText(text);
+    toast("Download blocked — copied instead");
+  }
+}
+
+/* ---- in-page reminder ---- */
+let notified = "";
+function checkReminder() {
+  const t = data.settings.reminderTime;
+  if (!t || !("Notification" in window) || Notification.permission !== "granted") return;
+  const now = new Date();
+  const stamp = today() + " " + t;
+  if (notified === stamp) return;
+  const [hh, mm] = t.split(":").map(Number);
+  if (now.getHours() > hh || (now.getHours() === hh && now.getMinutes() >= mm)) {
+    const live = data.habits.filter(h => !h.isArchived);
+    const left = live.filter(h => !DONE.has(K(h.id, today()))).length;
+    notified = stamp;
+    if (left > 0) new Notification("Habit Stamp", { body: `${cap(word(left))} habit${left === 1 ? "" : "s"} still unstamped today.` });
+  }
+}
+
+/* ================= events ================= */
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  if (el.classList.contains("scrim") && e.target !== el) return;
+  const act = el.dataset.act;
+
+  if (act === "toggle") return toggle(el.dataset.id, el.dataset.date);
+  if (act === "detail") {
+    const d = new Date();
+    view = { name: "detail", id: el.dataset.id, y: d.getFullYear(), m: d.getMonth() };
+    return render();
+  }
+  if (act === "nav") { view = { name: el.dataset.view }; return render(); }
+  if (act === "month") {
+    const d = new Date(view.y, view.m + Number(el.dataset.n), 1);
+    view = Object.assign({}, view, { y: d.getFullYear(), m: d.getMonth() });
+    return render();
+  }
+  if (act === "new") return openEditor(null), (el.dataset.name && setName(el.dataset.name));
+  if (act === "edit") return openEditor(data.habits.find(h => h.id === el.dataset.id));
+  if (act === "archive") {
+    const h = data.habits.find(x => x.id === el.dataset.id);
+    h.isArchived = !h.isArchived; save(); return render();
+  }
+  if (act === "close") { draft = null; return render(); }
+  if (act === "save") return saveHabit();
+  if (act === "color") {
+    draft.color = el.dataset.v;
+    document.querySelectorAll(".sw").forEach(s => s.classList.toggle("sel", s.dataset.v === draft.color));
+    return;
+  }
+  if (act === "emoji") {
+    draft.emoji = el.dataset.v;
+    document.querySelectorAll(".emo").forEach(s => s.classList.toggle("sel", s.dataset.v === draft.emoji));
+    return;
+  }
+  if (act === "csv") return download(csvText(), "habits.csv", "text/csv");
+  if (act === "backup") return download(JSON.stringify(data, null, 2), "habit-stamp-backup.json", "application/json");
+  if (act === "restore") return document.getElementById("importer").click();
+  if (act === "notify") {
+    if (!("Notification" in window)) return toast("This browser has no notifications");
+    Notification.requestPermission().then(p => toast(p === "granted" ? "Notifications on" : "Notifications blocked"));
+    return;
+  }
+  if (act === "wipe") {
+    if (!confirm("Erase every habit and stamp? This cannot be undone.")) return;
+    data = { habits: [], logs: [], settings: data.settings };
+    save(); view = { name: "today" }; return render();
+  }
+});
+
+function setName(v) {
+  const n = document.getElementById("hname");
+  if (n) { n.value = v; draft.name = v; }
+}
+
+document.addEventListener("input", e => {
+  if (e.target.id === "hname" && draft) draft.name = e.target.value;
+  if (e.target.id === "rtime") { data.settings.reminderTime = e.target.value; notified = ""; save(); }
+});
+document.addEventListener("keydown", e => {
+  if (!draft) return;
+  if (e.key === "Enter" && e.target.id === "hname") saveHabit();
+  if (e.key === "Escape") { draft = null; render(); }
+});
+document.getElementById("importer").addEventListener("change", e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const p = JSON.parse(r.result);
+      if (!Array.isArray(p.habits) || !Array.isArray(p.logs)) throw 0;
+      data = { habits: p.habits, logs: p.logs, settings: Object.assign({}, BLANK.settings, p.settings) };
+      save(); view = { name: "today" }; render(); toast("Backup restored");
+    } catch (err) { toast("That file isn't a Habit Stamp backup"); }
+  };
+  r.readAsText(f);
+  e.target.value = "";
+});
+
+/* redraw at midnight so "today" stays honest on a page left open */
+let day = today();
+setInterval(() => {
+  if (today() !== day) { day = today(); notified = ""; render(); }
+  checkReminder();
+}, 30000);
+
+/* ================= boot ================= */
+load().then(d => { data = d; render(); });
+</script>
+</body>
+</html>
