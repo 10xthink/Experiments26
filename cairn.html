@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#DEDED2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Cairn — a task trail</title>
+<style>
+:root{
+  --ground:#DEDED2; --sheet:#F2EFE6; --ink:#221F1B; --slate:#6E7268;
+  --path:#CFC8B4; --blaze:#C1531D; --moss:#4B6B4F; --moss-soft:#E4EADF; --danger:#B5432A;
+  --display:"Arial Black","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --serif:Georgia,"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+:root[data-theme="dark"]{
+  --ground:#18181A; --sheet:#232320; --ink:#ECE7DC; --slate:#93968D;
+  --path:#3A3934; --blaze:#D9683A; --moss:#74A06E; --moss-soft:#233128; --danger:#E2795A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--ground)}
+body{font-family:var(--serif);color:var(--ink);-webkit-font-smoothing:antialiased;
+  min-height:100vh;-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;
+  appearance:none;-webkit-appearance:none;-moz-appearance:none}
+input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3px}
+
+.wrap{max-width:520px;margin:0 auto;padding:24px 20px calc(110px + env(safe-area-inset-bottom))}
+.brandmark{font-family:var(--display);font-size:11px;letter-spacing:.24em;color:var(--slate);text-transform:uppercase}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--slate);margin-top:6px}
+.headline{font-family:var(--serif);font-weight:700;font-size:32px;letter-spacing:-.015em;margin-top:6px;color:var(--ink)}
+.sign{font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:11.5px;color:var(--slate)}
+.note{font-family:var(--serif);font-size:13.5px;color:var(--slate);line-height:1.55;margin-top:6px}
+
+/* capture */
+.capture{display:flex;gap:8px;margin-top:18px}
+.capture input{flex:1;padding:13px 15px;border-radius:11px;border:1px solid var(--path);
+  background:var(--sheet);color:var(--ink);font-size:16px;font-family:var(--serif)}
+.cap-btn{width:46px;height:46px;flex:none;border-radius:11px;background:var(--ink);color:var(--sheet);
+  font-size:22px;font-weight:700;line-height:1;display:grid;place-items:center}
+.cap-btn:active{transform:translateY(1px)}
+.suggest:not(:empty){margin-top:2px;border-radius:10px;overflow:hidden}
+.sugg-item{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;
+  padding:11px 13px;border:1px solid var(--path);border-top:none;background:var(--sheet);color:var(--ink);font-size:14px}
+.sugg-item:first-child{border-top:1px solid var(--path)}
+.sugg-item .n{font-family:var(--mono);font-size:10.5px;color:var(--slate);flex:none;align-self:center}
+
+/* frequent chips */
+.freq{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.freq-chip{padding:6px 12px;border-radius:999px;border:1px solid var(--path);background:var(--sheet);color:var(--ink);
+  font-family:var(--serif);font-size:12.5px;display:inline-flex;align-items:center;gap:6px}
+.freq-chip .n{font-family:var(--mono);color:var(--slate);font-size:10.5px}
+
+/* cards */
+.card{background:var(--sheet);border:1px solid var(--path);border-radius:16px}
+.now-card{background:var(--sheet);border:1px solid var(--path);border-radius:16px;padding:18px;margin-top:12px}
+.now-top{display:flex;gap:14px;align-items:flex-start}
+.cairn{flex:none;margin-top:2px}
+.pulse{transform-box:fill-box;transform-origin:center;animation:pulse 2.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.now-text{font-size:19px;line-height:1.35;font-weight:700;overflow-wrap:anywhere;color:var(--ink)}
+.now-meta{font-family:var(--mono);font-size:11px;color:var(--slate);margin-top:7px;letter-spacing:.02em}
+.now-actions{display:flex;gap:8px;margin-top:16px}
+
+.idle-card{border:1.5px dashed var(--path);border-radius:16px;padding:24px 20px;margin-top:12px;text-align:center}
+.idle-card p:first-child{font-size:16.5px;font-weight:700;color:var(--ink)}
+
+/* just finished banner */
+.just-done{display:flex;align-items:center;gap:8px;background:var(--moss-soft);border:1px solid var(--moss);
+  border-radius:12px;padding:10px 12px;margin-top:12px;font-size:13.5px;color:var(--ink)}
+.just-done .tick{color:var(--moss);font-weight:700;flex:none}
+.just-done .txt{flex:1;overflow-wrap:anywhere}
+.jd-close{color:var(--slate);font-size:16px;line-height:1;padding:2px 4px;flex:none}
+
+/* trail rail */
+.rail{margin-top:2px}
+.waypoint{position:relative;padding:12px 12px 12px 20px;margin-left:9px;
+  display:flex;align-items:center;gap:10px;border-left:2px dotted var(--path);background:var(--sheet)}
+.rail.solid .waypoint{border-left-style:solid}
+.rail .waypoint:last-child{border-left-color:transparent}
+.node{position:absolute;left:-6px;top:50%;transform:translateY(-50%);width:10px;height:10px;
+  border-radius:50%;background:var(--sheet);border:2px solid var(--slate)}
+.node.filled{background:var(--blaze);border-color:var(--blaze)}
+.wp-body{flex:1;min-width:0}
+.wp-text{font-size:15px;line-height:1.3;overflow-wrap:anywhere;color:var(--ink);font-weight:600}
+.wp-meta{font-family:var(--mono);font-size:10.5px;color:var(--slate);margin-top:4px;letter-spacing:.03em}
+.wp-actions{display:flex;gap:6px;flex:none;flex-wrap:wrap;justify-content:flex-end}
+
+.day-head{font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;
+  font-size:10.5px;color:var(--slate);margin:20px 0 2px 9px}
+.day-head span{text-transform:none;letter-spacing:0;font-family:var(--mono)}
+
+/* footprint chips */
+.footprints{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.fp-chip{display:inline-flex;align-items:center;gap:5px;max-width:180px;padding:5px 10px;color:var(--ink);
+  border-radius:8px;background:var(--sheet);border:1px solid var(--path);font-family:var(--mono);font-size:11px}
+.fp-chip .tick{color:var(--blaze);font-weight:700;flex:none}
+.fp-chip .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.more-link{display:block;margin-top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  color:var(--slate);text-decoration:underline;text-underline-offset:3px}
+
+/* desire paths */
+.rp-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--path)}
+.rp-row:last-child{border-bottom:none}
+.rp-text{font-size:14.5px;color:var(--ink)}
+.rp-meta{font-family:var(--mono);font-size:10.5px;color:var(--slate);margin-top:3px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;
+  border-radius:10px;background:var(--ink);color:var(--sheet);font-size:14px;font-weight:600;font-family:var(--serif)}
+.btn.blaze{background:var(--blaze)}
+.btn.ghost{background:var(--path);color:var(--ink);border:1px solid var(--path)}
+.btn.small{padding:7px 12px;font-size:12.5px;border-radius:8px;font-weight:600}
+.btn.revive{background:var(--moss);color:var(--sheet);border:1px solid var(--moss)}
+.btn.danger{background:var(--danger);color:var(--sheet);border:1px solid var(--danger)}
+.btn.wide{width:100%}
+.btn:active{transform:translateY(1px)}
+
+.ledger{padding:4px 16px;margin-top:14px}
+.line{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--path)}
+.line:last-child{border-bottom:none}
+.line dt{font-size:13.5px;color:var(--slate)}
+.line dd{font-family:var(--mono);font-weight:600;font-size:15.5px;color:var(--ink)}
+.line dd.streak{color:var(--moss)}
+
+/* segmented control */
+.segmented{display:flex;border:1px solid var(--path);border-radius:10px;overflow:hidden;margin-top:10px}
+.seg{flex:1;padding:10px 0;font-family:var(--display);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;background:var(--sheet);color:var(--slate)}
+.seg+.seg{border-left:1px solid var(--path)}
+.seg.sel{background:var(--ink);color:var(--sheet)}
+
+/* nav */
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--ground);opacity:.97;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--path);
+  padding-bottom:env(safe-area-inset-bottom)}
+.nav-in{max-width:520px;margin:0 auto;display:flex}
+.nav button{flex:1;padding:13px 0 18px;font-family:var(--display);font-size:10px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--slate)}
+.nav button::before{content:'';display:block;width:5px;height:5px;border-radius:50%;margin:0 auto 6px}
+.nav button.sel{color:var(--ink)}
+.nav button.sel::before{background:var(--blaze)}
+
+.sec{margin-top:28px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:88px;background:var(--ink);
+  color:var(--sheet);padding:10px 16px;border-radius:999px;font-size:13px;z-index:40;
+  font-family:var(--serif);animation:up .2s ease;max-width:88vw}
+@keyframes up{from{transform:translate(-50%,10px);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav class="nav"><div class="nav-in" id="nav"></div></nav>
+<input type="file" id="importer" accept="application/json,.json" hidden>
+
+<script>
+"use strict";
+
+/* ================= storage ================= */
+const KEY = "cairn:v1";
+const Store = (() => {
+  let memory = null;
+  const hasWin = typeof window.storage !== "undefined" && window.storage;
+  const hasLocal = (() => { try { localStorage.setItem("__t","1"); localStorage.removeItem("__t"); return true; } catch(e){ return false; } })();
+  return {
+    mode: hasWin ? "sandbox" : hasLocal ? "local" : "memory",
+    async get(){
+      if(hasWin){ try{ const r = await window.storage.get(KEY); return r? r.value : null; } catch(e){} }
+      if(hasLocal){ try{ return localStorage.getItem(KEY); } catch(e){} }
+      return memory;
+    },
+    async set(v){
+      memory = v;
+      if(hasWin){ try{ await window.storage.set(KEY, v); return; } catch(e){} }
+      if(hasLocal){ try{ localStorage.setItem(KEY, v); } catch(e){} }
+    }
+  };
+})();
+
+/* ================= data ================= */
+let data = { tasks: [], settings: { theme: "system" } };
+let view = { name: "now" };
+let state = { justDone: null };
+let lastAction = null;
+let toastTimer = null;
+
+const uid = () => Math.random().toString(36).slice(2,10);
+const now = () => new Date().toISOString();
+const find = id => data.tasks.find(t => t.id === id);
+const by = status => data.tasks.filter(t => t.status === status);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+async function load(){
+  const raw = await Store.get();
+  if(!raw) return { tasks: [], settings: { theme: "system" } };
+  try{
+    const p = JSON.parse(raw);
+    return {
+      tasks: Array.isArray(p.tasks) ? p.tasks : [],
+      settings: Object.assign({ theme: "system" }, p.settings || {})
+    };
+  } catch(e){ return { tasks: [], settings: { theme: "system" } }; }
+}
+function save(){ Store.set(JSON.stringify(data)); }
+
+/* ================= theme ================= */
+function resolveTheme(){
+  const t = data.settings.theme;
+  if(t === "light" || t === "dark") return t;
+  return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+}
+function applyTheme(){
+  const r = resolveTheme();
+  document.documentElement.setAttribute("data-theme", r);
+  document.documentElement.style.colorScheme = r;
+}
+applyTheme();
+if(window.matchMedia){
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const onChange = () => { if(data.settings.theme === "system") applyTheme(); };
+  if(mq.addEventListener) mq.addEventListener("change", onChange); else if(mq.addListener) mq.addListener(onChange);
+}
+
+/* ================= dates ================= */
+const DOW = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+function localDay(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+const todayKey = () => localDay(new Date());
+function shiftKey(key,n){ const [y,m,d]=key.split("-").map(Number); return localDay(new Date(y,m-1,d+n)); }
+function dayLabel(key){
+  if(key===todayKey()) return "Today";
+  if(key===shiftKey(todayKey(),-1)) return "Yesterday";
+  const [y,m,d]=key.split("-").map(Number); const dt=new Date(y,m-1,d);
+  return DOW[(dt.getDay()+6)%7]+" "+d+" "+MONTHS[dt.getMonth()].slice(0,3);
+}
+function hm(d){ return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+function daysAgo(iso){ return Math.floor((Date.now()-new Date(iso).getTime())/864e5); }
+function elapsed(iso){
+  let s = Math.max(0, Math.floor((Date.now()-new Date(iso).getTime())/1000));
+  const d=Math.floor(s/86400); s-=d*86400;
+  const h=Math.floor(s/3600); s-=h*3600;
+  const m=Math.floor(s/60);
+  if(d>0) return d+"d "+h+"h";
+  if(h>0) return h+"h "+m+"m";
+  if(m>0) return m+"m";
+  return "just now";
+}
+function currentStreak(){
+  const doneKeys = new Set(by("done").map(t=>localDay(new Date(t.doneAt))));
+  let cursor = todayKey();
+  if(!doneKeys.has(cursor)) cursor = shiftKey(cursor,-1);
+  let n=0;
+  while(doneKeys.has(cursor)){ n++; cursor=shiftKey(cursor,-1); }
+  return n;
+}
+
+/* ================= recurring / desire paths ================= */
+function normalize(s){ return s.trim().replace(/\s+/g," ").toLowerCase(); }
+function buildRecurring(){
+  const map = new Map();
+  data.tasks.forEach(t=>{
+    const k = normalize(t.text);
+    if(!k) return;
+    if(!map.has(k)) map.set(k, { key:k, text:t.text, count:0, lastCreated:t.createdAt, doneCount:0 });
+    const e = map.get(k);
+    e.count++;
+    if(t.createdAt > e.lastCreated){ e.lastCreated = t.createdAt; e.text = t.text; }
+    if(t.status === "done") e.doneCount++;
+  });
+  return [...map.values()];
+}
+function tooSoonDuplicate(text){
+  const k = normalize(text);
+  if(!k) return false;
+  return data.tasks.some(t => normalize(t.text)===k && (Date.now() - new Date(t.createdAt).getTime()) < 4000);
+}
+function quickCapture(text){
+  if(tooSoonDuplicate(text)){ toast("Already logged that."); return; }
+  data.tasks.push({ id: uid(), text, createdAt: now(), status: "queued", statusAt: now(), doneAt: null });
+  save(); render();
+  toast("Logged.");
+}
+
+/* ================= pieces ================= */
+function cairnSVG(){
+  return `<svg class="cairn" width="38" height="32" viewBox="0 0 40 34" fill="none" aria-hidden="true">
+    <ellipse cx="18" cy="29" rx="17" ry="4.2" fill="var(--ink)" opacity=".85"/>
+    <ellipse cx="17" cy="19" rx="12" ry="3.8" fill="var(--ink)" opacity=".92"/>
+    <ellipse cx="16" cy="10" rx="7.5" ry="3.4" fill="var(--ink)"/>
+    <circle class="pulse" cx="28" cy="6" r="3.4" fill="var(--blaze)"/>
+  </svg>`;
+}
+function captureBarHTML(){
+  return `<div class="capture">
+    <input id="capture" type="text" placeholder="What's the next physical action?" autocomplete="off">
+    <button class="cap-btn" data-act="capture" aria-label="Log it">+</button>
+  </div>
+  <div class="suggest" id="suggest"></div>`;
+}
+function frequentChipsHTML(){
+  const recurring = buildRecurring().filter(e=>e.count>=2)
+    .sort((a,b)=> b.count-a.count || b.lastCreated.localeCompare(a.lastCreated)).slice(0,4);
+  if(!recurring.length) return "";
+  return `<div class="freq">${recurring.map(e=>
+    `<button class="freq-chip" data-act="quickcap" data-text="${esc(e.text)}">${esc(e.text)} <span class="n">×${e.count}</span></button>`
+  ).join("")}</div>`;
+}
+function justDoneBanner(){
+  if(!state.justDone) return "";
+  if(Date.now() - state.justDone.at > 45000) return "";
+  return `<div class="just-done"><span class="tick">✓</span><span class="txt">Just finished — ${esc(state.justDone.text)}</span>
+    <button class="jd-close" data-act="dismiss-justdone" aria-label="Dismiss">×</button></div>`;
+}
+function taskRow(t, meta, actions){
+  return `<div class="waypoint">
+    <span class="node"></span>
+    <div class="wp-body">
+      <p class="wp-text">${esc(t.text)}</p>
+      <p class="wp-meta">${meta}</p>
+    </div>
+    <div class="wp-actions">
+      ${actions.map(a=>`<button class="btn small${a.cls?" "+a.cls:""}" data-act="${a.act}" data-id="${t.id}">${a.label}</button>`).join("")}
+    </div>
+  </div>`;
+}
+
+/* ================= screens ================= */
+function nowScreen(){
+  const nowTask = data.tasks.find(t=>t.status==="now");
+  const queued = by("queued").sort((a,b)=>a.statusAt.localeCompare(b.statusAt));
+  const nextUp = queued.slice(0,4);
+  const more = queued.length - nextUp.length;
+  const todayDone = by("done").filter(t=>localDay(new Date(t.doneAt))===todayKey())
+    .sort((a,b)=>a.doneAt.localeCompare(b.doneAt));
+  const streak = currentStreak();
+  const dt = new Date();
+
+  let html = `<div class="brandmark">Cairn</div>
+    <div class="eyebrow">${DOW[(dt.getDay()+6)%7]} · ${String(dt.getDate()).padStart(2,"0")} ${MONTHS[dt.getMonth()].slice(0,3)} · keep moving</div>`;
+  html += captureBarHTML();
+  html += frequentChipsHTML();
+
+  html += `<div class="sec"><div class="sign">You are here</div>`;
+  html += justDoneBanner();
+  if(nowTask){
+    html += `<div class="now-card">
+      <div class="now-top">${cairnSVG()}
+        <div>
+          <p class="now-text">${esc(nowTask.text)}</p>
+          <p class="now-meta">in motion for ${elapsed(nowTask.statusAt)}</p>
+        </div>
+      </div>
+      <div class="now-actions">
+        <button class="btn blaze" data-act="done" data-id="${nowTask.id}">Done</button>
+        <button class="btn ghost" data-act="park" data-id="${nowTask.id}">Park it</button>
+      </div>
+    </div>`;
+  } else if(queued.length){
+    html += `<div class="idle-card"><p>Nothing in motion.</p><p class="note">Pick your next move below.</p></div>`;
+  } else {
+    html += `<div class="idle-card"><p>The trail's empty.</p><p class="note">Log the next thing on your mind, above.</p></div>`;
+  }
+  html += `</div>`;
+
+  if(queued.length){
+    html += `<div class="sec"><div class="sign">Next up</div>
+      <div class="rail dotted" style="margin-top:6px">
+        ${nextUp.map(t=>taskRow(t, "queued "+elapsed(t.statusAt)+" ago", [{label:"Start",act:"start"}])).join("")}
+      </div>
+      ${more>0 ? `<button class="more-link" data-act="nav" data-view="queue">+ ${more} more waiting →</button>` : ""}
+    </div>`;
+  }
+
+  if(todayDone.length){
+    html += `<div class="sec"><div class="sign">Footprints today</div>
+      <div class="footprints">
+        ${todayDone.map(t=>`<span class="fp-chip" title="${esc(t.text)}"><span class="tick">✓</span><span class="txt">${esc(t.text)}</span></span>`).join("")}
+      </div>
+      <p class="note">${todayDone.length} moved today${streak>1?` · <span style="color:var(--moss);font-weight:600">${streak} day streak</span>`:""}</p>
+    </div>`;
+  }
+
+  return html;
+}
+
+function queueScreen(){
+  const queued = by("queued").sort((a,b)=>a.statusAt.localeCompare(b.statusAt));
+  const parked = by("parked").sort((a,b)=>a.statusAt.localeCompare(b.statusAt));
+  let html = `<div class="eyebrow">Sort it out</div><h1 class="headline">Queue.</h1>`;
+  html += captureBarHTML();
+
+  html += `<div class="sec"><div class="sign">Next up</div>
+    <p class="note">Small next actions — ready to start today.</p>`;
+  html += queued.length
+    ? `<div class="rail dotted" style="margin-top:12px">${queued.map(t=>taskRow(t, "queued "+elapsed(t.statusAt)+" ago", [
+        {label:"Start",act:"start"},{label:"Someday",act:"someday",cls:"ghost"},{label:"Let go",act:"letgo",cls:"danger"}
+      ])).join("")}</div>`
+    : `<p class="note">Nothing waiting. Whatever's next, capture it above.</p>`;
+  html += `</div>`;
+
+  html += `<div class="sec"><div class="sign">Someday</div>
+    <p class="note">Big ideas live here until they're small enough to start.</p>`;
+  html += parked.length
+    ? `<div class="rail dotted" style="margin-top:12px">${parked.map(t=>taskRow(t, "parked "+elapsed(t.statusAt)+" ago", [
+        {label:"Bring back",act:"bringback",cls:"revive"},{label:"Let go",act:"letgo",cls:"danger"}
+      ])).join("")}</div>`
+    : `<p class="note">No someday ideas parked.</p>`;
+  html += `</div>`;
+
+  return html;
+}
+
+function desirePathsHTML(){
+  const recurring = buildRecurring().filter(e=>e.count>=3)
+    .sort((a,b)=> b.count-a.count || b.lastCreated.localeCompare(a.lastCreated));
+  if(!recurring.length) return "";
+  return `<div class="sec"><div class="sign">Desire paths</div>
+    <p class="note">Paths you keep walking — logged more than a couple of times.</p>
+    <div class="card" style="margin-top:10px">
+      ${recurring.map(e=>`<div class="rp-row">
+        <div style="flex:1">
+          <p class="rp-text">${esc(e.text)}</p>
+          <p class="rp-meta">${e.count}× · last ${elapsed(e.lastCreated)} ago</p>
+        </div>
+        <button class="btn small" data-act="quickcap" data-text="${esc(e.text)}">Walk it again</button>
+      </div>`).join("")}
+    </div>
+  </div>`;
+}
+
+function trailScreen(){
+  const done = by("done").sort((a,b)=>b.doneAt.localeCompare(a.doneAt));
+  const streak = currentStreak();
+  const weekCount = done.filter(t=>daysAgo(t.doneAt)<7).length;
+
+  let html = `<div class="eyebrow">Where you've been</div><h1 class="headline">Trail.</h1>`;
+  html += `<dl class="card ledger">
+    <div class="line"><dt>Moved today</dt><dd>${done.filter(t=>localDay(new Date(t.doneAt))===todayKey()).length}</dd></div>
+    <div class="line"><dt>This week</dt><dd>${weekCount}</dd></div>
+    <div class="line"><dt>Day streak</dt><dd class="streak">${streak} d</dd></div>
+    <div class="line"><dt>All time</dt><dd>${done.length}</dd></div>
+  </dl>`;
+
+  html += desirePathsHTML();
+
+  if(!done.length){
+    html += `<div class="idle-card" style="margin-top:20px"><p>No footprints yet.</p><p class="note">Finish your first thing and it'll show up here.</p></div>`;
+  } else {
+    let lastDay = null;
+    html += `<div class="rail solid sec">`;
+    done.forEach(t=>{
+      const dkey = localDay(new Date(t.doneAt));
+      if(dkey !== lastDay){
+        lastDay = dkey;
+        const n = done.filter(x=>localDay(new Date(x.doneAt))===dkey).length;
+        html += `<div class="day-head">${dayLabel(dkey)} <span>· ${n} moved</span></div>`;
+      }
+      html += `<div class="waypoint">
+        <span class="node filled"></span>
+        <div class="wp-body">
+          <p class="wp-text">${esc(t.text)}</p>
+          <p class="wp-meta">${hm(new Date(t.doneAt))}</p>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  return html;
+}
+
+function settingsScreen(){
+  const where = Store.mode==="local" ? "this browser on this device" : Store.mode==="sandbox" ? "this preview" : "memory only — this session will not be kept";
+  const theme = data.settings.theme;
+  return `
+    <div class="eyebrow">Preferences</div><h1 class="headline">Settings.</h1>
+    <div class="sec"><div class="sign">Appearance</div>
+      <div class="segmented" role="group" aria-label="Theme">
+        <button class="seg ${theme==='light'?'sel':''}" data-act="theme" data-v="light">Light</button>
+        <button class="seg ${theme==='dark'?'sel':''}" data-act="theme" data-v="dark">Dark</button>
+        <button class="seg ${theme==='system'?'sel':''}" data-act="theme" data-v="system">System</button>
+      </div>
+      <p class="note">System follows your phone or browser's setting automatically.</p>
+    </div>
+    <div class="sec"><div class="sign">Your data</div>
+      <div class="card" style="padding:16px;margin-top:10px">
+        <p class="note" style="margin-top:0">${data.tasks.length} tasks logged, stored in ${where}.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+          <button class="btn ghost" data-act="csv">Export CSV</button>
+          <button class="btn ghost" data-act="backup">Save backup</button>
+          <button class="btn ghost" data-act="restore">Restore backup</button>
+        </div>
+        <p class="note">Clearing your browser data erases your trail. Save a backup now and then.</p>
+      </div>
+    </div>
+    <div class="sec"><div class="sign">Danger</div>
+      <div class="card" style="padding:16px;margin-top:10px">
+        <button class="btn ghost danger" data-act="wipe">Erase everything</button>
+      </div>
+    </div>`;
+}
+
+/* ================= render ================= */
+const TABS = [["now","Now"],["queue","Queue"],["trail","Trail"],["settings","Settings"]];
+function render(){
+  const app = document.getElementById("app");
+  const screen = view.name==="queue" ? queueScreen()
+    : view.name==="trail" ? trailScreen()
+    : view.name==="settings" ? settingsScreen()
+    : nowScreen();
+  app.innerHTML = `<div class="wrap">${screen}</div>`;
+  document.getElementById("nav").innerHTML = TABS.map(([id,label])=>
+    `<button class="${view.name===id?"sel":""}" data-act="nav" data-view="${id}">${label}</button>`).join("");
+}
+
+function toast(msg, undoable){
+  document.querySelectorAll(".toast").forEach(t=>t.remove());
+  const el = document.createElement("div");
+  el.className = "toast"; el.setAttribute("role","status");
+  el.innerHTML = esc(msg) + (undoable ? ` <button data-act="undo" style="margin-left:8px;text-decoration:underline">Undo</button>` : "");
+  document.body.appendChild(el);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.remove(); if(undoable) lastAction=null; }, 4000);
+}
+
+/* ================= keyboard-aware suggestion positioning ================= */
+function positionSuggest(){
+  const box = document.getElementById("suggest");
+  if(!box) return;
+  const active = document.activeElement && document.activeElement.id === "capture";
+  if(active && window.visualViewport && box.innerHTML.trim()){
+    const vv = window.visualViewport;
+    const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    box.style.position = "fixed";
+    box.style.left = "20px"; box.style.right = "20px";
+    box.style.maxWidth = "480px"; box.style.margin = "0 auto";
+    box.style.bottom = (kb + 10) + "px";
+    box.style.zIndex = "35";
+  } else {
+    box.style.position = ""; box.style.left = ""; box.style.right = "";
+    box.style.maxWidth = ""; box.style.margin = ""; box.style.bottom = ""; box.style.zIndex = "";
+  }
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize", positionSuggest);
+  window.visualViewport.addEventListener("scroll", positionSuggest);
+}
+document.addEventListener("focusin", e=>{ if(e.target.id==="capture") positionSuggest(); });
+document.addEventListener("focusout", e=>{ if(e.target.id==="capture") setTimeout(positionSuggest, 60); });
+
+/* ================= actions ================= */
+function capture(){
+  const el = document.getElementById("capture");
+  const text = el.value.trim();
+  if(!text) return;
+  if(tooSoonDuplicate(text)){ toast("Already logged that."); el.value=""; return; }
+  data.tasks.push({ id: uid(), text, createdAt: now(), status: "queued", statusAt: now(), doneAt: null });
+  el.value = "";
+  save(); render();
+  const fresh = document.getElementById("capture");
+  if(fresh) fresh.focus();
+}
+function start(id){
+  const active = data.tasks.find(t=>t.status==="now");
+  if(active && active.id!==id){
+    const label = active.text.length>34 ? active.text.slice(0,34)+"…" : active.text;
+    toast(`Finish or park "${label}" first — one thing in motion at a time.`);
+    return;
+  }
+  const t = find(id); t.status="now"; t.statusAt=now();
+  state.justDone = null;
+  save(); render();
+}
+function markDone(id){
+  const t = find(id); if(!t || t.status!=="now") return;
+  lastAction = { kind:"done", id, prevStatus:"now", prevDoneAt:null };
+  const stamp = now();
+  t.status="done"; t.doneAt=stamp; t.statusAt=stamp;
+  state.justDone = { id, text: t.text, at: Date.now() };
+  save(); render();
+  toast(`Marked done · ${by("done").filter(x=>localDay(new Date(x.doneAt))===todayKey()).length} today`, true);
+}
+function park(id){
+  const t = find(id); if(!t || t.status!=="now") return;
+  t.status="queued"; t.statusAt=now();
+  save(); render();
+}
+function someday(id){ const t=find(id); t.status="parked"; t.statusAt=now(); save(); render(); }
+function bringback(id){ const t=find(id); t.status="queued"; t.statusAt=now(); save(); render(); }
+function letgo(id){
+  const idx = data.tasks.findIndex(t=>t.id===id);
+  if(idx===-1) return;
+  lastAction = { kind:"delete", task: JSON.parse(JSON.stringify(data.tasks[idx])) };
+  data.tasks.splice(idx,1);
+  save(); render();
+  toast("Let go.", true);
+}
+function undo(){
+  if(!lastAction) return;
+  if(lastAction.kind === "delete"){
+    data.tasks.push(lastAction.task);
+  } else if(lastAction.kind === "done"){
+    const t = find(lastAction.id);
+    if(t){ t.status=lastAction.prevStatus; t.doneAt=lastAction.prevDoneAt; t.statusAt=now(); }
+    if(state.justDone && state.justDone.id===lastAction.id) state.justDone=null;
+  }
+  lastAction = null; save(); render();
+}
+function csvText(){
+  const rows = [["id","text","status","created_at","status_at","done_at"]].concat(
+    data.tasks.slice().sort((a,b)=>a.createdAt.localeCompare(b.createdAt))
+      .map(t=>[t.id, '"'+t.text.replace(/"/g,'""')+'"', t.status, t.createdAt, t.statusAt, t.doneAt||""]));
+  return rows.map(r=>r.join(",")).join("\n");
+}
+function download(text, filename, type){
+  try{
+    const url = URL.createObjectURL(new Blob([text],{type}));
+    const a = document.createElement("a"); a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    toast("Saved "+filename);
+  } catch(e){
+    navigator.clipboard && navigator.clipboard.writeText(text);
+    toast("Download blocked — copied instead");
+  }
+}
+
+/* ================= events ================= */
+document.addEventListener("click", e=>{
+  if(!e.target.closest("#capture") && !e.target.closest("#suggest")){
+    const s = document.getElementById("suggest");
+    if(s && s.innerHTML) s.innerHTML = "";
+  }
+  const el = e.target.closest("[data-act]");
+  if(!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+  if(act==="capture") return capture();
+  if(act==="quickcap") return quickCapture(el.dataset.text);
+  if(act==="start") return start(id);
+  if(act==="done") return markDone(id);
+  if(act==="park") return park(id);
+  if(act==="someday") return someday(id);
+  if(act==="bringback") return bringback(id);
+  if(act==="letgo") return letgo(id);
+  if(act==="undo") return undo();
+  if(act==="dismiss-justdone"){ state.justDone=null; return render(); }
+  if(act==="nav"){ view = { name: el.dataset.view }; return render(); }
+  if(act==="theme"){ data.settings.theme = el.dataset.v; save(); applyTheme(); return render(); }
+  if(act==="csv") return download(csvText(), "cairn.csv", "text/csv");
+  if(act==="backup") return download(JSON.stringify(data,null,2), "cairn-backup.json", "application/json");
+  if(act==="restore") return document.getElementById("importer").click();
+  if(act==="wipe"){
+    if(!confirm("Erase every task and every footprint? This cannot be undone.")) return;
+    data = { tasks: [], settings: data.settings }; save(); view = { name:"now" }; return render();
+  }
+});
+document.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && e.target.id==="capture") capture();
+});
+document.addEventListener("input", e=>{
+  if(e.target.id !== "capture") return;
+  const box = document.getElementById("suggest");
+  if(!box) return;
+  const q = e.target.value.trim();
+  if(q.length < 2){ box.innerHTML = ""; positionSuggest(); return; }
+  const nq = normalize(q);
+  const pool = buildRecurring().filter(x=>x.doneCount>=1 && x.key.includes(nq) && x.key!==nq)
+    .sort((a,b)=> b.count-a.count || b.lastCreated.localeCompare(a.lastCreated)).slice(0,4);
+  box.innerHTML = pool.map(x=>
+    `<button type="button" class="sugg-item" data-act="quickcap" data-text="${esc(x.text)}"><span>${esc(x.text)}</span><span class="n">×${x.count}</span></button>`
+  ).join("");
+  positionSuggest();
+});
+document.getElementById("importer").addEventListener("change", e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const p = JSON.parse(r.result);
+      if(!Array.isArray(p.tasks)) throw 0;
+      data = { tasks: p.tasks, settings: Object.assign({theme:"system"}, p.settings||{}) };
+      save(); applyTheme(); view = { name:"now" }; render();
+      toast("Backup restored");
+    } catch(err){ toast("That file isn't a Cairn backup"); }
+  };
+  r.readAsText(f);
+  e.target.value = "";
+});
+
+/* redraw periodically for fresh "elapsed" captions + midnight rollover,
+   but never while someone is mid-capture */
+setInterval(()=>{
+  const a = document.activeElement;
+  if(a && a.id==="capture" && a.value) return;
+  render();
+}, 30000);
+
+/* ================= boot ================= */
+load().then(d => { data = d; applyTheme(); render(); });
+</script>
+</body>
+</html>
