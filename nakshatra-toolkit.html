@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nakshatra Toolkit — Reference, Dynamics & My Circle</title>
+<style>
+  :root{
+    --bg:#f7f4ee; --panel:#fffdf9; --panel2:#fbf8f1;
+    --accent:#b8935a; --accent2:#8a9e7a; --text:#3a3530; --muted:#847c6e;
+    --support:#4a6b3d; --support-bg:#e7f0e2;
+    --challenge:#a3543d; --challenge-bg:#f5e5df;
+    --neutral:#8a7549; --neutral-bg:#f0e9d8;
+    --empty:#cfc6b3; --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 20% 0%, #fbf3e6, var(--bg) 60%);
+    color:var(--text);min-height:100vh;padding-bottom:60px;
+  }
+  header{text-align:center;padding:24px 16px 10px;}
+  header h1{margin:0 0 6px;font-size:1.4rem;}
+  header p{margin:0;color:var(--muted);font-size:.85rem;}
+
+  .hint-bar{
+    max-width:700px;margin:14px auto 0;background:var(--panel);border:1px solid #e5ddd0;
+    border-radius:12px;padding:10px 16px;font-size:.78rem;color:var(--muted);
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+  }
+  .hint-bar button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:0 4px;}
+  .hint-bar.hidden{display:none;}
+
+  nav.maintabs{
+    display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:16px auto 4px;padding:0 12px;
+  }
+  nav.maintabs button{
+    background:var(--panel);color:var(--text);border:1px solid #e5ddd0;
+    padding:9px 16px;border-radius:999px;cursor:pointer;font-size:.85rem;transition:.15s;
+  }
+  nav.maintabs button:hover{border-color:var(--accent2);}
+  nav.maintabs button.active{
+    background:linear-gradient(135deg,var(--accent2),var(--accent));
+    color:#fffdf9;border-color:transparent;font-weight:600;
+  }
+
+  main{max-width:1000px;margin:0 auto;padding:0 16px;}
+  .page{display:none;}
+  .page.active{display:block;}
+
+  /* ---- REFERENCE TAB ---- */
+  .subtabs{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:16px 0 4px;}
+  .subtabs button{
+    background:var(--panel);border:1px solid #e5ddd0;color:var(--muted);
+    padding:7px 14px;border-radius:8px;font-size:.8rem;cursor:pointer;
+  }
+  .subtabs button.active{color:var(--accent);border-color:var(--accent);}
+  .subpage{display:none;}
+  .subpage.active{display:block;}
+
+  .maha-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:18px;}
+  .maha-card{
+    background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid #e5ddd0;
+    border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;
+  }
+  .maha-card .num{position:absolute;top:10px;right:14px;font-size:2rem;opacity:.12;font-weight:800;}
+  .maha-card h3{margin:0 0 4px;font-size:1.05rem;}
+  .maha-card .kid{color:var(--accent);font-weight:600;font-size:.85rem;margin-bottom:6px;}
+  .maha-card .adult{color:var(--accent2);font-size:.8rem;margin-bottom:8px;}
+  .maha-card .mission{color:var(--muted);font-size:.82rem;line-height:1.4;}
+
+  .searchbar{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .searchbar input{
+    flex:1;min-width:180px;padding:11px 14px;border-radius:10px;border:1px solid #e5ddd0;
+    background:var(--panel);color:var(--text);font-size:.9rem;
+  }
+  .group-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+  .group-tabs button{
+    background:var(--panel);border:1px solid #e5ddd0;color:var(--muted);
+    padding:6px 12px;border-radius:8px;font-size:.78rem;cursor:pointer;
+  }
+  .group-tabs button.active{background:var(--accent2);color:#fffdf9;border-color:transparent;font-weight:600;}
+
+  .avatar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:16px;}
+  .avatar-tile{
+    background:var(--panel);border:1px solid #e5ddd0;border-radius:12px;padding:12px 10px;
+    text-align:center;cursor:pointer;transition:.15s;
+  }
+  .avatar-tile:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .avatar-tile .emoji{font-size:1.7rem;}
+  .avatar-tile .name{font-size:.78rem;font-weight:600;margin-top:4px;}
+  .avatar-tile .idx{font-size:.65rem;color:var(--muted);}
+
+  /* ---- SHARED: selectors, legend, wheel ---- */
+  .selector-row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:20px 0 6px;}
+  .selector-row label{font-size:.85rem;color:var(--muted);}
+  .selector-row select{
+    background:var(--panel);color:var(--text);border:1px solid #e5ddd0;
+    padding:10px 14px;border-radius:10px;font-size:.9rem;max-width:280px;
+  }
+  .legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:14px 0 4px;font-size:.76rem;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .dot.support{background:var(--support);} .dot.challenge{background:var(--challenge);}
+  .dot.neutral{background:var(--neutral);} .dot.empty{background:var(--empty);}
+
+  .wheel-wrap{position:relative;width:100%;max-width:640px;aspect-ratio:1/1;margin:24px auto;}
+  .center-node{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:118px;height:118px;border-radius:50%;
+    background:linear-gradient(160deg,var(--accent2),var(--accent));
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    color:#fffdf9;font-weight:700;text-align:center;
+    box-shadow:0 0 0 6px #b8935a22, 0 4px 14px #00000014;z-index:5;padding:6px;
+  }
+  .center-node .emoji{font-size:1.6rem;}
+  .center-node .pname{font-size:.75rem;line-height:1.15;margin-top:2px;}
+  .center-node .nname{font-size:.62rem;opacity:.75;}
+
+  .orbit-node{
+    position:absolute;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:1.2rem;cursor:pointer;transform:translate(-50%,-50%);
+    border:2px solid transparent;transition:.15s;
+  }
+  .orbit-node:hover{transform:translate(-50%,-50%) scale(1.15);}
+  .orbit-node.support{background:var(--support-bg);border-color:var(--support);}
+  .orbit-node.challenge{background:var(--challenge-bg);border-color:var(--challenge);}
+  .orbit-node.neutral{background:var(--neutral-bg);border-color:var(--neutral);}
+  .orbit-node.empty{background:transparent;border-color:var(--empty);opacity:.35;}
+  .orbit-node .badge{
+    position:absolute;top:-6px;right:-6px;background:var(--accent);color:#fffdf9;
+    font-size:.62rem;font-weight:700;min-width:16px;height:16px;border-radius:999px;
+    display:flex;align-items:center;justify-content:center;padding:0 3px;
+  }
+
+  .list-toggle{text-align:center;margin-top:6px;}
+  .list-toggle button{
+    background:none;border:1px solid #e5ddd0;color:var(--muted);
+    padding:6px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;
+  }
+  .alignment-list{display:none;margin-top:20px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+  .alignment-list.active{display:grid;}
+  .wheel-container.hidden{display:none;}
+  .list-item{border-radius:12px;padding:12px;cursor:pointer;border:1px solid transparent;}
+  .list-item.support{background:var(--support-bg);border-color:var(--support);}
+  .list-item.challenge{background:var(--challenge-bg);border-color:var(--challenge);}
+  .list-item.neutral{background:var(--neutral-bg);border-color:var(--neutral);}
+  .list-item.empty{background:transparent;border-color:var(--empty);opacity:.5;}
+  .list-item .li-top{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;font-weight:600;}
+  .list-item .li-tara{font-size:.72rem;color:var(--muted);margin-top:3px;}
+  .list-item .li-people{font-size:.72rem;color:var(--accent);margin-top:4px;}
+  .empty-state{text-align:center;color:var(--muted);font-size:.85rem;margin-top:20px;}
+
+  /* ---- MY CIRCLE: people panel ---- */
+  .people-panel{background:var(--panel);border:1px solid #e5ddd0;border-radius:var(--radius);padding:16px;margin-top:20px;}
+  .people-panel h2{margin:0 0 10px;font-size:1rem;}
+  .add-form{display:flex;gap:8px;flex-wrap:wrap;}
+  .add-form input, .add-form select{
+    background:var(--panel2);color:var(--text);border:1px solid #e5ddd0;
+    padding:9px 12px;border-radius:8px;font-size:.85rem;
+  }
+  .add-form input[type="text"]{flex:1;min-width:120px;}
+  .add-form select{flex:1;min-width:160px;}
+  .add-form button{
+    background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fffdf9;border:none;
+    padding:9px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;
+  }
+  .self-checkbox{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted);}
+  .people-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+  .person-chip{
+    display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid #e5ddd0;
+    padding:6px 10px;border-radius:999px;font-size:.78rem;cursor:pointer;
+  }
+  .person-chip.self{border-color:var(--accent);color:var(--accent);}
+  .person-chip .remove-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;padding:0 2px;}
+  .person-chip .remove-btn:hover{color:var(--challenge);}
+  .data-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+  .data-tools button, .data-tools label{
+    background:var(--panel2);border:1px solid #e5ddd0;color:var(--muted);
+    padding:7px 12px;border-radius:8px;font-size:.76rem;cursor:pointer;
+  }
+  .data-tools input[type=file]{display:none;}
+
+  /* ---- MODAL ---- */
+  .overlay{
+    display:none;position:fixed;inset:0;background:rgba(58,53,48,.35);backdrop-filter:blur(3px);
+    z-index:50;align-items:center;justify-content:center;padding:16px;
+  }
+  .overlay.active{display:flex;}
+  .modal{
+    background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid #e5ddd0;
+    border-radius:var(--radius);max-width:520px;width:100%;padding:24px;position:relative;
+    max-height:85vh;overflow-y:auto;
+  }
+  .modal .close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;}
+  .modal .emoji-big{font-size:2.8rem;}
+  .modal h2{margin:6px 0 2px;font-size:1.3rem;}
+  .modal .sub{color:var(--muted);font-size:.85rem;margin-bottom:14px;}
+  .pair-row{display:flex;align-items:center;justify-content:center;gap:16px;margin:6px 0 10px;}
+  .pair-side{text-align:center;flex:1;}
+  .pair-side .emoji{font-size:2.2rem;}
+  .pair-side .name{font-size:.85rem;font-weight:700;margin-top:2px;}
+  .pair-side .sub{font-size:.7rem;color:var(--muted);}
+  .pair-arrow{font-size:1.3rem;color:var(--muted);}
+  .tara-tag{
+    text-align:center;font-size:.78rem;padding:6px 12px;border-radius:999px;
+    display:inline-block;margin:0 auto 14px;font-weight:600;
+  }
+  .tara-tag.support{background:var(--support-bg);color:var(--support);}
+  .tara-tag.challenge{background:var(--challenge-bg);color:var(--challenge);}
+  .tara-tag.neutral{background:var(--neutral-bg);color:var(--neutral);}
+  .tag-wrap{text-align:center;}
+  .modal .block{margin-bottom:12px;padding:12px;border-radius:10px;background:#f0ead9;}
+  .modal .block .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent2);margin-bottom:4px;}
+  .modal .block.shadow .label{color:var(--challenge);}
+  .modal .block.good .label{color:var(--support);}
+  .modal .question{font-style:italic;font-size:.95rem;line-height:1.4;}
+  .modal .traits{display:flex;gap:10px;}
+  .modal .traits > div{flex:1;font-size:.8rem;}
+  .modal .traits .t-label{color:var(--muted);font-size:.68rem;text-transform:uppercase;margin-bottom:2px;}
+  .people-here{display:flex;flex-direction:column;gap:6px;}
+  .people-here .ph-item{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--panel);padding:8px 10px;border-radius:8px;font-size:.82rem;
+  }
+  .edit-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .edit-row input, .edit-row select{
+    background:var(--panel2);color:var(--text);border:1px solid #e5ddd0;padding:6px 8px;
+    border-radius:6px;font-size:.78rem;flex:1;min-width:100px;
+  }
+  .edit-row button{
+    background:var(--accent2);color:#fffdf9;border:none;padding:6px 10px;border-radius:6px;
+    font-size:.75rem;font-weight:600;cursor:pointer;
+  }
+
+  /* ---- FILTERS ---- */
+  .filter-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0 4px;}
+  .filter-chip{
+    background:var(--panel);border:1px solid #e5ddd0;color:var(--muted);
+    padding:6px 13px;border-radius:999px;font-size:.78rem;cursor:pointer;transition:.15s;
+  }
+  .filter-chip.active[data-filter="all"]{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fffdf9;border-color:transparent;font-weight:600;}
+  .filter-chip.active[data-filter="support"]{background:var(--support-bg);color:var(--support);border-color:var(--support);font-weight:600;}
+  .filter-chip.active[data-filter="challenge"]{background:var(--challenge-bg);color:var(--challenge);border-color:var(--challenge);font-weight:600;}
+  .filter-chip.active[data-filter="neutral"]{background:var(--neutral-bg);color:var(--neutral);border-color:var(--neutral);font-weight:600;}
+  .orbit-node.dimmed, .list-item.dimmed{opacity:.12;pointer-events:none;}
+
+  /* ---- GROUP VIEW MATRIX ---- */
+  .matrix-scroll{overflow-x:auto;margin-top:20px;padding-bottom:8px;}
+  table.matrix{border-collapse:collapse;margin:0 auto;}
+  table.matrix th, table.matrix td{
+    text-align:center;padding:0;
+  }
+  table.matrix th{
+    font-size:.68rem;color:var(--muted);font-weight:500;padding:4px 6px;
+    white-space:nowrap;max-width:70px;
+  }
+  table.matrix th.rowhead{text-align:right;padding-right:10px;}
+  table.matrix td.cell{
+    width:44px;height:44px;min-width:44px;
+    border-radius:8px;cursor:pointer;font-size:1.1rem;
+    transition:.15s;
+  }
+  table.matrix td.cell:hover{transform:scale(1.12);}
+  table.matrix td.cell.support{background:var(--support-bg);}
+  table.matrix td.cell.challenge{background:var(--challenge-bg);}
+  table.matrix td.cell.neutral{background:var(--neutral-bg);}
+  table.matrix td.cell.self-cell{background:transparent;opacity:.2;cursor:default;}
+  .matrix-name-cell{display:flex;align-items:center;gap:5px;justify-content:flex-end;}
+  .matrix-summary{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:10px;margin-top:20px;
+  }
+  .summary-card{
+    background:var(--panel);border:1px solid #e5ddd0;border-radius:12px;padding:12px 14px;
+  }
+  .summary-card .sc-name{font-size:.85rem;font-weight:700;margin-bottom:6px;}
+  .summary-card .sc-line{font-size:.76rem;color:var(--muted);margin-top:2px;}
+  .summary-card .sc-line b{color:var(--text);}
+
+  .orbit-node.self-person{
+    box-shadow:0 0 0 3px var(--accent), 0 2px 8px #00000020;
+  }
+  table.matrix td.cell.self-row-marker{position:relative;}
+  .matrix-name-cell .self-star{color:var(--accent);}
+
+  @media (max-width: 480px){
+    .orbit-node{width:38px;height:38px;font-size:1rem;}
+    .center-node{width:92px;height:92px;}
+    .center-node .emoji{font-size:1.3rem;}
+    .center-node .pname{font-size:.66rem;}
+    .center-node .nname{font-size:.56rem;}
+    .orbit-node .badge{width:14px;height:14px;font-size:.56rem;top:-4px;right:-4px;}
+    table.matrix td.cell{width:36px;height:36px;min-width:36px;font-size:.9rem;}
+    table.matrix th{font-size:.62rem;padding:3px 4px;}
+  }
+
+  footer{text-align:center;color:var(--muted);font-size:.75rem;margin-top:40px;padding:0 16px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌌 Nakshatra Toolkit</h1>
+  <p>Reference · Explore Dynamics · My Circle — all in one place</p>
+</header>
+
+<div class="hint-bar" id="hintBar">
+  <span>💡 New here? Start in <b>Reference</b> to learn the system, add people in <b>My Circle</b>, then check <b>Group View</b> for the full picture.</span>
+  <button id="hintClose" title="Dismiss">✕</button>
+</div>
+
+<nav class="maintabs">
+  <button data-page="reference" class="active">📖 Reference</button>
+  <button data-page="explore">🎯 Explore Dynamics</button>
+  <button data-page="circle">🌐 My Circle</button>
+  <button data-page="group">🕸️ Group View</button>
+</nav>
+
+<main>
+
+  <!-- ============ PAGE 1: REFERENCE ============ -->
+  <section id="reference" class="page active">
+    <div class="subtabs">
+      <button data-sub="ref-maha" class="active">🪐 Mahadasha Levels</button>
+      <button data-sub="ref-avatars">🦸 Avatar Roster</button>
+    </div>
+
+    <div id="ref-maha" class="subpage active">
+      <div class="maha-grid" id="mahaGrid"></div>
+    </div>
+
+    <div id="ref-avatars" class="subpage">
+      <div class="searchbar">
+        <input type="text" id="refSearchInput" placeholder="Search avatar, theme, or keyword…">
+      </div>
+      <div class="group-tabs" id="refGroupTabs">
+        <button data-group="all" class="active">All 27</button>
+        <button data-group="1">Physical Realm (1–9)</button>
+        <button data-group="2">Social Realm (10–18)</button>
+        <button data-group="3">Universal Realm (19–27)</button>
+      </div>
+      <div class="avatar-grid" id="refAvatarGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 2: EXPLORE DYNAMICS ============ -->
+  <section id="explore" class="page">
+    <div class="selector-row">
+      <label for="exploreBaseSelect">Base Nakshatra:</label>
+      <select id="exploreBaseSelect"></select>
+    </div>
+    <div class="legend">
+      <span><span class="dot support"></span> Supporting</span>
+      <span><span class="dot challenge"></span> Challenging</span>
+      <span><span class="dot neutral"></span> Same Wiring</span>
+    </div>
+    <div class="filter-row" id="exploreFilterRow">
+      <button class="filter-chip active" data-filter="all">All</button>
+      <button class="filter-chip" data-filter="support">✅ Supporters</button>
+      <button class="filter-chip" data-filter="challenge">⚠️ Challengers</button>
+      <button class="filter-chip" data-filter="neutral">➖ Same Wiring</button>
+    </div>
+    <div class="wheel-container" id="exploreWheelContainer">
+      <div class="wheel-wrap" id="exploreWheelWrap">
+        <div class="center-node" id="exploreCenterNode"></div>
+      </div>
+    </div>
+    <div class="list-toggle"><button id="exploreToggleListBtn">Show as list instead</button></div>
+    <div class="alignment-list" id="exploreAlignmentList"></div>
+  </section>
+
+  <!-- ============ PAGE 3: MY CIRCLE ============ -->
+  <section id="circle" class="page">
+    <div class="people-panel">
+      <h2>👥 People</h2>
+      <div class="add-form">
+        <input type="text" id="nameInput" placeholder="Name (e.g. Priya, Dad, Manager)">
+        <select id="nakSelect"></select>
+        <label class="self-checkbox"><input type="checkbox" id="selfCheck"> Mark as "Self"</label>
+        <button id="addBtn">+ Add</button>
+      </div>
+      <div class="people-list" id="peopleList"></div>
+      <div class="data-tools">
+        <button id="exportBtn">⬇ Export circle (JSON)</button>
+        <label for="importFile">⬆ Import circle (JSON)</label>
+        <input type="file" id="importFile" accept="application/json">
+        <button id="clearBtn">🗑 Clear all</button>
+      </div>
+    </div>
+
+    <div class="selector-row">
+      <label for="centerSelect">View wheel centered on:</label>
+      <select id="centerSelect"></select>
+    </div>
+    <div class="legend">
+      <span><span class="dot support"></span> Supporting</span>
+      <span><span class="dot challenge"></span> Challenging</span>
+      <span><span class="dot neutral"></span> Same Wiring</span>
+      <span><span class="dot empty"></span> No one here yet</span>
+    </div>
+    <div class="filter-row" id="circleFilterRow">
+      <button class="filter-chip active" data-filter="all">All</button>
+      <button class="filter-chip" data-filter="support">✅ Supporters</button>
+      <button class="filter-chip" data-filter="challenge">⚠️ Challengers</button>
+      <button class="filter-chip" data-filter="neutral">➖ Same Wiring</button>
+    </div>
+    <div id="emptyState" class="empty-state" style="display:none;">Add at least one person above to see the wheel.</div>
+    <div class="wheel-container" id="wheelContainer">
+      <div class="wheel-wrap" id="wheelWrap">
+        <div class="center-node" id="centerNode"></div>
+      </div>
+    </div>
+    <div class="list-toggle"><button id="toggleListBtn">Show as list instead</button></div>
+    <div class="alignment-list" id="alignmentList"></div>
+  </section>
+
+  <!-- ============ PAGE 4: GROUP VIEW ============ -->
+  <section id="group" class="page">
+    <div class="legend">
+      <span><span class="dot support"></span> Supporting</span>
+      <span><span class="dot challenge"></span> Challenging</span>
+      <span><span class="dot neutral"></span> Same Wiring</span>
+    </div>
+    <div id="groupEmptyState" class="empty-state" style="display:none;">Add at least 2 people in My Circle to see the group matrix.</div>
+    <div class="matrix-scroll" id="matrixScroll"></div>
+    <div class="matrix-summary" id="matrixSummary"></div>
+  </section>
+
+</main>
+
+<footer>Circle data saved locally in this browser only (localStorage) · Nothing sent anywhere · Based on the traditional Tara Chakra cycle</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+/* ============ SHARED DATA ============ */
+const mahadashas = [
+  {n:1, planet:"Ketu", emoji:"✂️", adult:"Auditing: Clearing clutter & internal truth", kid:"Secret Clean-Up Stage", mission:"Prune outdated habits and clean out your inventory!"},
+  {n:2, planet:"Venus", emoji:"💎", adult:"Refinement: Value, art & harmony", kid:"Treasure & Art Festival", mission:"Make beautiful things, form friendships, and share joy!"},
+  {n:3, planet:"Sun", emoji:"☀️", adult:"Sovereignty: Visibility & leadership", kid:"King / Spotlight Stage", mission:"Step onto the stage, take charge, and lead with honor!"},
+  {n:4, planet:"Moon", emoji:"🌙", adult:"Belonging: Emotional safety & care", kid:"Cozy Base Camp", mission:"Rest, recharge your batteries, and care for your feelings!"},
+  {n:5, planet:"Mars", emoji:"💥", adult:"Solo Hustle: Building & execution", kid:"Solo Challenge Course", mission:"Work hard on your own and tackle tough obstacles!"},
+  {n:6, planet:"Rahu", emoji:"🐉", adult:"Scale: Unconventional expansion", kid:"Rocket Booster Level", mission:"Try cool new tools, move super fast, and expand your reach!"},
+  {n:7, planet:"Jupiter", emoji:"📚", adult:"Wisdom: Guidance & learning", kid:"Wise Mentor Academy", mission:"Learn big lessons, teach others, and grow your wisdom!"},
+  {n:8, planet:"Saturn", emoji:"🪐", adult:"Mastery: Patience & systems", kid:"Ninja Training Camp", mission:"Practice the basics over and over to build endurance!"},
+  {n:9, planet:"Mercury", emoji:"🧠", adult:"Synthesis: Skill, trade & logic", kid:"Puzzle & Trade Fair", mission:"Solve tricky puzzles, practice skills, and exchange ideas!"}
+];
+
+const avatars = [
+  {n:1,group:1,name:"Ashwini",emoji:"🐎",avatar:"The Speedster Flash",good:"Swift execution",shadow:"Impulsivity",q:"Am I starting this from readiness, or just escaping boredom?",
+    jung:"Integrate Stillness: accept that slow progress isn't failure — patience is a superpower.",
+    carnegie:"Praise their quick initiative; give them autonomy and avoid micromanaging their speed.",
+    energize:"Rapid action & fresh starts.", drains:"Red tape, waiting, & delay."},
+  {n:2,group:1,name:"Bharani",emoji:"⚖️",avatar:"Heavy Weightlifter",good:"Deep endurance",shadow:"Over-burdening",q:"Am I carrying this because it's mine, or because I won't let go?",
+    jung:"Integrate Surrender: learn to release heavy emotional burdens and accept natural cycles of endings.",
+    carnegie:"Acknowledge the heavy responsibility they carry; validate their quiet strength.",
+    energize:"Deep creative transformation.", drains:"Superficial fluff & endless clutter."},
+  {n:3,group:1,name:"Krittika",emoji:"🗡️",avatar:"Laser Cutter",good:"Sharp clarity",shadow:"Harsh critique",q:"Is my critique cutting away clutter, or burning bridges?",
+    jung:"Integrate Warmth: constructive truth needs empathy to heal rather than just burn.",
+    carnegie:"Show respect for their high standards; be direct, honest, and skip the fluff.",
+    energize:"Absolute clarity & decisive action.", drains:"Deceit, passive-aggressiveness, & fluff."},
+  {n:4,group:1,name:"Rohini",emoji:"🌾",avatar:"Master Gardener",good:"Steady growth",shadow:"Over-attachment",q:"Am I holding onto this position out of comfort rather than growth?",
+    jung:"Integrate Detachment: true beauty and growth require allowing things to wither naturally.",
+    carnegie:"Appeal to their sense of beauty and quality; make them feel comfortable and appreciated.",
+    energize:"Art, comfort, & tangible results.", drains:"Harsh environments & chaos."},
+  {n:5,group:1,name:"Mrigashira",emoji:"🦌",avatar:"Star Detective",good:"Curiosity",shadow:"Endless searching",q:"Am I gathering useful facts, or avoiding real commitment?",
+    jung:"Integrate Contentment: the ultimate truth is inside, not just in the next search.",
+    carnegie:"Engage their curiosity; ask for their perspective on intriguing questions or ideas.",
+    energize:"Discovery & open-ended research.", drains:"Rigid routine & closed minds."},
+  {n:6,group:1,name:"Ardra",emoji:"🌧️",avatar:"Storm Cleaner",good:"Renewal",shadow:"Creating chaos",q:"Is this confrontation necessary, or am I just venting?",
+    jung:"Integrate Vulnerability: allow emotional storms to clear the air without burning bridges.",
+    carnegie:"Be a calm, non-judgmental sounding board when they vent; offer stability amidst chaos.",
+    energize:"Emotional honesty & breakthroughs.", drains:"Suppressed feelings & pretense."},
+  {n:7,group:1,name:"Punarvasu",emoji:"🏹",avatar:"Phoenix Rebuilder",good:"Resilient rebuilding",shadow:"Repeat errors",q:"Am I truly rebuilding better, or returning to old habits?",
+    jung:"Integrate Failure: starting over is a strength, not a flaw or a regression.",
+    carnegie:"Remind them of their natural resilience; praise their optimism and restorative spirit.",
+    energize:"Fresh starts & safe home bases.", drains:"Chronic cynicism & hopelessness."},
+  {n:8,group:1,name:"Pushya",emoji:"🥛",avatar:"Protective Shield",good:"Caring protection",shadow:"Self-sacrifice",q:"Am I nourishing myself first before trying to protect others?",
+    jung:"Integrate Self-Nurture: filling your own cup is necessary to care for others.",
+    carnegie:"Express sincere gratitude for their care; show respect for their devotion to duty.",
+    energize:"Supporting community & fulfillment.", drains:"Ingratitude & emotional neglect."},
+  {n:9,group:1,name:"Ashlesha",emoji:"🐍",avatar:"Tactical Guard",good:"Strategic security",shadow:"Paranoia",q:"Am I securing my position, or suffocating my team's space?",
+    jung:"Integrate Trust: lowering your guard creates real connection, not weakness.",
+    carnegie:"Respect their privacy and boundaries; earn trust slowly through loyalty and discretion.",
+    energize:"Strategic privacy & deep loyalty.", drains:"Forced exposure & broken trust."},
+  {n:10,group:2,name:"Magha",emoji:"👑",avatar:"Sovereign Ruler",good:"Dignified honor",shadow:"Arrogance",q:"Am I honoring high standards, or expecting unearned deference?",
+    jung:"Integrate Humility: true power comes from service, not just pedigree or title.",
+    carnegie:"Show genuine respect for their standards; never dismiss their authority publicly.",
+    energize:"Honor & recognition.", drains:"Disrespect & feeling unappreciated."},
+  {n:11,group:2,name:"Purva Phalguni",emoji:"🛋️",avatar:"Vacation Master",good:"Creative rest",shadow:"Procrastination",q:"Have I earned this rest, or am I putting off key duties?",
+    jung:"Integrate Discipline: balance rest and play with meaningful effort and duty.",
+    carnegie:"Highlight the creative enjoyment of a task; keep interactions warm and relaxed.",
+    energize:"Creative play & relaxation.", drains:"Rigid routine & harsh pressure."},
+  {n:12,group:2,name:"Uttara Phalguni",emoji:"🤝",avatar:"Team Captain",good:"Reliable contracts",shadow:"Rigidity",q:"Is this partnership built on mutual value or rigid rules?",
+    jung:"Integrate Flexibility: relationships thrive on adaptable grace, not rigid rules.",
+    carnegie:"Appeal to their sense of fairness; keep promises strictly and honor commitments.",
+    energize:"Shared goals & teamwork.", drains:"Broken promises & disorder."},
+  {n:13,group:2,name:"Hasta",emoji:"🖐️",avatar:"Master Craftsman",good:"Technical mastery",shadow:"Micromanaging",q:"Am I perfecting the work, or obsessing over minor details?",
+    jung:"Integrate Trust: release the need to control every detail; allow spontaneous outcomes.",
+    carnegie:"Value their technical skill; give them concrete practical problems to solve.",
+    energize:"Hands-on mastery & order.", drains:"Micromanagement & chaos."},
+  {n:14,group:2,name:"Chitra",emoji:"🎨",avatar:"Master Architect",good:"Great design",shadow:"Surface focus",q:"Does this project have real depth, or just a flashy look?",
+    jung:"Integrate Inner Substance: value internal character as much as outer design and aesthetics.",
+    carnegie:"Praise their aesthetic vision; consult them on visual structure and design.",
+    energize:"Visual beauty & creation.", drains:"Ugliness & messy environments."},
+  {n:15,group:2,name:"Swati",emoji:"🌾",avatar:"Free Wind",good:"Flexible freedom",shadow:"Scattering",q:"Is my independence helping my mission, or ungrounding me?",
+    jung:"Integrate Commitment: deep roots enable true freedom, rather than restricting it.",
+    carnegie:"Offer them options and independence; avoid cornering them into rigid demands.",
+    energize:"Autonomy & fresh ideas.", drains:"Heavy confinement & rigid rules."},
+  {n:16,group:2,name:"Vishakha",emoji:"🎯",avatar:"Sharpshooter",good:"Unyielding focus",shadow:"Rivalry",q:"Am I pursuing my target, or just trying to defeat someone else?",
+    jung:"Integrate Celebration: appreciate current milestones instead of obsessing solely on the next target.",
+    carnegie:"Align with their ambitious goals; show how collaboration achieves the ultimate objective.",
+    energize:"Clear targets & victory.", drains:"Aimlessness & lost focus."},
+  {n:17,group:2,name:"Anuradha",emoji:"🪷",avatar:"Devoted Ally",good:"Deep loyalty",shadow:"Suppressing limits",q:"Am I staying loyal out of shared purpose, or fear of conflict?",
+    jung:"Integrate Boundaries: healthy limits strengthen true devotion rather than weakening it.",
+    carnegie:"Demonstrate quiet loyalty; build rapport through genuine emotional connection.",
+    energize:"Deep bonds & shared purpose.", drains:"Betrayal & shallow pretense."},
+  {n:18,group:2,name:"Jyeshtha",emoji:"🛡️",avatar:"Veteran Defender",good:"Senior protection",shadow:"Power struggles",q:"Am I protecting my team, or defending my fragile authority?",
+    jung:"Integrate Vulnerability: admitting limits builds authentic authority and trust.",
+    carnegie:"Acknowledge their experience and protective role; seek their counsel directly.",
+    energize:"Seniority & protection.", drains:"Threats to authority or status."},
+  {n:19,group:3,name:"Mula",emoji:"🌳",avatar:"Truth Detective",good:"Root truth",shadow:"Total destruction",q:"Am I fixing the root cause, or tearing down what works?",
+    jung:"Integrate Construction: rebuild constructively after tearing down illusions.",
+    carnegie:"Respect their search for truth; never defend superficial facades.",
+    energize:"Radical honesty & deep roots.", drains:"Pretense & superficiality."},
+  {n:20,group:3,name:"Purva Ashadha",emoji:"🌊",avatar:"Invincible Shield",good:"Strong conviction",shadow:"Stubbornness",q:"Is my stance based on reality, or pride in being unyielding?",
+    jung:"Integrate Flexibility: strategic compromise builds lasting victory.",
+    carnegie:"Validate their convictions; avoid stubborn, head-on confrontation.",
+    energize:"Unshakable conviction.", drains:"Public defeat & doubt."},
+  {n:21,group:3,name:"Uttara Ashadha",emoji:"🏆",avatar:"Legacy Champion",good:"Ethical legacy",shadow:"Severe overwork",q:"Am I building an enduring victory, or exhausting my stamina?",
+    jung:"Integrate Rest: rest is vital for long-term endurance.",
+    carnegie:"Acknowledge their integrity; align with their ethical goals.",
+    energize:"Enduring achievement & duty.", drains:"Shortcuts & dishonesty."},
+  {n:22,group:3,name:"Shravana",emoji:"👂",avatar:"Wise Listener",good:"Active listening",shadow:"Passive collection",q:"Am I applying what I hear, or just collecting more info?",
+    jung:"Integrate Action: turn absorbed wisdom into practical application.",
+    carnegie:"Listen actively to them; show that their knowledge is valued.",
+    energize:"Learning & being heard.", drains:"Being ignored & mental noise."},
+  {n:23,group:3,name:"Dhanishta",emoji:"🥁",avatar:"Rhythm Conductor",good:"Team rhythm",shadow:"Material greed",q:"Am I staying in sync with the team, or pushing my own agenda?",
+    jung:"Integrate Generosity: share resources freely to build true group harmony.",
+    carnegie:"Include them in group timing; value their organizational skills.",
+    energize:"Team rhythm & prosperity.", drains:"Discord & bad timing."},
+  {n:24,group:3,name:"Shatabhisha",emoji:"⭕",avatar:"Lone Alchemist",good:"Solo problem-solving",shadow:"Isolation",q:"Am I working independently, or shutting out good help?",
+    jung:"Integrate Openness: allow trusted allies into your private sanctuary.",
+    carnegie:"Respect their need for privacy; present clear, objective logic.",
+    energize:"Solitude & problem-solving.", drains:"Intrusion & emotional drama."},
+  {n:25,group:3,name:"Purva Bhadrapada",emoji:"🔥",avatar:"Phoenix Flame",good:"Transformation",shadow:"Extreme burnout",q:"Is this effort purposeful, or am I pushing to extreme limits?",
+    jung:"Integrate Balance: moderate intensity to prevent self-burnout.",
+    carnegie:"Respect their passion; give them space for deep transformation.",
+    energize:"Purposeful transformation.", drains:"Apathy & trivial tasks."},
+  {n:26,group:3,name:"Uttara Bhadrapada",emoji:"🌊",avatar:"Deep Ocean Elder",good:"Quiet wisdom",shadow:"Avoidance",q:"Am I exercising true patience, or avoiding necessary action?",
+    jung:"Integrate Engagement: step out of detachment to take active, timely steps.",
+    carnegie:"Approach with calm respect; value their quiet, steady advice.",
+    energize:"Quiet wisdom & patience.", drains:"Rush, chaos, & panic."},
+  {n:27,group:3,name:"Revati",emoji:"🐟",avatar:"Safe Navigator",good:"Empathetic guidance",shadow:"Boundary loss",q:"Am I guiding effectively, or carrying burdens that aren't mine?",
+    jung:"Integrate Grounding: set firm personal boundaries while remaining caring.",
+    carnegie:"Show genuine empathy; appreciate their guiding vision.",
+    energize:"Compassion & safe closure.", drains:"Harshness & boundary loss."}
+];
+
+const taraCycle = [
+  {key:"janma",     label:"Janma — Same Wiring",     type:"neutral",   tip:"You likely share instincts and blind spots. Useful for quick understanding, but watch for reinforcing the same shadow pattern instead of balancing it."},
+  {key:"sampat",    label:"Sampat — Growth Partner",  type:"support",   tip:"This person tends to help you build and gain ground. Good to collaborate with on new projects or resources — lean on them when scaling something up."},
+  {key:"vipat",     label:"Vipat — Friction Point",   type:"challenge", tip:"Interactions here can surface risk or destabilize plans. Slow down before big decisions together, and get a second opinion before acting on their input."},
+  {key:"kshema",    label:"Kshema — Steady Support",  type:"support",   tip:"A grounding, well-being-oriented dynamic. Good for emotional support and reliability — this is often a safe person to check in with."},
+  {key:"pratyak",   label:"Pratyak — Obstacle",       type:"challenge", tip:"Expect obstacles or miscommunication to show up more easily here. Be extra clear and explicit in communication; don't assume shared understanding."},
+  {key:"sadhana",   label:"Sadhana — Achievement Ally",type:"support",  tip:"A strong dynamic for accomplishing goals together. Good to team up with on tasks that need follow-through and results."},
+  {key:"naidhana",  label:"Naidhana — Loss/Caution",  type:"challenge", tip:"This pairing can drain energy or resources if unmanaged. Keep boundaries clear and avoid high-stakes commitments without a cushion."},
+  {key:"mitra",     label:"Mitra — Friend",           type:"support",   tip:"A naturally easy, friendly dynamic. Good for day-to-day collaboration and morale."},
+  {key:"parama",    label:"Parama Mitra — Best Friend",type:"support",  tip:"The most harmonious pairing in the cycle. Great for deep trust, mentorship, or long-term partnership."}
+];
+
+function getAvatar(n){ return avatars.find(a=>a.n===n); }
+function taraFor(baseN, targetN){
+  let diff = (targetN - baseN + 27) % 27;
+  let count = diff + 1;
+  let mod = count % 9;
+  if(mod === 0) mod = 9;
+  return taraCycle[mod-1];
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============ MAIN TAB NAVIGATION ============ */
+document.querySelectorAll('nav.maintabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.maintabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('main .page').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.page).classList.add('active');
+  });
+});
+
+/* ============ PAGE 1: REFERENCE ============ */
+document.querySelectorAll('.subtabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.subtabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.subpage').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.sub).classList.add('active');
+  });
+});
+
+const mahaGrid = document.getElementById('mahaGrid');
+mahadashas.forEach(m=>{
+  const card = document.createElement('div');
+  card.className = 'maha-card';
+  card.innerHTML = `
+    <div class="num">${m.n}</div>
+    <h3>${m.emoji} ${m.planet}</h3>
+    <div class="kid">${m.kid}</div>
+    <div class="adult">${m.adult}</div>
+    <div class="mission">${m.mission}</div>
+  `;
+  mahaGrid.appendChild(card);
+});
+
+const refAvatarGrid = document.getElementById('refAvatarGrid');
+let refGroup = 'all', refSearch = '';
+function renderRefAvatars(){
+  refAvatarGrid.innerHTML = '';
+  const filtered = avatars.filter(a=>{
+    const groupMatch = refGroup === 'all' || a.group == refGroup;
+    const s = refSearch.toLowerCase();
+    const searchMatch = !s || a.name.toLowerCase().includes(s) || a.avatar.toLowerCase().includes(s)
+      || a.good.toLowerCase().includes(s) || a.shadow.toLowerCase().includes(s)
+      || a.jung.toLowerCase().includes(s) || a.carnegie.toLowerCase().includes(s)
+      || a.energize.toLowerCase().includes(s) || a.drains.toLowerCase().includes(s);
+    return groupMatch && searchMatch;
+  });
+  if(filtered.length === 0){
+    refAvatarGrid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1;text-align:center;">No matches found.</p>';
+    return;
+  }
+  filtered.forEach(a=>{
+    const tile = document.createElement('div');
+    tile.className = 'avatar-tile';
+    tile.innerHTML = `<div class="emoji">${a.emoji}</div><div class="name">${a.avatar}</div><div class="idx">#${a.n} · ${a.name}</div>`;
+    tile.addEventListener('click', ()=>openArchetypeModal(a));
+    refAvatarGrid.appendChild(tile);
+  });
+}
+renderRefAvatars();
+document.getElementById('refSearchInput').addEventListener('input', e=>{ refSearch = e.target.value; renderRefAvatars(); });
+document.getElementById('refGroupTabs').addEventListener('click', e=>{
+  if(e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#refGroupTabs button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  refGroup = e.target.dataset.group;
+  renderRefAvatars();
+});
+
+function openArchetypeModal(a){
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <button class="close" id="closeModal">✕</button>
+    <div class="emoji-big">${a.emoji}</div>
+    <h2>${a.avatar}</h2>
+    <div class="sub">#${a.n} · ${a.name} Nakshatra</div>
+    <div class="block good"><div class="label">✅ Strength (Core OS)</div><div>${a.good}</div></div>
+    <div class="block shadow"><div class="label">⚠️ Shadow (Watch For)</div><div>${a.shadow}</div></div>
+    <div class="block"><div class="label">🎯 Daily Check-In</div><div class="question">"${a.q}"</div></div>
+    <div class="block"><div class="label">☯️ Jung — Path to Wholeness</div><div>${a.jung}</div></div>
+    <div class="block"><div class="label">🤝 Carnegie — How to Influence Them</div><div>${a.carnegie}</div></div>
+    <div class="block"><div class="label">🔋 Energy Battery</div><div>⚡ Energizes: ${a.energize}<br>🪫 Drains: ${a.drains}</div></div>
+  `;
+  openOverlay();
+}
+
+/* ============ SHARED OVERLAY ============ */
+function openOverlay(){
+  document.getElementById('overlay').classList.add('active');
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('active'); }
+document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id === 'overlay') closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal(); });
+
+/* ============ PAGE 2: EXPLORE DYNAMICS ============ */
+const exploreBaseSelect = document.getElementById('exploreBaseSelect');
+avatars.forEach(a=>{
+  const opt = document.createElement('option');
+  opt.value = a.n;
+  opt.textContent = `#${a.n} ${a.emoji} ${a.name} — ${a.avatar}`;
+  exploreBaseSelect.appendChild(opt);
+});
+let exploreBase = 1;
+let exploreFilter = 'all';
+exploreBaseSelect.value = exploreBase;
+
+function renderExploreWheel(){
+  const base = getAvatar(exploreBase);
+  document.getElementById('exploreCenterNode').innerHTML = `<div class="emoji">${base.emoji}</div><div class="pname">${base.name}</div>`;
+  const wrap = document.getElementById('exploreWheelWrap');
+  wrap.querySelectorAll('.orbit-node').forEach(n=>n.remove());
+  const others = avatars.filter(a=>a.n !== exploreBase);
+  const radius = 42, total = others.length;
+  others.forEach((a,i)=>{
+    const angle = (i/total)*2*Math.PI - Math.PI/2;
+    const x = 50 + radius*Math.cos(angle), y = 50 + radius*Math.sin(angle);
+    const tara = taraFor(exploreBase, a.n);
+    const node = document.createElement('div');
+    node.className = `orbit-node ${tara.type}`;
+    if(exploreFilter !== 'all' && tara.type !== exploreFilter) node.classList.add('dimmed');
+    node.style.left = x+'%'; node.style.top = y+'%';
+    node.textContent = a.emoji;
+    node.title = `${a.name} — ${tara.label}`;
+    node.addEventListener('click', ()=>openPairModal(base, a, tara, null));
+    wrap.appendChild(node);
+  });
+  renderExploreList(base);
+}
+function renderExploreList(base){
+  const listEl = document.getElementById('exploreAlignmentList');
+  listEl.innerHTML = '';
+  avatars.filter(a=>a.n!==exploreBase).forEach(a=>{
+    const tara = taraFor(exploreBase, a.n);
+    const item = document.createElement('div');
+    item.className = `list-item ${tara.type}`;
+    if(exploreFilter !== 'all' && tara.type !== exploreFilter) item.classList.add('dimmed');
+    item.innerHTML = `<div class="li-top"><span>${a.emoji} ${a.name}</span><span>${tara.type==='support'?'✅':tara.type==='challenge'?'⚠️':'➖'}</span></div><div class="li-tara">${tara.label}</div>`;
+    item.addEventListener('click', ()=>openPairModal(base, a, tara, null));
+    listEl.appendChild(item);
+  });
+}
+exploreBaseSelect.addEventListener('change', e=>{ exploreBase = parseInt(e.target.value); renderExploreWheel(); });
+document.getElementById('exploreFilterRow').addEventListener('click', e=>{
+  if(!e.target.classList.contains('filter-chip')) return;
+  document.querySelectorAll('#exploreFilterRow .filter-chip').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  exploreFilter = e.target.dataset.filter;
+  renderExploreWheel();
+});
+
+let exploreListMode = false;
+document.getElementById('exploreToggleListBtn').addEventListener('click', ()=>{
+  exploreListMode = !exploreListMode;
+  document.getElementById('exploreWheelContainer').classList.toggle('hidden', exploreListMode);
+  document.getElementById('exploreAlignmentList').classList.toggle('active', exploreListMode);
+  document.getElementById('exploreToggleListBtn').textContent = exploreListMode ? 'Show as wheel instead' : 'Show as list instead';
+});
+
+function openPairModal(centerLike, slotAvatar, tara, peopleHere){
+  const centerNak = centerLike.nak !== undefined ? getAvatar(centerLike.nak) : centerLike;
+  const centerName = centerLike.name && centerLike.nak !== undefined ? centerLike.name : centerNak.name;
+  const modal = document.getElementById('modalContent');
+
+  let peopleHtml = '';
+  if(peopleHere !== null){
+    if(peopleHere.length===0){
+      peopleHtml = `<div class="block"><div class="label">People here</div><div style="color:var(--muted);">No one assigned to this nakshatra yet.</div></div>`;
+    }else{
+      peopleHtml = `<div class="block"><div class="label">People here</div><div class="people-here">
+        ${peopleHere.map(p=>`<div class="ph-item"><span>${p.isSelf?'⭐ ':''}${escapeHtml(p.name)}</span><span style="color:var(--muted);font-size:.72rem;">${slotAvatar.avatar}</span></div>`).join('')}
+      </div></div>`;
+    }
+  }
+
+  modal.innerHTML = `
+    <button class="close" id="closeModal">✕</button>
+    <div class="pair-row">
+      <div class="pair-side"><div class="emoji">${centerNak.emoji}</div><div class="name">${escapeHtml(centerName)}</div><div class="sub">${centerNak.name}</div></div>
+      <div class="pair-arrow">⇄</div>
+      <div class="pair-side"><div class="emoji">${slotAvatar.emoji}</div><div class="name">${slotAvatar.name}</div><div class="sub">${slotAvatar.avatar}</div></div>
+    </div>
+    <div class="tag-wrap"><span class="tara-tag ${tara.type}">${tara.label}</span></div>
+    <div class="block"><div class="label">How to handle this dynamic</div><div>${tara.tip}</div></div>
+    <div class="block"><div class="label">🤝 How to influence/interact with ${escapeHtml(slotAvatar.name)}</div><div>${slotAvatar.carnegie}</div></div>
+    <div class="block"><div class="label">🔋 Their Energy Battery</div><div>⚡ Energizes: ${slotAvatar.energize}<br>🪫 Drains: ${slotAvatar.drains}</div></div>
+    <div class="block"><div class="label">☯️ Their Path to Wholeness (Jung)</div><div>${slotAvatar.jung}</div></div>
+    ${peopleHtml}
+    <div class="block">
+      <div class="label">Archetype trait comparison</div>
+      <div class="traits">
+        <div><div class="t-label">${centerNak.name} strength</div><div>${centerNak.good}</div><div class="t-label" style="margin-top:6px;">shadow</div><div>${centerNak.shadow}</div></div>
+        <div><div class="t-label">${slotAvatar.name} strength</div><div>${slotAvatar.good}</div><div class="t-label" style="margin-top:6px;">shadow</div><div>${slotAvatar.shadow}</div></div>
+      </div>
+    </div>
+  `;
+  openOverlay();
+}
+
+/* ============ PAGE 3: MY CIRCLE ============ */
+const STORAGE_KEY = 'nakshatraToolkit_people_v1';
+let people = [];
+function loadPeople(){
+  try{ const raw = localStorage.getItem(STORAGE_KEY); people = raw ? JSON.parse(raw) : []; }
+  catch(e){ console.error('load failed', e); people = []; }
+}
+function savePeople(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(people)); }
+  catch(e){ console.error('save failed', e); alert('Could not save — storage may be full or blocked.'); }
+}
+
+const nakSelect = document.getElementById('nakSelect');
+avatars.forEach(a=>{
+  const opt = document.createElement('option');
+  opt.value = a.n;
+  opt.textContent = `#${a.n} ${a.emoji} ${a.name}`;
+  nakSelect.appendChild(opt);
+});
+
+document.getElementById('addBtn').addEventListener('click', ()=>{
+  const nameInput = document.getElementById('nameInput');
+  const name = nameInput.value.trim();
+  const nak = parseInt(nakSelect.value);
+  const isSelf = document.getElementById('selfCheck').checked;
+  if(!name){ nameInput.focus(); return; }
+  if(isSelf){ people.forEach(p=>p.isSelf=false); }
+  people.push({ id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), name, nak, isSelf });
+  savePeople();
+  nameInput.value='';
+  document.getElementById('selfCheck').checked=false;
+  refreshCircle();
+});
+
+function removePerson(id){ people = people.filter(p=>p.id!==id); savePeople(); refreshCircle(); }
+
+function renderPeopleList(){
+  const list = document.getElementById('peopleList');
+  list.innerHTML = '';
+  if(people.length===0){
+    list.innerHTML = '<span style="color:var(--muted);font-size:.8rem;">No one added yet.</span>';
+    return;
+  }
+  people.forEach(p=>{
+    const a = getAvatar(p.nak);
+    const chip = document.createElement('div');
+    chip.className = 'person-chip' + (p.isSelf ? ' self':'');
+    chip.innerHTML = `${a.emoji} ${p.isSelf?'⭐ ':''}${escapeHtml(p.name)} <span style="color:var(--muted);">(${a.name})</span> <button class="remove-btn" data-id="${p.id}">✕</button>`;
+    chip.addEventListener('click', (e)=>{ if(e.target.classList.contains('remove-btn')) return; openEditPerson(p); });
+    list.appendChild(chip);
+  });
+  list.querySelectorAll('.remove-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); removePerson(btn.dataset.id); });
+  });
+}
+
+function openEditPerson(p){
+  const modal = document.getElementById('modalContent');
+  const options = avatars.map(a=>`<option value="${a.n}" ${a.n===p.nak?'selected':''}>#${a.n} ${a.emoji} ${a.name}</option>`).join('');
+  modal.innerHTML = `
+    <button class="close" id="closeModal">✕</button>
+    <h2>Edit ${escapeHtml(p.name)}</h2>
+    <div class="edit-row">
+      <input type="text" id="editName" value="${escapeHtml(p.name)}">
+      <select id="editNak">${options}</select>
+    </div>
+    <div class="edit-row">
+      <label class="self-checkbox"><input type="checkbox" id="editSelf" ${p.isSelf?'checked':''}> Mark as "Self"</label>
+      <button id="saveEditBtn">Save</button>
+    </div>
+  `;
+  openOverlay();
+  document.getElementById('saveEditBtn').addEventListener('click', ()=>{
+    const newName = document.getElementById('editName').value.trim();
+    const newNak = parseInt(document.getElementById('editNak').value);
+    const newSelf = document.getElementById('editSelf').checked;
+    if(!newName) return;
+    if(newSelf){ people.forEach(pp=>pp.isSelf=false); }
+    p.name = newName; p.nak = newNak; p.isSelf = newSelf;
+    savePeople();
+    closeModal();
+    refreshCircle();
+  });
+}
+
+const centerSelect = document.getElementById('centerSelect');
+let currentCenterPersonId = null;
+let circleFilter = 'all';
+document.getElementById('circleFilterRow').addEventListener('click', e=>{
+  if(!e.target.classList.contains('filter-chip')) return;
+  document.querySelectorAll('#circleFilterRow .filter-chip').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  circleFilter = e.target.dataset.filter;
+  renderCircleWheel();
+});
+function renderCenterSelector(){
+  centerSelect.innerHTML = '';
+  if(people.length===0){ centerSelect.innerHTML = '<option>No one added yet</option>'; return; }
+  people.forEach(p=>{
+    const a = getAvatar(p.nak);
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = `${p.isSelf?'⭐ ':''}${p.name} (${a.name})`;
+    centerSelect.appendChild(opt);
+  });
+  const selfPerson = people.find(p=>p.isSelf);
+  const stillExists = people.find(p=>p.id===currentCenterPersonId);
+  currentCenterPersonId = stillExists ? currentCenterPersonId : (selfPerson ? selfPerson.id : people[0].id);
+  centerSelect.value = currentCenterPersonId;
+}
+centerSelect.addEventListener('change', e=>{ currentCenterPersonId = e.target.value; renderCircleWheel(); });
+
+function renderCircleWheel(){
+  const wheelContainer = document.getElementById('wheelContainer');
+  const emptyState = document.getElementById('emptyState');
+  if(people.length===0){
+    wheelContainer.style.display='none'; emptyState.style.display='block';
+    document.getElementById('alignmentList').innerHTML=''; return;
+  }
+  emptyState.style.display='none'; wheelContainer.style.display='';
+
+  const centerPerson = people.find(p=>p.id===currentCenterPersonId) || people[0];
+  const centerNak = getAvatar(centerPerson.nak);
+  document.getElementById('centerNode').innerHTML = `<div class="emoji">${centerNak.emoji}</div><div class="pname">${centerPerson.isSelf?'⭐ ':''}${escapeHtml(centerPerson.name)}</div><div class="nname">${centerNak.name}</div>`;
+
+  const wheelWrap = document.getElementById('wheelWrap');
+  wheelWrap.querySelectorAll('.orbit-node').forEach(n=>n.remove());
+  const others = avatars.filter(a=>a.n !== centerPerson.nak);
+  const radius = 42, total = others.length;
+
+  others.forEach((a,i)=>{
+    const angle = (i/total)*2*Math.PI - Math.PI/2;
+    const x = 50 + radius*Math.cos(angle), y = 50 + radius*Math.sin(angle);
+    const tara = taraFor(centerPerson.nak, a.n);
+    const peopleHere = people.filter(p=>p.nak===a.n && p.id!==centerPerson.id);
+    const node = document.createElement('div');
+    const isEmpty = peopleHere.length===0;
+    node.className = `orbit-node ${isEmpty ? 'empty' : tara.type}`;
+    if(peopleHere.some(p=>p.isSelf)) node.classList.add('self-person');
+    if(circleFilter !== 'all' && (isEmpty || tara.type !== circleFilter)) node.classList.add('dimmed');
+    node.style.left = x+'%'; node.style.top = y+'%';
+    node.textContent = a.emoji;
+    node.title = isEmpty ? `${a.name} — empty` : `${a.name} — ${peopleHere.map(p=>p.name).join(', ')}`;
+    if(peopleHere.length>0){
+      const badge = document.createElement('div');
+      badge.className='badge'; badge.textContent = peopleHere.length;
+      node.appendChild(badge);
+    }
+    node.addEventListener('click', ()=>openPairModal(centerPerson, a, tara, peopleHere));
+    wheelWrap.appendChild(node);
+  });
+  renderCircleList(centerPerson);
+}
+
+function renderCircleList(centerPerson){
+  const listEl = document.getElementById('alignmentList');
+  listEl.innerHTML = '';
+  avatars.filter(a=>a.n!==centerPerson.nak).forEach(a=>{
+    const tara = taraFor(centerPerson.nak, a.n);
+    const peopleHere = people.filter(p=>p.nak===a.n && p.id!==centerPerson.id);
+    const isEmpty = peopleHere.length===0;
+    const item = document.createElement('div');
+    item.className = `list-item ${isEmpty?'empty':tara.type}`;
+    if(circleFilter !== 'all' && (isEmpty || tara.type !== circleFilter)) item.classList.add('dimmed');
+    item.innerHTML = `
+      <div class="li-top"><span>${a.emoji} ${a.name}</span><span>${isEmpty?'':(tara.type==='support'?'✅':tara.type==='challenge'?'⚠️':'➖')}</span></div>
+      <div class="li-tara">${isEmpty?'No one here yet':tara.label}</div>
+      ${peopleHere.length>0 ? `<div class="li-people">${peopleHere.map(p=>escapeHtml(p.name)).join(', ')}</div>` : ''}
+    `;
+    item.addEventListener('click', ()=>openPairModal(centerPerson, a, tara, peopleHere));
+    listEl.appendChild(item);
+  });
+}
+
+let circleListMode = false;
+document.getElementById('toggleListBtn').addEventListener('click', ()=>{
+  circleListMode = !circleListMode;
+  document.getElementById('wheelContainer').classList.toggle('hidden', circleListMode);
+  document.getElementById('alignmentList').classList.toggle('active', circleListMode);
+  document.getElementById('toggleListBtn').textContent = circleListMode ? 'Show as wheel instead' : 'Show as list instead';
+});
+
+/* Export / Import / Clear */
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(people, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'my-circle-export.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+document.getElementById('importFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      const imported = JSON.parse(ev.target.result);
+      if(!Array.isArray(imported)) throw new Error('Invalid format');
+      const valid = imported.filter(p=>p && p.name && Number.isInteger(p.nak) && p.nak>=1 && p.nak<=27);
+      if(valid.length===0){ alert('No valid people found in that file.'); return; }
+      valid.forEach(p=>{
+        if(!p.id) p.id = Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+      });
+      people = people.concat(valid);
+      savePeople();
+      refreshCircle();
+      alert(`Imported ${valid.length} people.`);
+    }catch(err){
+      alert('Could not read that file — make sure it\'s a valid export JSON.');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  if(people.length===0) return;
+  if(confirm('Remove all people from your circle? This cannot be undone.')){
+    people = []; savePeople(); refreshCircle();
+  }
+});
+
+function refreshCircle(){
+  renderPeopleList();
+  renderCenterSelector();
+  renderCircleWheel();
+  renderGroupMatrix();
+}
+
+/* ============ PAGE 4: GROUP VIEW MATRIX ============ */
+function renderGroupMatrix(){
+  const scrollWrap = document.getElementById('matrixScroll');
+  const summaryWrap = document.getElementById('matrixSummary');
+  const emptyState = document.getElementById('groupEmptyState');
+
+  if(people.length < 2){
+    scrollWrap.innerHTML = '';
+    summaryWrap.innerHTML = '';
+    emptyState.style.display = 'block';
+    return;
+  }
+  emptyState.style.display = 'none';
+
+  // Build matrix table
+  let html = '<table class="matrix"><thead><tr><th></th>';
+  people.forEach(p=>{
+    const a = getAvatar(p.nak);
+    html += `<th title="${escapeHtml(p.name)} (${a.name})">${a.emoji}<br>${escapeHtml(p.name.split(' ')[0])}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  people.forEach(rowP=>{
+    const rowA = getAvatar(rowP.nak);
+    html += `<tr><th class="rowhead"><div class="matrix-name-cell">${rowP.isSelf?'<span class="self-star">⭐</span>':''}${rowA.emoji} ${escapeHtml(rowP.name.split(' ')[0])}</div></th>`;
+    people.forEach(colP=>{
+      if(rowP.id === colP.id){
+        html += `<td class="cell self-cell">·</td>`;
+      }else{
+        const tara = taraFor(rowP.nak, colP.nak);
+        const icon = tara.type==='support'?'✅':tara.type==='challenge'?'⚠️':'➖';
+        html += `<td class="cell ${tara.type}" data-row="${rowP.id}" data-col="${colP.id}" title="${escapeHtml(rowP.name)} → ${escapeHtml(colP.name)}: ${tara.label}">${icon}</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  scrollWrap.innerHTML = html;
+
+  scrollWrap.querySelectorAll('td.cell:not(.self-cell)').forEach(td=>{
+    td.addEventListener('click', ()=>{
+      const rowP = people.find(p=>p.id===td.dataset.row);
+      const colP = people.find(p=>p.id===td.dataset.col);
+      const tara = taraFor(rowP.nak, colP.nak);
+      const colAvatar = getAvatar(colP.nak);
+      openPairModal(rowP, colAvatar, tara, [colP]);
+    });
+  });
+
+  // Summary cards: per person, count supporters/challengers among the group
+  summaryWrap.innerHTML = '';
+  people.forEach(p=>{
+    let supportCount=0, challengeCount=0, neutralCount=0;
+    const supporters=[], challengers=[];
+    people.forEach(other=>{
+      if(other.id===p.id) return;
+      const tara = taraFor(p.nak, other.nak);
+      if(tara.type==='support'){ supportCount++; supporters.push(other.name); }
+      else if(tara.type==='challenge'){ challengeCount++; challengers.push(other.name); }
+      else neutralCount++;
+    });
+    const card = document.createElement('div');
+    card.className = 'summary-card';
+    card.innerHTML = `
+      <div class="sc-name">${p.isSelf?'⭐ ':''}${escapeHtml(p.name)}</div>
+      <div class="sc-line">✅ Supported by <b>${supportCount}</b>${supporters.length?': '+supporters.map(escapeHtml).join(', '):''}</div>
+      <div class="sc-line">⚠️ Challenged by <b>${challengeCount}</b>${challengers.length?': '+challengers.map(escapeHtml).join(', '):''}</div>
+      <div class="sc-line">➖ Same wiring as <b>${neutralCount}</b></div>
+    `;
+    summaryWrap.appendChild(card);
+  });
+}
+
+/* ============ HINT BAR ============ */
+(function(){
+  const HINT_KEY = 'nakshatraToolkit_hintDismissed';
+  const bar = document.getElementById('hintBar');
+  if(localStorage.getItem(HINT_KEY) === '1'){ bar.classList.add('hidden'); }
+  document.getElementById('hintClose').addEventListener('click', ()=>{
+    bar.classList.add('hidden');
+    try{ localStorage.setItem(HINT_KEY, '1'); }catch(e){}
+  });
+})();
+
+/* ============ INIT ============ */
+loadPeople();
+refreshCircle();
+renderExploreWheel();
+</script>
+
+</body>
+</html>
