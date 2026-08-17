@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blank Paper</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  .page {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    background:
+      linear-gradient(90deg, transparent 55px, #e88 56px, #e88 57px, transparent 58px),
+      repeating-linear-gradient(#fdfcf7, #fdfcf7 31px, #b9d3e8 32px);
+    background-color: #fdfcf7;
+    padding: 40px 40px 40px 70px;
+    font-size: 18px;
+    line-height: 32px;
+    color: #2b2b2b;
+    border: none;
+    resize: none;
+    outline: none;
+  }
+</style>
+</head>
+<body>
+  <textarea class="page" spellcheck="false"></textarea>
+
+<script>
+const page = document.querySelector('.page');
+const KEY = 'blank-paper-content';
+let t;
+
+try {
+  const saved = window.localStorage.getItem(KEY);
+  if (saved) page.value = saved;
+} catch (e) {}
+
+page.addEventListener('input', () => {
+  clearTimeout(t);
+  t = setTimeout(() => {
+    try { window.localStorage.setItem(KEY, page.value); } catch (e) {}
+  }, 400);
+});
+</script>
+</body>
+</html>
