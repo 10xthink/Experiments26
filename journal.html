@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, interactive-widget=resizes-content">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0f0f10">
 <title>Journal</title>
 <style>
   :root{
+    color-scheme: dark;
     --bg:#0f0f10;
     --panel:#18181a;
     --bubble:#232326;
@@ -25,6 +28,7 @@
     display:flex;
     flex-direction:column;
     height:100vh;
+    height:100dvh;
     overflow:hidden;
   }
   header{
@@ -656,7 +660,6 @@
     font-family:inherit;
     flex:1;
     min-width:0;
-    color-scheme:dark;
   }
   .event-time-badge{
     flex-shrink:0;
@@ -672,6 +675,21 @@
     font-size:14.5px;
     line-height:1.4;
     word-break:break-word;
+  }
+
+  /* Desktop/large screens: rather than letting the header, tabs, and
+     content stretch edge-to-edge across a wide window, present the app
+     as a centered panel — same idea as the max-width already used on
+     individual cards, just applied one level up to the whole shell. */
+  @media (min-width: 860px){
+    html{background:#050505;}
+    body{
+      max-width:760px;
+      margin:0 auto;
+      border-left:1px solid var(--border);
+      border-right:1px solid var(--border);
+      box-shadow:0 0 60px rgba(0,0,0,.5);
+    }
   }
 
 </style>
@@ -1376,6 +1394,12 @@ function addEntry(){
   journalInput.value = '';
   journalInput.style.height = 'auto';
   renderJournal(true);
+  // Refocusing keeps the keyboard open on desktop for back-to-back typing
+  // (safe there — no on-screen keyboard to cover anything). On mobile we
+  // deliberately don't: re-opening the keyboard there can cover the entry
+  // we just scrolled into view, which is worse than just tapping to type
+  // the next one.
+  if(!isMobile) journalInput.focus();
 }
 document.getElementById('journalForm').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -1639,6 +1663,7 @@ function addTask(){
       taskInput.value = '';
       repeatDaily.checked = false;
       showToast(`"${dup.text}" is already a daily routine`);
+      if(!isMobile) taskInput.focus();
       return;
     }
   }
@@ -1648,6 +1673,7 @@ function addTask(){
   taskInput.style.height = 'auto';
   repeatDaily.checked = false;
   renderTasks();
+  if(!isMobile) taskInput.focus();
 }
 document.getElementById('taskForm').addEventListener('submit', (e) => { e.preventDefault(); addTask(); });
 taskInput.addEventListener('input', () => autoGrow(taskInput, 120));
@@ -1767,6 +1793,7 @@ function addIdea(){
   ideaInput.value = '';
   ideaInput.style.height = 'auto';
   renderIdeas();
+  if(!isMobile) ideaInput.focus();
 }
 document.getElementById('ideaForm').addEventListener('submit', (e) => { e.preventDefault(); addIdea(); });
 ideaInput.addEventListener('input', () => autoGrow(ideaInput, 120));
@@ -1884,6 +1911,7 @@ function addEvent(){
   const date = eventDate.value;
   if(!title || !date) {
     showToast(title ? 'Pick a date' : 'Add a title');
+    if(!isMobile) eventTitle.focus();
     return;
   }
   events.push({ id: newId(), title, date, time: eventTime.value || '', createdTs: new Date().toISOString() });
@@ -1891,6 +1919,7 @@ function addEvent(){
   eventTitle.value = '';
   eventTime.value = '';
   renderEvents();
+  if(!isMobile) eventTitle.focus();
 }
 document.getElementById('eventForm').addEventListener('submit', (e) => { e.preventDefault(); addEvent(); });
 
