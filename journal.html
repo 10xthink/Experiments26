@@ -475,6 +475,44 @@
     border-radius:20px;
     flex-shrink:0;
   }
+  .star-toggle{
+    background:none;
+    border:none;
+    font-size:16px;
+    line-height:1;
+    cursor:pointer;
+    padding:2px 4px;
+    flex-shrink:0;
+    color:var(--text-dim);
+    transition:.15s;
+  }
+  .star-toggle.starred{color:var(--accent);}
+  .tasks-toolbar{
+    max-width:640px;
+    margin:0 auto 16px;
+    padding:0 2px;
+  }
+  .link-button{
+    background:none;
+    border:none;
+    color:var(--accent);
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    padding:4px 2px;
+  }
+  .undo-btn{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--accent);
+    font-size:11px;
+    font-weight:600;
+    cursor:pointer;
+    padding:3px 9px;
+    border-radius:20px;
+    margin-right:8px;
+  }
+  .undo-btn:hover{background:var(--accent-soft);}
   .row.active-idea{
     border-color:var(--accent);
     background:var(--accent-soft);
@@ -719,13 +757,13 @@
         <button class="icon-btn" id="exportBtn">⭳ Export</button>
         <button class="icon-btn" id="importBtn">⭱ Import</button>
         <button class="icon-btn danger" id="clearBtn">Clear all</button>
-        <div class="version-label">v1.3</div>
+        <div class="version-label">v2.0</div>
       </div>
     </div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" id="tabJournal">Journal</button>
-    <button class="tab-btn" id="tabToday">Today</button>
+    <button class="tab-btn" id="tabToday">Tasks</button>
     <button class="tab-btn" id="tabIdeas">Ideas</button>
     <button class="tab-btn" id="tabEvents">Events</button>
   </div>
@@ -1226,7 +1264,7 @@ function inlineEdit(labelEl, getValue, onCommit){
 /* ============ Tab switching ============ */
 const tabs = {
   journal: { btn: document.getElementById('tabJournal'), view: document.getElementById('journalView'), title:'Journal' },
-  today:   { btn: document.getElementById('tabToday'),   view: document.getElementById('todayView'),   title:'Today' },
+  today:   { btn: document.getElementById('tabToday'),   view: document.getElementById('todayView'),   title:'Tasks' },
   ideas:   { btn: document.getElementById('tabIdeas'),   view: document.getElementById('ideasView'),   title:'Ideas' },
   events:  { btn: document.getElementById('tabEvents'),  view: document.getElementById('eventsView'),  title:'Events' }
 };
@@ -1244,7 +1282,7 @@ function switchTab(name){
   resetSearchState();
   currentTab = name; // set before rendering — updateHeaderSub() reads this
   if(name === 'journal'){ renderJournal(); updateHeaderSub(); }
-  if(name === 'today'){ renderTasks(); updateHeaderSub(); }
+  if(name === 'today'){ tasksView = 'active'; renderTasks(); updateHeaderSub(); }
   if(name === 'ideas'){ renderIdeas(); updateHeaderSub(); }
   if(name === 'events'){ renderEvents(); updateHeaderSub(); }
 }
@@ -1258,8 +1296,11 @@ function updateHeaderSub(){
   if(currentTab === 'journal'){
     headerSub.textContent = entries.length + (entries.length === 1 ? ' entry' : ' entries');
   } else if(currentTab === 'today'){
-    const doneCount = tasks.filter(isDoneToday).length;
-    headerSub.textContent = `${doneCount}/${tasks.length} done today`;
+    const openCount = tasks.filter(t => t.recurring || !t.done).length;
+    const doneCount = tasks.filter(t => !t.recurring && t.done).length;
+    headerSub.textContent = tasksView === 'done'
+      ? `${doneCount} completed`
+      : `${openCount} open`;
   } else if(currentTab === 'ideas'){
     const active = ideas.find(i => i.active);
     headerSub.textContent = active ? '1 active · ' + (ideas.length-1) + ' parked' : ideas.length + ' ideas';
@@ -1471,8 +1512,9 @@ fileInput.addEventListener('change', (e) => {
           const id = item.id || newId();
           if(existingIds.has(id)) return;
           tasks.push({
-            id, text: item.text, recurring: !!item.recurring, done: !!item.done,
-            completions: item.completions || {}, createdDate: item.createdDate || todayStr()
+            id, text: item.text, recurring: !!item.recurring, done: !!item.done, starred: !!item.starred,
+            completions: item.completions || {}, createdDate: item.createdDate || todayStr(),
+            completedAt: item.completedAt || null
           });
           existingIds.add(id);
           added++;
@@ -1547,10 +1589,11 @@ document.getElementById('clearBtn').addEventListener('click', async () => {
 });
 
 /* =================================================================== */
-/* TODAY (tasks + routines)                                             */
+/* TASKS (to-do / doing / done + routines)                              */
 /* =================================================================== */
 const TASKS_KEY = 'journal_tasks_v1';
 let tasks = loadJSON(TASKS_KEY, []);
+let tasksView = 'active'; // 'active' | 'done' — which sub-view of the Tasks tab is showing
 
 const taskSections = document.getElementById('taskSections');
 const todayDateEl = document.getElementById('todayDate');
@@ -1570,6 +1613,7 @@ function setDoneToday(task, val){
     else delete task.completions[todayStr()];
   } else {
     task.done = val;
+    task.completedAt = val ? new Date().toISOString() : null;
   }
 }
 function daysSince(dateStr){
@@ -1585,25 +1629,113 @@ function renderTasks(){
   const d = new Date();
   todayDateEl.textContent = d.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
   updateHeaderSub();
+  renderTasksToolbar();
+
+  if(tasksView === 'done'){ renderDoneArchive(); return; }
 
   taskSections.innerHTML = '';
 
-  if(tasks.length === 0){
-    renderEmptyState(taskSections, '☀️', 'Nothing planned for today. Add a task or a daily routine below.', 'today-empty');
+  const oneOffOpen = tasks.filter(t => !t.recurring && !t.done);
+  const routinesAll = tasks.filter(t => t.recurring);
+  const relevant = [...oneOffOpen, ...routinesAll];
+
+  if(relevant.length === 0){
+    renderEmptyState(taskSections, '☀️', 'Nothing here yet. Add a task or a daily routine below.', 'today-empty');
     return;
   }
 
-  const filtered = tasks.filter(t => matchesSearch(t.text));
+  const filtered = relevant.filter(t => matchesSearch(t.text));
   if(filtered.length === 0){
     renderEmptyState(taskSections, '🔍', `No tasks match "${searchInput.value}".`, 'today-empty');
     return;
   }
 
-  const routines = filtered.filter(t => t.recurring);
-  const oneOff = filtered.filter(t => !t.recurring);
+  const doing = filtered.filter(t => t.starred);
+  const todo = filtered.filter(t => !t.starred && !t.recurring);
+  const routines = filtered.filter(t => !t.starred && t.recurring);
 
+  if(doing.length) taskSections.appendChild(buildTaskSection('Doing', doing));
+  if(todo.length) taskSections.appendChild(buildTaskSection('To-do', todo));
   if(routines.length) taskSections.appendChild(buildTaskSection('Routines', routines));
-  if(oneOff.length) taskSections.appendChild(buildTaskSection("Today's tasks", oneOff));
+}
+
+// Small toolbar link above the list: "View completed" from the active view,
+// or "Back to Tasks" from the archive — swaps sub-view without a new tab.
+function renderTasksToolbar(){
+  const doneCount = tasks.filter(t => !t.recurring && t.done).length;
+  let toolbar = document.getElementById('tasksToolbar');
+  if(!toolbar){
+    toolbar = document.createElement('div');
+    toolbar.id = 'tasksToolbar';
+    toolbar.className = 'tasks-toolbar';
+    todayDateEl.insertAdjacentElement('afterend', toolbar);
+  }
+  toolbar.innerHTML = '';
+  const link = document.createElement('button');
+  link.className = 'link-button';
+  if(tasksView === 'done'){
+    link.textContent = '← Back to Tasks';
+    link.onclick = () => { tasksView = 'active'; renderTasks(); };
+  } else {
+    link.textContent = `✓ View completed (${doneCount})`;
+    link.onclick = () => { tasksView = 'done'; renderTasks(); };
+  }
+  toolbar.appendChild(link);
+}
+
+// Journal-style archive of completed one-off tasks, grouped by the date
+// they were finished, with an explicit one-tap Undo (no confirmation
+// needed since it's non-destructive — the task just returns to To-do).
+function renderDoneArchive(){
+  taskSections.innerHTML = '';
+  const doneTasks = tasks.filter(t => !t.recurring && t.done && t.completedAt);
+
+  if(doneTasks.length === 0){
+    renderEmptyState(taskSections, '✅', 'Nothing completed yet.', 'today-empty');
+    return;
+  }
+  const filtered = doneTasks.filter(t => matchesSearch(t.text));
+  if(filtered.length === 0){
+    renderEmptyState(taskSections, '🔍', `No completed tasks match "${searchInput.value}".`, 'today-empty');
+    return;
+  }
+
+  const sorted = [...filtered].sort((a,b) => new Date(a.completedAt) - new Date(b.completedAt));
+  let lastDay = null;
+  sorted.forEach(task => {
+    const d = new Date(task.completedAt);
+    const label = dayLabel(d);
+    if(label !== lastDay){
+      const div = document.createElement('div');
+      div.className = 'date-divider';
+      div.innerHTML = `<span>${label}</span>`;
+      taskSections.appendChild(div);
+      lastDay = label;
+    }
+    const card = document.createElement('div');
+    card.className = 'card entry';
+    const textDiv = document.createElement('div');
+    textDiv.className = 'entry-text';
+    textDiv.textContent = task.text;
+    const meta = document.createElement('div');
+    meta.className = 'entry-meta';
+    const undoBtn = document.createElement('button');
+    undoBtn.className = 'undo-btn';
+    undoBtn.textContent = '↺ Undo';
+    undoBtn.onclick = () => {
+      task.done = false;
+      task.completedAt = null;
+      saveTasks();
+      renderTasks();
+    };
+    const timeSpan = document.createElement('span');
+    timeSpan.textContent = timeLabel(d);
+    meta.appendChild(undoBtn);
+    meta.appendChild(timeSpan);
+    card.appendChild(textDiv);
+    card.appendChild(meta);
+    taskSections.appendChild(card);
+  });
 }
 
 function buildTaskSection(title, list){
@@ -1636,8 +1768,19 @@ function buildTaskRow(task){
   label.className = 'row-label' + (done ? ' checked' : '');
   label.textContent = task.text;
 
+  const star = document.createElement('button');
+  star.className = 'star-toggle' + (task.starred ? ' starred' : '');
+  star.textContent = task.starred ? '★' : '☆';
+  star.title = task.starred ? 'Remove from Focus' : 'Add to Focus';
+  star.onclick = () => {
+    task.starred = !task.starred;
+    saveTasks();
+    renderTasks();
+  };
+
   row.appendChild(check);
   row.appendChild(label);
+  row.appendChild(star);
   if(task.recurring){
     const badge = document.createElement('span');
     badge.className = 'row-badge';
@@ -1658,7 +1801,7 @@ function buildTaskRow(task){
       saveTasks();
       renderTasks();
     }
-  }, '.row-toggle');
+  }, '.row-toggle, .star-toggle');
 
   return row;
 }
@@ -1676,7 +1819,7 @@ function addTask(){
       return;
     }
   }
-  tasks.push({ id: newId(), text, recurring: repeatDaily.checked, done:false, completions:{}, createdDate: todayStr() });
+  tasks.push({ id: newId(), text, recurring: repeatDaily.checked, done:false, starred:false, completedAt:null, completions:{}, createdDate: todayStr() });
   saveTasks();
   taskInput.value = '';
   taskInput.style.height = 'auto';
