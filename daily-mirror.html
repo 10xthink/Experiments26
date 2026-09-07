@@ -89,24 +89,18 @@
       box-shadow: 0 0 14px var(--gold);
     }
 
-    /* Container */
+    /* Main Container */
     .container {
       max-width: 440px;
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1.75rem;
+      gap: 2rem;
       margin: auto 0;
     }
 
-    /* 1. Breathing Stage */
-    .breath-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.6rem;
-    }
+    /* 1. Pure Breathing Orb */
     .orb-stage {
       position: relative;
       width: 180px;
@@ -138,27 +132,7 @@
       box-shadow: 0 0 15px var(--gold-dim);
     }
 
-    /* Tier Indicator Pips below the Orb */
-    .tier-pips {
-      display: flex;
-      gap: 6px;
-      cursor: pointer;
-      padding: 4px;
-    }
-    .pip {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: #252d3d;
-      transition: all 0.3s ease;
-    }
-    .pip.active {
-      background: var(--gold);
-      box-shadow: 0 0 6px var(--gold);
-      transform: scale(1.2);
-    }
-
-    /* 2. Vector Gate */
+    /* 2. The Singular Vector */
     .vector-gate {
       display: flex;
       flex-direction: column;
@@ -243,7 +217,7 @@
       filter: drop-shadow(0 0 4px var(--active));
     }
 
-    /* Help Drawer Copy & Contrasts */
+    /* Clarification Drawer & Contrasts */
     .guide-text {
       font-size: 0.82rem;
       color: var(--muted);
@@ -280,6 +254,37 @@
     .tag-good { color: #4ade80; font-weight: 700; font-family: monospace; font-size: 0.68rem; }
     .contrast-text { color: var(--muted); line-height: 1.3; }
     .contrast-text strong { color: #cbd5e1; display: inline; font-size: 0.75rem; }
+
+    /* Breathing Rhythm Selector (Inside Help Drawer) */
+    .rhythm-selector {
+      display: flex;
+      gap: 0.35rem;
+      background: #0d1017;
+      padding: 3px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      margin: 0.6rem 0 0.4rem 0;
+      justify-content: center;
+    }
+    .rhythm-btn {
+      flex: 1;
+      padding: 0.35rem 0.6rem;
+      font-size: 0.72rem;
+      border-radius: 16px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .rhythm-btn.active {
+      background: var(--card);
+      color: var(--gold);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      border: 1px solid var(--gold-dim);
+    }
 
     body.show-guide .guide-text { display: block; }
 
@@ -323,7 +328,7 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
     }
 
-    /* Story Modal */
+    /* Story Overlay */
     .story-modal {
       position: fixed;
       top: 0;
@@ -415,21 +420,21 @@
 
   <div class="container">
     
-    <div class="breath-wrapper">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem;">
       <div class="orb-stage" id="stage" onclick="togglePulse()">
         <div class="ring" id="ring"></div>
         <div class="orb" id="orb"></div>
       </div>
-      
-      <div class="tier-pips" id="tier-pips" onclick="cycleTier()" title="Tap to switch breathing depth">
-        <div class="pip active" id="pip-0"></div>
-        <div class="pip" id="pip-1"></div>
-        <div class="pip" id="pip-2"></div>
-      </div>
 
       <div class="guide-text">
         <strong>1. Clear the Glass (Breathe)</strong>
-        Inhale as the light grows, hold still, and exhale smoothly as it shrinks. Begin the next breath immediately with no empty pause.
+        Follow the light: Inhale as it expands, hold gently in stillness, and exhale smoothly as it contracts. Begin the next breath immediately with no empty pause.
+
+        <div class="rhythm-selector">
+          <button class="rhythm-btn active" id="r-0" onclick="setTier(0)">Gentle (3-4-6)</button>
+          <button class="rhythm-btn" id="r-1" onclick="setTier(1)">Focused (2-8-4)</button>
+          <button class="rhythm-btn" id="r-2" onclick="setTier(2)">Deep 1:4:2 (3-12-6)</button>
+        </div>
         
         <div class="contrast-box">
           <div class="contrast-row">
@@ -437,12 +442,8 @@
             <span class="contrast-text"><strong>4 to 8 rounds (2–4 min)</strong> resets your nervous system. Stop when you feel calm.</span>
           </div>
           <div class="contrast-row">
-            <span class="tag-good">Tiers</span>
-            <span class="contrast-text">Tap the dots below the orb to switch: <strong>Gentle (3-4-6)</strong> &bull; <strong>Focused (2-8-4)</strong> &bull; <strong>Deep (3-12-6)</strong>.</span>
-          </div>
-          <div class="contrast-row">
             <span class="tag-good">Next Step</span>
-            <span class="contrast-text">Thirumoolar's advanced ratios (16-64-32) require physical locks (<em>Bandhas</em>) to protect blood vessels. <strong>Never force long retentions alone; seek an experienced human teacher.</strong></span>
+            <span class="contrast-text">Thirumoolar's advanced ratios (16-64-32) require physical locks (<em>Bandhas</em>) to protect cerebral blood flow. <strong>Never force long retentions alone; seek an experienced human teacher.</strong></span>
           </div>
         </div>
       </div>
@@ -593,27 +594,26 @@
     let startTime = null;
     let isDemoing = false;
 
-    // Breath Tier Profiles
+    // Breath Rhythms (Safe, physiologically validated gears)
     const TIERS = [
-      { inhale: 3000, hold: 4000,  exhale: 6000 },  // Tier 0: Universal Gentle (3-4-6)
-      { inhale: 2000, hold: 8000,  exhale: 4000 },  // Tier 1: Focused Siddha (2-8-4, 1:4:2)
-      { inhale: 3000, hold: 12000, exhale: 6000 }   // Tier 2: Deep Siddha (3-12-6, 1:4:2)
+      { inhale: 3000, hold: 4000,  exhale: 6000 },  // 0: Universal Gentle (3-4-6)
+      { inhale: 2000, hold: 8000,  exhale: 4000 },  // 1: Focused Siddha (2-8-4, 1:4:2)
+      { inhale: 3000, hold: 12000, exhale: 6000 }   // 2: Deep Siddha (3-12-6, 1:4:2)
     ];
     let currentTierIdx = 0;
 
-    function cycleTier() {
+    function setTier(idx) {
       if (isDemoing) return;
-      currentTierIdx = (currentTierIdx + 1) % TIERS.length;
-      localStorage.setItem('m_tier', currentTierIdx);
-      updateTierUI();
-      if (isRunning) {
-        startTime = performance.now(); // reset cycle phase smoothly
-      }
+      currentTierIdx = idx;
+      localStorage.setItem('m_tier', idx);
+      updateTierButtons();
+      if (isRunning) startTime = performance.now();
     }
 
-    function updateTierUI() {
+    function updateTierButtons() {
       for (let i = 0; i < 3; i++) {
-        document.getElementById(`pip-${i}`).classList.toggle('active', i === currentTierIdx);
+        const btn = document.getElementById(`r-${i}`);
+        if (btn) btn.classList.toggle('active', i === currentTierIdx);
       }
     }
 
@@ -647,7 +647,7 @@
       });
 
       currentTierIdx = parseInt(localStorage.getItem('m_tier') || '0', 10);
-      updateTierUI();
+      updateTierButtons();
       checkHarmony();
     }
 
@@ -705,6 +705,7 @@
       animFrame = requestAnimationFrame(loop);
     }
 
+    // Real User Actions
     function toggleVector() {
       if (isDemoing) return;
       vectorBtn.classList.toggle('active');
@@ -743,7 +744,9 @@
       }
     }
 
-    // Direct Sandboxed Demonstration
+    /* -------------------------------------------------------------
+       Direct Visual Demo (Deterministic & Non-destructive)
+       ------------------------------------------------------------- */
     async function startWordlessDemo() {
       if (isDemoing) return;
       isDemoing = true;
