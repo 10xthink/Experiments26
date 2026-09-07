@@ -32,7 +32,7 @@
       overflow-x: hidden;
     }
 
-    /* Top Bar */
+    /* Top Navigation */
     .top-bar {
       width: 100%;
       max-width: 440px;
@@ -77,6 +77,13 @@
       stroke: var(--gold);
     }
 
+    .status-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
     .status-dot {
       width: 8px;
       height: 8px;
@@ -87,6 +94,14 @@
     .status-dot.lit {
       background: var(--gold);
       box-shadow: 0 0 14px var(--gold);
+    }
+
+    .temporal-whisper {
+      font-size: 0.65rem;
+      color: #526077;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: color 0.3s ease;
     }
 
     /* Main Container */
@@ -100,7 +115,7 @@
       margin: auto 0;
     }
 
-    /* 1. Pure Breathing Orb */
+    /* 1. Breathing Engine */
     .orb-stage {
       position: relative;
       width: 180px;
@@ -217,7 +232,7 @@
       filter: drop-shadow(0 0 4px var(--active));
     }
 
-    /* Clarification Drawer & Contrasts */
+    /* Tactical Guide Drawer */
     .guide-text {
       font-size: 0.82rem;
       color: var(--muted);
@@ -255,7 +270,7 @@
     .contrast-text { color: var(--muted); line-height: 1.3; }
     .contrast-text strong { color: #cbd5e1; display: inline; font-size: 0.75rem; }
 
-    /* Breathing Rhythm Selector (Inside Help Drawer) */
+    /* Breath Gear Selector */
     .rhythm-selector {
       display: flex;
       gap: 0.35rem;
@@ -293,7 +308,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Ghost Pointer & Demo Toast */
+    /* Demo Elements */
     #ghost-finger {
       position: fixed;
       width: 28px;
@@ -328,14 +343,14 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
     }
 
-    /* Story Overlay */
+    /* Story Modal Sheet */
     .story-modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(7, 8, 10, 0.96);
+      background: rgba(7, 8, 10, 0.97);
       backdrop-filter: blur(8px);
       z-index: 2000;
       display: none;
@@ -347,7 +362,7 @@
     }
     .story-modal.open { display: flex; }
     .story-content {
-      max-width: 540px;
+      max-width: 560px;
       width: 100%;
       color: var(--text-story);
       line-height: 1.7;
@@ -355,7 +370,7 @@
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
-      padding-bottom: 3rem;
+      padding-bottom: 3.5rem;
     }
     .story-content h2 {
       font-size: 1.4rem;
@@ -373,11 +388,34 @@
       margin: 0.5rem 0;
     }
     .story-content h3 {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       color: #fff;
-      margin-top: 0.75rem;
+      margin-top: 1rem;
       border-bottom: 1px solid var(--border);
       padding-bottom: 0.3rem;
+    }
+    .walker-card {
+      background: #11141a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .walker-title {
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .walker-detail {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .walker-detail strong {
+      color: #e2e8f0;
     }
     .close-story-btn {
       align-self: flex-end;
@@ -405,7 +443,10 @@
       <button class="icon-btn" id="help-toggle" onclick="toggleGuide()" title="Help & Examples">?</button>
     </div>
 
-    <div class="status-dot" id="master-dot"></div>
+    <div class="status-group">
+      <div class="status-dot" id="master-dot"></div>
+      <div class="temporal-whisper" id="temporal-whisper">Dawn</div>
+    </div>
 
     <div class="top-group">
       <button class="icon-btn" id="demo-btn" onclick="startWordlessDemo()" title="Watch Demo">
@@ -428,7 +469,7 @@
 
       <div class="guide-text">
         <strong>1. Clear the Glass (Breathe)</strong>
-        Follow the light: Inhale as it expands, hold gently in stillness, and exhale smoothly as it contracts. Begin the next breath immediately with no empty pause.
+        Follow the light: Inhale as it expands, hold still, and exhale smoothly as it contracts. Begin the next breath immediately with no empty pause.
 
         <div class="rhythm-selector">
           <button class="rhythm-btn active" id="r-0" onclick="setTier(0)">Gentle (3-4-6)</button>
@@ -466,7 +507,15 @@
           </div>
           <div class="contrast-row">
             <span class="tag-good">✓ TRUE</span>
-            <span class="contrast-text"><strong>Built the core algorithm module / Cared for sick child.</strong></span>
+            <span class="contrast-text"><strong>Built the core module / Comforted a sick child.</strong></span>
+          </div>
+          <div class="contrast-row">
+            <span class="tag-bad">✕ PHANTOM ITCH</span>
+            <span class="contrast-text">Finished at 11 AM, then panicked and created 10 fake tasks to feel worthy.</span>
+          </div>
+          <div class="contrast-row">
+            <span class="tag-good">✓ THE MARGIN</span>
+            <span class="contrast-text"><strong>Arrow lit. Victory claimed. Let the afternoon be quiet.</strong></span>
           </div>
         </div>
       </div>
@@ -529,36 +578,30 @@
       </div>
 
       <p>
-        Imagine a great, warm Sun shining high in the sky. Down on the ground, someone places a thousand bowls filled with water. In every single bowl, you see a bright, dancing sun. 
+        Imagine a warm Sun shining in the sky. Down on the ground, someone places a thousand bowls filled with water. In every bowl, you see a bright, dancing sun. 
       </p>
       <p>
-        A child looks at the yard and laughs: <em>"Look! A thousand little suns!"</em> But an elder smiles and points up: <em>"There is only one Sun. The bowls are just catching the light."</em>
+        A child laughs: <em>"Look! A thousand little suns!"</em> But an elder smiles: <em>"There is only one Sun. The bowls are just catching the light."</em>
       </p>
 
       <h3>The Big Human Game</h3>
       <p>
-        For sixty-five thousand years, humans have played a strange game. Whenever we forgot about the Sun, we got scared. We thought our little bowl was all alone in the dark.
-      </p>
-      <p>
-        So we built gigantic, noisy things:
+        For sixty-five thousand years, humans forgot about the Sun and got scared. We thought our little bowl was alone in the dark. So we built loud, complicated things:
       </p>
       <ul style="padding-left: 1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
-        <li><strong>Empires and Kings:</strong> Rulers marched across deserts, conquering countries because they feared dying without leaving a giant name carved in stone.</li>
-        <li><strong>Complicated Temples and Rules:</strong> People built tall gates and thick books, saying: <em>"Unless you chant these secret words, the light will not love you."</em></li>
-        <li><strong>Machines and Screens:</strong> Today, computers buzz with endless notifications: <em>"Do more! Buy this! Check this message or you will fall behind!"</em></li>
+        <li><strong>Empires and Kings:</strong> Rulers conquered countries because they feared dying without leaving a name carved in stone.</li>
+        <li><strong>Complicated Temples:</strong> People built massive gates, saying: <em>"Unless you chant these secret words, the light will not love you."</em></li>
+        <li><strong>Machines and Screens:</strong> Today, feeds buzz with endless red dots: <em>"Do more! Buy this! Check this message or you will fall behind!"</em></li>
       </ul>
 
       <h3>The Sages Who Smiled</h3>
       <p>
-        Every few centuries, wise men and women stepped out of the noise and laughed gently: <strong>Stop making it so hard.</strong>
-      </p>
-      <p>
-        You do not need an army. You do not need to read 500 books on philosophy. You do not need an algorithm telling you how to live. The entire secret has only three rules:
+        Every few centuries, wise wanderers stepped out of the noise and laughed gently: <strong>Stop making it so hard.</strong> The entire secret to an honorable, peaceful, and fearless life has only three rules:
       </p>
 
       <h3>1. Calm the Breath (The Orb)</h3>
       <p>
-        When you panic, the water in your bowl ripples like a storm. When the water churns, the sun looks broken. Take three quiet breaths. When the water goes still, the light returns.
+        When you panic, the water in your bowl churns like a storm. When the water churns, the sun looks broken. Take three quiet breaths. When the water settles, the light returns.
       </p>
 
       <h3>2. Do One True Thing (The Arrow)</h3>
@@ -566,17 +609,99 @@
         Do not run in fifty directions trying to look busy. Pick the one thing that actually matters today. Do it with your whole heart, then put your tools away.
       </p>
 
+      <div style="background: #0d1017; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="color: var(--gold); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase;">
+          The Law of Compounding (One Stone vs. Scattered Dust)
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 0.5rem; padding: 0.5rem 0;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap: 4px; flex: 1;">
+            <div style="width: 14px; height: 14px; background: var(--gold); border-radius: 2px;"></div>
+            <span style="font-size: 0.68rem; color: var(--muted);">Day 1</span>
+            <span style="font-size: 0.65rem; color: #cbd5e1; text-align: center;">One Stone</span>
+          </div>
+          <div style="color: var(--border); font-size: 1rem; padding-bottom: 10px;">→</div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap: 4px; flex: 1.3;">
+            <div style="display: grid; grid-template-columns: repeat(5, 5px); gap: 2px; background: rgba(212,163,115,0.15); padding: 4px; border-radius: 3px; border: 1px solid var(--gold-dim);">
+              <div style="width:5px; height:5px; background:var(--gold);"></div>
+              <div style="width:5px; height:5px; background:var(--gold);"></div>
+              <div style="width:5px; height:5px; background:var(--gold);"></div>
+              <div style="width:5px; height:5px; background:var(--gold);"></div>
+              <div style="width:5px; height:5px; background:var(--gold);"></div>
+              <div style="width:5px; height:5px; background:var(--gold);"></div>
+              <div style="width:5px; height:5px; background:var(--gold);"></div>
+              <div style="width:5px; height:5px; background:var(--gold);"></div>
+              <div style="width:5px; height:5px; background:var(--gold);"></div>
+              <div style="width:5px; height:5px; background:var(--gold);"></div>
+            </div>
+            <span style="font-size: 0.68rem; color: var(--gold);">Day 30</span>
+            <span style="font-size: 0.65rem; color: #cbd5e1; text-align: center;">Foundation</span>
+          </div>
+          <div style="color: var(--border); font-size: 1rem; padding-bottom: 10px;">→</div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap: 4px; flex: 1.5;">
+            <div style="width: 100%; height: 24px; border: 1px solid var(--gold); background: var(--gold-dim); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--gold); font-weight: bold; letter-spacing: 0.05em;">
+              SANCTUARY
+            </div>
+            <span style="font-size: 0.68rem; color: var(--gold); font-weight: bold;">Day 90</span>
+            <span style="font-size: 0.65rem; color: #cbd5e1; text-align: center;">A Built Life</span>
+          </div>
+        </div>
+        <div style="font-size: 0.78rem; color: var(--muted); line-height: 1.4;">
+          <strong>Why one move beats fifty:</strong> Trying to do everything scatters dust in the wind. Setting just one real stone per day creates 90 interlocking blocks in three months. That is a finished manuscript, an operational system, or a healed life. Small is not weak—small is unbreakable.
+        </div>
+      </div>
+
       <h3>3. Keep Clean Hands (The Three Balances)</h3>
       <p>
         Before you sleep at night, ask three quiet questions:
       </p>
       <ul style="padding-left: 1.25rem; display:flex; flex-direction:column; gap:0.4rem;">
         <li><strong>The Shield:</strong> Did I tell the truth today? Did I play fair?</li>
-        <li><strong>The Heart:</strong> Did I put my armor down to rest and be with family?</li>
+        <li><strong>The Heart:</strong> Did I put my armor down to rest and be with loved ones?</li>
         <li><strong>The Circle:</strong> Did I stay humble, remembering that I am just a wave in a vast ocean?</li>
       </ul>
 
+      <h3>The Four Walkers: Finding Your Reflection</h3>
       <p>
+        How does this look in everyday life? Different people carry the mirror in different ways:
+      </p>
+
+      <div class="walker-card">
+        <div class="walker-title">The Builder (Knowledge Worker / Maker)</div>
+        <div class="walker-detail">
+          <strong>The Struggle:</strong> 20 open browser tabs, answering emails all day, feeling frantic but building nothing real.<br/>
+          <strong>The Shift:</strong> Turns off notifications. By 11 AM, writes the key code module or finishes the pitch deck. Lights the Arrow.<br/>
+          <strong>The Void:</strong> Feels guilty that the afternoon is open. Learns that having space to walk and think is where real breakthrough happens.
+        </div>
+      </div>
+
+      <div class="walker-card">
+        <div class="walker-title">The Caregiver (Parent / Family Anchor)</div>
+        <div class="walker-detail">
+          <strong>The Struggle:</strong> Feeling unproductive because modern culture does not count soothing a child or preparing a clean meal.<br/>
+          <strong>The Shift:</strong> Redefines the Arrow: <em>Sit with my child for 30 minutes without touching a phone.</em><br/>
+          <strong>The Victory:</strong> Lights the Heart glyph at night with pride. Presence is real work.
+        </div>
+      </div>
+
+      <div class="walker-card">
+        <div class="walker-title">The Student (Young Mind / Discoverer)</div>
+        <div class="walker-detail">
+          <strong>The Struggle:</strong> Screen paralysis, late-night doom-scrolling, exam panic.<br/>
+          <strong>The Shift:</strong> Uses Gentle Breath (Tier 1) before opening a textbook. Masters <em>one</em> tough problem instead of stressing over the whole syllabus.<br/>
+          <strong>The Victory:</strong> Leaves the Shield unlit without shame when they cut a corner, resolving to try again honestly tomorrow.
+        </div>
+      </div>
+
+      <div class="walker-card">
+        <div class="walker-title">The Elder (Retiree / Transitioning Soul)</div>
+        <div class="walker-detail">
+          <strong>The Struggle:</strong> Wondering what their purpose is now that career deadlines have ended.<br/>
+          <strong>The Shift:</strong> The Arrow becomes quiet: <em>Prune the rose bush; forgive an old family debt; write down a memory.</em><br/>
+          <strong>The Victory:</strong> The Circle (Humility & Unity) becomes their primary anchor. They see their life as a drop resting peacefully in the ocean.
+        </div>
+      </div>
+
+      <p style="margin-top: 1rem;">
         If you lived honestly today, you are already complete. Tomorrow morning, the board wipes clean. Wake up, greet the Sun, and wipe the glass once more.
       </p>
     </div>
@@ -588,19 +713,34 @@
     const vectorBtn = document.getElementById('vector-btn');
     const masterDot = document.getElementById('master-dot');
     const storyModal = document.getElementById('story-modal');
+    const whisperEl = document.getElementById('temporal-whisper');
     
     let isRunning = false;
     let animFrame = null;
     let startTime = null;
     let isDemoing = false;
 
-    // Breath Rhythms (Safe, physiologically validated gears)
+    // Breath Profiles
     const TIERS = [
       { inhale: 3000, hold: 4000,  exhale: 6000 },  // 0: Universal Gentle (3-4-6)
       { inhale: 2000, hold: 8000,  exhale: 4000 },  // 1: Focused Siddha (2-8-4, 1:4:2)
       { inhale: 3000, hold: 12000, exhale: 6000 }   // 2: Deep Siddha (3-12-6, 1:4:2)
     ];
     let currentTierIdx = 0;
+
+    // Temporal Coaching Engine
+    function updateTemporalWhisper() {
+      const hour = new Date().getHours();
+      if (hour >= 5 && hour < 12) {
+        whisperEl.innerText = "Dawn • Set Vector";
+      } else if (hour >= 12 && hour < 18) {
+        whisperEl.innerText = "Day • Hold Focus";
+      } else if (hour >= 18 && hour < 23) {
+        whisperEl.innerText = "Dusk • Audit & Rest";
+      } else {
+        whisperEl.innerText = "Night • Stillness";
+      }
+    }
 
     function setTier(idx) {
       if (isDemoing) return;
@@ -654,6 +794,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       checkDayRollover();
       syncUIFromStorage();
+      updateTemporalWhisper();
       if (localStorage.getItem('m_guide') === '1') {
         document.body.classList.add('show-guide');
         document.getElementById('help-toggle').style.color = 'var(--gold)';
@@ -705,7 +846,6 @@
       animFrame = requestAnimationFrame(loop);
     }
 
-    // Real User Actions
     function toggleVector() {
       if (isDemoing) return;
       vectorBtn.classList.toggle('active');
@@ -744,9 +884,7 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       Direct Visual Demo (Deterministic & Non-destructive)
-       ------------------------------------------------------------- */
+    // Direct Sandboxed Demonstration
     async function startWordlessDemo() {
       if (isDemoing) return;
       isDemoing = true;
