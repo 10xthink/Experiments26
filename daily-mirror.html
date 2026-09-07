@@ -32,7 +32,7 @@
       overflow-x: hidden;
     }
 
-    /* Top Navigation */
+    /* Top Navigation Bar */
     .top-bar {
       width: 100%;
       max-width: 440px;
@@ -115,7 +115,7 @@
       margin: auto 0;
     }
 
-    /* 1. Breathing Engine */
+    /* 1. Breathing Light */
     .orb-stage {
       position: relative;
       width: 180px;
@@ -147,7 +147,7 @@
       box-shadow: 0 0 15px var(--gold-dim);
     }
 
-    /* 2. The Singular Vector */
+    /* 2. The Main Move */
     .vector-gate {
       display: flex;
       flex-direction: column;
@@ -188,7 +188,7 @@
       filter: drop-shadow(0 0 6px var(--gold));
     }
 
-    /* 3. Trinity of Conscience */
+    /* 3. Three Evening Questions */
     .trinity-row {
       display: flex;
       gap: 1.25rem;
@@ -232,7 +232,7 @@
       filter: drop-shadow(0 0 4px var(--active));
     }
 
-    /* Tactical Guide Drawer */
+    /* Guide Drawers */
     .guide-text {
       font-size: 0.82rem;
       color: var(--muted);
@@ -270,7 +270,7 @@
     .contrast-text { color: var(--muted); line-height: 1.3; }
     .contrast-text strong { color: #cbd5e1; display: inline; font-size: 0.75rem; }
 
-    /* Breath Gear Selector */
+    /* Rhythm Selector */
     .rhythm-selector {
       display: flex;
       gap: 0.35rem;
@@ -343,7 +343,7 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
     }
 
-    /* Story Modal Sheet */
+    /* Story Sheet */
     .story-modal {
       position: fixed;
       top: 0;
@@ -440,7 +440,7 @@
 
   <div class="top-bar">
     <div class="top-group">
-      <button class="icon-btn" id="help-toggle" onclick="toggleGuide()" title="Help & Examples">?</button>
+      <button class="icon-btn" id="help-toggle" onclick="toggleGuide()" title="Help & Clarifications">?</button>
     </div>
 
     <div class="status-group">
@@ -449,7 +449,7 @@
     </div>
 
     <div class="top-group">
-      <button class="icon-btn" id="demo-btn" onclick="startWordlessDemo()" title="Watch Demo">
+      <button class="icon-btn" id="demo-btn" onclick="startWordlessDemo()" title="Watch Walkthrough">
         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
           <circle cx="12" cy="12" r="3"></circle>
@@ -468,23 +468,23 @@
       </div>
 
       <div class="guide-text">
-        <strong>1. Clear the Glass (Breathe)</strong>
-        Follow the light: Inhale as it expands, hold still, and exhale smoothly as it contracts. Begin the next breath immediately with no empty pause.
+        <strong>1. Settle the Water (Breathe)</strong>
+        Follow the light: Inhale as it gently expands, hold in quiet stillness, and exhale as it softly shrinks. When your lungs empty, flow straight into the next breath like an ocean wave.
 
         <div class="rhythm-selector">
-          <button class="rhythm-btn active" id="r-0" onclick="setTier(0)">Gentle (3-4-6)</button>
-          <button class="rhythm-btn" id="r-1" onclick="setTier(1)">Focused (2-8-4)</button>
-          <button class="rhythm-btn" id="r-2" onclick="setTier(2)">Deep 1:4:2 (3-12-6)</button>
+          <button class="rhythm-btn active" id="r-0" onclick="setTier(0)">Gentle Wave</button>
+          <button class="rhythm-btn" id="r-1" onclick="setTier(1)">Deep Well</button>
+          <button class="rhythm-btn" id="r-2" onclick="setTier(2)">Mountain Still</button>
         </div>
         
         <div class="contrast-box">
           <div class="contrast-row">
-            <span class="tag-good">Cycles</span>
-            <span class="contrast-text"><strong>4 to 8 rounds (2–4 min)</strong> resets your nervous system. Stop when you feel calm.</span>
+            <span class="tag-good">Rounds</span>
+            <span class="contrast-text"><strong>4 to 8 quiet breaths (2–4 minutes)</strong> settles the dust. Stop whenever your head feels light and clear.</span>
           </div>
           <div class="contrast-row">
-            <span class="tag-good">Next Step</span>
-            <span class="contrast-text">Thirumoolar's advanced ratios (16-64-32) require physical locks (<em>Bandhas</em>) to protect cerebral blood flow. <strong>Never force long retentions alone; seek an experienced human teacher.</strong></span>
+            <span class="tag-good">Wisdom</span>
+            <span class="contrast-text">Deep, ancient breathwork requires learning physical locks (<em>Bandhas</em>) from a living teacher to protect your blood vessels. <strong>Never force breath retention alone.</strong></span>
           </div>
         </div>
       </div>
@@ -498,24 +498,24 @@
         </svg>
       </div>
       <div class="guide-text">
-        <strong>2. The Frontier Vector</strong>
-        Choose one real action today. When settled, tap the arrow to light it.
+        <strong>2. Today's Main Stone</strong>
+        Pick the single real thing that matters most today. When it is placed, tap the arrow to light your victory.
         <div class="contrast-box">
           <div class="contrast-row">
-            <span class="tag-bad">✕ TRAP</span>
-            <span class="contrast-text">Clearing 40 messages and feeling busy.</span>
+            <span class="tag-bad">✕ KICKING DUST</span>
+            <span class="contrast-text">Clearing 40 quick messages and feeling drained.</span>
           </div>
           <div class="contrast-row">
-            <span class="tag-good">✓ TRUE</span>
+            <span class="tag-good">✓ REAL STONE</span>
             <span class="contrast-text"><strong>Built the core module / Comforted a sick child.</strong></span>
           </div>
           <div class="contrast-row">
-            <span class="tag-bad">✕ PHANTOM ITCH</span>
-            <span class="contrast-text">Finished at 11 AM, then panicked and created 10 fake tasks to feel worthy.</span>
+            <span class="tag-bad">✕ PHANTOM GUILT</span>
+            <span class="contrast-text">Finished by 11 AM, then panicked and created fake tasks to look busy.</span>
           </div>
           <div class="contrast-row">
             <span class="tag-good">✓ THE MARGIN</span>
-            <span class="contrast-text"><strong>Arrow lit. Victory claimed. Let the afternoon be quiet.</strong></span>
+            <span class="contrast-text"><strong>Arrow lit. Stone placed. Let the afternoon be peaceful.</strong></span>
           </div>
         </div>
       </div>
@@ -544,19 +544,19 @@
       </div>
 
       <div class="guide-text">
-        <strong>3. Evening Balance</strong>
+        <strong>3. Three Questions at Sundown</strong>
         <div class="contrast-box">
           <div class="contrast-row">
-            <span class="tag-good">Shield</span>
-            <span class="contrast-text">Honesty: Left unlit without guilt if you compromised today.</span>
+            <span class="tag-good">The Shield</span>
+            <span class="contrast-text">Clean Hands: Did I play fair? (Leave unlit with honest peace if you slipped).</span>
           </div>
           <div class="contrast-row">
-            <span class="tag-good">Heart</span>
-            <span class="contrast-text">Sanctuary: Screens powered down for dinner, family, and sleep.</span>
+            <span class="tag-good">The Heart</span>
+            <span class="contrast-text">Sanctuary: Armor down; screens put away for dinner, family, and sleep.</span>
           </div>
           <div class="contrast-row">
-            <span class="tag-good">Circle</span>
-            <span class="contrast-text">Humility: No arrogance in victory; you are part of the vast whole.</span>
+            <span class="tag-good">The Circle</span>
+            <span class="contrast-text">Humility: No arrogance in victory; you are a single drop in a vast ocean.</span>
           </div>
         </div>
       </div>
@@ -574,11 +574,11 @@
     <div class="story-content">
       <h2>The Story of the Mirror</h2>
       <div class="story-quote">
-        "You do not become the sunlight. You are the mirror remembering how to wipe away the dust."
+        "You do not have to make the sunlight. You are just the mirror remembering how to wipe away the dust."
       </div>
 
       <p>
-        Imagine a warm Sun shining in the sky. Down on the ground, someone places a thousand bowls filled with water. In every bowl, you see a bright, dancing sun. 
+        Imagine a warm Sun shining in a clear blue sky. Down on the ground, someone places a thousand bowls of water. In every single bowl, you see a bright, dancing sun. 
       </p>
       <p>
         A child laughs: <em>"Look! A thousand little suns!"</em> But an elder smiles: <em>"There is only one Sun. The bowls are just catching the light."</em>
@@ -586,27 +586,27 @@
 
       <h3>The Big Human Game</h3>
       <p>
-        For sixty-five thousand years, humans forgot about the Sun and got scared. We thought our little bowl was alone in the dark. So we built loud, complicated things:
+        For sixty-five thousand years, humans kept forgetting about the Sun. Whenever we forgot, we got scared. We thought our little bowl was alone in the cold dark. So we built loud, complicated things:
       </p>
       <ul style="padding-left: 1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
-        <li><strong>Empires and Kings:</strong> Rulers conquered countries because they feared dying without leaving a name carved in stone.</li>
-        <li><strong>Complicated Temples:</strong> People built massive gates, saying: <em>"Unless you chant these secret words, the light will not love you."</em></li>
-        <li><strong>Machines and Screens:</strong> Today, feeds buzz with endless red dots: <em>"Do more! Buy this! Check this message or you will fall behind!"</em></li>
+        <li><strong>Empires and Kings:</strong> Rulers conquered distant countries because they feared being forgotten once they were gone.</li>
+        <li><strong>Complicated Gates and Rules:</strong> People built massive temples, saying: <em>"Unless you chant these secret passwords, the light will turn away from you."</em></li>
+        <li><strong>Screens and Beeps:</strong> Today, our devices buzz with endless alerts: <em>"Hurry! Do more! Buy this! Check this or you will be left behind!"</em></li>
       </ul>
 
       <h3>The Sages Who Smiled</h3>
       <p>
-        Every few centuries, wise wanderers stepped out of the noise and laughed gently: <strong>Stop making it so hard.</strong> The entire secret to an honorable, peaceful, and fearless life has only three rules:
+        Every few centuries, quiet wanderers stepped out of the crowd and smiled gently: <strong>Stop making it so hard.</strong> An honest, fearless life has only three simple rhythms:
       </p>
 
-      <h3>1. Calm the Breath (The Orb)</h3>
+      <h3>1. Settle the Water (The Light)</h3>
       <p>
-        When you panic, the water in your bowl churns like a storm. When the water churns, the sun looks broken. Take three quiet breaths. When the water settles, the light returns.
+        When you rush around in worry, the water in your bowl ripples into a storm. In churning water, the sun looks shattered into jagged pieces. Take three slow, quiet breaths. When the water goes still, the sun is whole again.
       </p>
 
-      <h3>2. Do One True Thing (The Arrow)</h3>
+      <h3>2. Lay One True Stone (The Arrow)</h3>
       <p>
-        Do not run in fifty directions trying to look busy. Pick the one thing that actually matters today. Do it with your whole heart, then put your tools away.
+        Do not run across twenty fields kicking up dust. Pick the single real task that matters today. Give it your whole heart, finish it, and put your tools away.
       </p>
 
       <div style="background: #0d1017; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.75rem;">
@@ -634,7 +634,7 @@
               <div style="width:5px; height:5px; background:var(--gold);"></div>
             </div>
             <span style="font-size: 0.68rem; color: var(--gold);">Day 30</span>
-            <span style="font-size: 0.65rem; color: #cbd5e1; text-align: center;">Foundation</span>
+            <span style="font-size: 0.65rem; color: #cbd5e1; text-align: center;">Solid Base</span>
           </div>
           <div style="color: var(--border); font-size: 1rem; padding-bottom: 10px;">→</div>
           <div style="display:flex; flex-direction:column; align-items:center; gap: 4px; flex: 1.5;">
@@ -646,63 +646,63 @@
           </div>
         </div>
         <div style="font-size: 0.78rem; color: var(--muted); line-height: 1.4;">
-          <strong>Why one move beats fifty:</strong> Trying to do everything scatters dust in the wind. Setting just one real stone per day creates 90 interlocking blocks in three months. That is a finished manuscript, an operational system, or a healed life. Small is not weak—small is unbreakable.
+          <strong>Why one move beats fifty:</strong> Chasing fifty small chores just kicks up dust that blows away. Laying one solid stone each day gives you 90 interlocking blocks in three months. That is a completed manuscript, a new craft, or a healed bond. Small is not weak—small is unbreakable.
         </div>
       </div>
 
-      <h3>3. Keep Clean Hands (The Three Balances)</h3>
+      <h3>3. Keep Clean Hands (Three Sundown Balances)</h3>
       <p>
-        Before you sleep at night, ask three quiet questions:
+        Before you close your eyes at night, ask three quiet questions:
       </p>
       <ul style="padding-left: 1.25rem; display:flex; flex-direction:column; gap:0.4rem;">
         <li><strong>The Shield:</strong> Did I tell the truth today? Did I play fair?</li>
         <li><strong>The Heart:</strong> Did I put my armor down to rest and be with loved ones?</li>
-        <li><strong>The Circle:</strong> Did I stay humble, remembering that I am just a wave in a vast ocean?</li>
+        <li><strong>The Circle:</strong> Did I stay humble, remembering that I am just a wave in a vast sea?</li>
       </ul>
 
       <h3>The Four Walkers: Finding Your Reflection</h3>
       <p>
-        How does this look in everyday life? Different people carry the mirror in different ways:
+        How does this look in ordinary life? Different people carry the mirror in their own way:
       </p>
 
       <div class="walker-card">
-        <div class="walker-title">The Builder (Knowledge Worker / Maker)</div>
+        <div class="walker-title">The Builder (Craftsman / Maker / Worker)</div>
         <div class="walker-detail">
-          <strong>The Struggle:</strong> 20 open browser tabs, answering emails all day, feeling frantic but building nothing real.<br/>
-          <strong>The Shift:</strong> Turns off notifications. By 11 AM, writes the key code module or finishes the pitch deck. Lights the Arrow.<br/>
-          <strong>The Void:</strong> Feels guilty that the afternoon is open. Learns that having space to walk and think is where real breakthrough happens.
+          <strong>The Struggle:</strong> Answering endless emails, feeling frantic all day, yet finishing nothing meaningful.<br/>
+          <strong>The Shift:</strong> Silences alerts. By mid-morning, finishes the core design or writes the difficult letter. Lights the Arrow.<br/>
+          <strong>The Margin:</strong> Refuses to invent fake chores just to feel busy. Treats a quiet afternoon as honest restoration.
         </div>
       </div>
 
       <div class="walker-card">
         <div class="walker-title">The Caregiver (Parent / Family Anchor)</div>
         <div class="walker-detail">
-          <strong>The Struggle:</strong> Feeling unproductive because modern culture does not count soothing a child or preparing a clean meal.<br/>
-          <strong>The Shift:</strong> Redefines the Arrow: <em>Sit with my child for 30 minutes without touching a phone.</em><br/>
-          <strong>The Victory:</strong> Lights the Heart glyph at night with pride. Presence is real work.
+          <strong>The Struggle:</strong> Feeling behind because modern culture rarely measures folding laundry, listening, or soothing tears.<br/>
+          <strong>The Shift:</strong> Claims the true stone: <em>Sit with my child for 30 uninterrupted minutes without touching a phone.</em><br/>
+          <strong>The Victory:</strong> Lights the Heart glyph at sundown with pride. Being fully present is vital work.
         </div>
       </div>
 
       <div class="walker-card">
-        <div class="walker-title">The Student (Young Mind / Discoverer)</div>
+        <div class="walker-title">The Student (Young Learner / Seeker)</div>
         <div class="walker-detail">
-          <strong>The Struggle:</strong> Screen paralysis, late-night doom-scrolling, exam panic.<br/>
-          <strong>The Shift:</strong> Uses Gentle Breath (Tier 1) before opening a textbook. Masters <em>one</em> tough problem instead of stressing over the whole syllabus.<br/>
-          <strong>The Victory:</strong> Leaves the Shield unlit without shame when they cut a corner, resolving to try again honestly tomorrow.
+          <strong>The Struggle:</strong> Screen distraction, late-night doom-scrolling, exam dread.<br/>
+          <strong>The Shift:</strong> Uses the Gentle Wave breath before opening a book. Masters <em>one</em> tough problem instead of panicking over the entire course.<br/>
+          <strong>The Victory:</strong> Leaves the Shield unlit without shame if they cut corners, greeting the new dawn with an honest resolve.
         </div>
       </div>
 
       <div class="walker-card">
-        <div class="walker-title">The Elder (Retiree / Transitioning Soul)</div>
+        <div class="walker-title">The Elder (Retiree / Seasoned Soul)</div>
         <div class="walker-detail">
-          <strong>The Struggle:</strong> Wondering what their purpose is now that career deadlines have ended.<br/>
-          <strong>The Shift:</strong> The Arrow becomes quiet: <em>Prune the rose bush; forgive an old family debt; write down a memory.</em><br/>
-          <strong>The Victory:</strong> The Circle (Humility & Unity) becomes their primary anchor. They see their life as a drop resting peacefully in the ocean.
+          <strong>The Struggle:</strong> Feeling unneeded now that formal work and deadlines have passed.<br/>
+          <strong>The Shift:</strong> The stone becomes gentle: <em>Tend the garden; mend an old rift; write down an ancestral tale.</em><br/>
+          <strong>The Victory:</strong> The Circle (Humility & Unity) becomes their steady home. They know their drop is part of the great sea.
         </div>
       </div>
 
       <p style="margin-top: 1rem;">
-        If you lived honestly today, you are already complete. Tomorrow morning, the board wipes clean. Wake up, greet the Sun, and wipe the glass once more.
+        If you lived honestly today, you are already whole. Tomorrow morning, the slate wipes clean. Wake up, greet the Sun, and wipe the glass once more.
       </p>
     </div>
   </div>
@@ -720,25 +720,25 @@
     let startTime = null;
     let isDemoing = false;
 
-    // Breath Profiles
+    // Breath Profiles (Gentle Wave, Deep Well, Mountain Still)
     const TIERS = [
-      { inhale: 3000, hold: 4000,  exhale: 6000 },  // 0: Universal Gentle (3-4-6)
-      { inhale: 2000, hold: 8000,  exhale: 4000 },  // 1: Focused Siddha (2-8-4, 1:4:2)
-      { inhale: 3000, hold: 12000, exhale: 6000 }   // 2: Deep Siddha (3-12-6, 1:4:2)
+      { inhale: 3000, hold: 4000,  exhale: 6000 },  // 0: Gentle Wave (3-4-6)
+      { inhale: 2000, hold: 8000,  exhale: 4000 },  // 1: Deep Well (2-8-4)
+      { inhale: 3000, hold: 12000, exhale: 6000 }   // 2: Mountain Still (3-12-6)
     ];
     let currentTierIdx = 0;
 
-    // Temporal Coaching Engine
+    // Everyday Coaching Cues Across the Day
     function updateTemporalWhisper() {
       const hour = new Date().getHours();
       if (hour >= 5 && hour < 12) {
-        whisperEl.innerText = "Dawn • Set Vector";
+        whisperEl.innerText = "Dawn • Pick One Stone";
       } else if (hour >= 12 && hour < 18) {
-        whisperEl.innerText = "Day • Hold Focus";
+        whisperEl.innerText = "Day • Place It Well";
       } else if (hour >= 18 && hour < 23) {
-        whisperEl.innerText = "Dusk • Audit & Rest";
+        whisperEl.innerText = "Dusk • Lay Armor Down";
       } else {
-        whisperEl.innerText = "Night • Stillness";
+        whisperEl.innerText = "Night • Sleep in Peace";
       }
     }
 
@@ -884,7 +884,9 @@
       }
     }
 
-    // Direct Sandboxed Demonstration
+    /* -------------------------------------------------------------
+       Walkthrough Demo Engine (Sandboxed & Non-Destructive)
+       ------------------------------------------------------------- */
     async function startWordlessDemo() {
       if (isDemoing) return;
       isDemoing = true;
@@ -934,30 +936,37 @@
         checkHarmony();
       };
 
-      showCaption("1. Breathe: Clear your mind");
+      // Step 1: Breath
+      showCaption("1. Breathe: Settle the water");
       await moveAndActivate(stage, 'breath');
       await new Promise(r => setTimeout(r, 6500));
       stopPulse();
 
-      showCaption("2. Finish today's one vital move");
+      // Step 2: One Stone
+      showCaption("2. Place today's main stone");
       await moveAndActivate(vectorBtn, 'vector');
       await new Promise(r => setTimeout(r, 1400));
 
+      // Step 3: Shield
       showCaption("3. Truth: Clean hands today");
       await moveAndActivate(document.getElementById('g1'), 'g1');
       await new Promise(r => setTimeout(r, 1100));
 
-      showCaption("4. Sanctuary: Rest & power down");
+      // Step 4: Heart
+      showCaption("4. Sanctuary: Lay armor down");
       await moveAndActivate(document.getElementById('g2'), 'g2');
       await new Promise(r => setTimeout(r, 1100));
 
-      showCaption("5. Humility: Part of the vast whole");
+      // Step 5: Circle
+      showCaption("5. Humility: A drop in the great sea");
       await moveAndActivate(document.getElementById('g3'), 'g3');
       await new Promise(r => setTimeout(r, 1300));
 
+      // Culmination
       showCaption("All aligned. The mirror is clear.");
       await new Promise(r => setTimeout(r, 2000));
 
+      // Hand-off
       showCaption("Demo finished. Your turn.");
       finger.style.opacity = '0';
       await new Promise(r => setTimeout(r, 1500));
