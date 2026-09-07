@@ -32,7 +32,7 @@
       overflow-x: hidden;
     }
 
-    /* Top Bar with Harmonized Text & Vector Glyphs */
+    /* Top Bar */
     .top-bar {
       width: 100%;
       max-width: 440px;
@@ -89,18 +89,24 @@
       box-shadow: 0 0 14px var(--gold);
     }
 
-    /* Main Ergonomic Container */
+    /* Container */
     .container {
       max-width: 440px;
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2rem;
+      gap: 1.75rem;
       margin: auto 0;
     }
 
-    /* 1. Universal Breathing Orb */
+    /* 1. Breathing Stage */
+    .breath-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+    }
     .orb-stage {
       position: relative;
       width: 180px;
@@ -132,7 +138,27 @@
       box-shadow: 0 0 15px var(--gold-dim);
     }
 
-    /* 2. The Singular Vector Arrow */
+    /* Tier Indicator Pips below the Orb */
+    .tier-pips {
+      display: flex;
+      gap: 6px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .pip {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #252d3d;
+      transition: all 0.3s ease;
+    }
+    .pip.active {
+      background: var(--gold);
+      box-shadow: 0 0 6px var(--gold);
+      transform: scale(1.2);
+    }
+
+    /* 2. Vector Gate */
     .vector-gate {
       display: flex;
       flex-direction: column;
@@ -217,7 +243,7 @@
       filter: drop-shadow(0 0 4px var(--active));
     }
 
-    /* Clarification Drawer & Contrasts */
+    /* Help Drawer Copy & Contrasts */
     .guide-text {
       font-size: 0.82rem;
       color: var(--muted);
@@ -262,7 +288,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Ghost Pointer & Demo Caption */
+    /* Ghost Pointer & Demo Toast */
     #ghost-finger {
       position: fixed;
       width: 28px;
@@ -297,7 +323,7 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
     }
 
-    /* The Story Overlay */
+    /* Story Modal */
     .story-modal {
       position: fixed;
       top: 0;
@@ -369,45 +395,59 @@
 </head>
 <body>
 
-  <!-- Top Bar: Fully Harmonized Muted Controls -->
   <div class="top-bar">
     <div class="top-group">
-      <!-- 1. Help Toggle -->
       <button class="icon-btn" id="help-toggle" onclick="toggleGuide()" title="Help & Examples">?</button>
     </div>
 
-    <!-- Center: Master Harmony Indicator -->
     <div class="status-dot" id="master-dot"></div>
 
     <div class="top-group">
-      <!-- 2. Demo Trigger (Wireframe Eye) -->
       <button class="icon-btn" id="demo-btn" onclick="startWordlessDemo()" title="Watch Demo">
         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
           <circle cx="12" cy="12" r="3"></circle>
         </svg>
       </button>
-
-      <!-- 3. Story Sheet (Harmonized Spark Glyph ✧) -->
       <button class="icon-btn" onclick="openStory()" title="The Story of the Mirror">✧</button>
     </div>
   </div>
 
   <div class="container">
     
-    <!-- 1. The Breathing Orb -->
-    <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem;">
+    <div class="breath-wrapper">
       <div class="orb-stage" id="stage" onclick="togglePulse()">
-        <div class="ring"></div>
+        <div class="ring" id="ring"></div>
         <div class="orb" id="orb"></div>
       </div>
+      
+      <div class="tier-pips" id="tier-pips" onclick="cycleTier()" title="Tap to switch breathing depth">
+        <div class="pip active" id="pip-0"></div>
+        <div class="pip" id="pip-1"></div>
+        <div class="pip" id="pip-2"></div>
+      </div>
+
       <div class="guide-text">
         <strong>1. Clear the Glass (Breathe)</strong>
-        Follow the light: Inhale as it grows. Hold in stillness. Exhale as it shrinks. Wipe away yesterday's static.
+        Inhale as the light grows, hold still, and exhale smoothly as it shrinks. Begin the next breath immediately with no empty pause.
+        
+        <div class="contrast-box">
+          <div class="contrast-row">
+            <span class="tag-good">Cycles</span>
+            <span class="contrast-text"><strong>4 to 8 rounds (2–4 min)</strong> resets your nervous system. Stop when you feel calm.</span>
+          </div>
+          <div class="contrast-row">
+            <span class="tag-good">Tiers</span>
+            <span class="contrast-text">Tap the dots below the orb to switch: <strong>Gentle (3-4-6)</strong> &bull; <strong>Focused (2-8-4)</strong> &bull; <strong>Deep (3-12-6)</strong>.</span>
+          </div>
+          <div class="contrast-row">
+            <span class="tag-good">Next Step</span>
+            <span class="contrast-text">Thirumoolar's advanced ratios (16-64-32) require physical locks (<em>Bandhas</em>) to protect blood vessels. <strong>Never force long retentions alone; seek an experienced human teacher.</strong></span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 2. The Arrow / Singular Vector -->
     <div class="vector-gate">
       <div class="vector-symbol" id="vector-btn" onclick="toggleVector()">
         <svg viewBox="0 0 24 24">
@@ -431,24 +471,20 @@
       </div>
     </div>
 
-    <!-- 3. The Trinity of Conscience -->
     <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem;">
       <div class="trinity-row">
-        <!-- Glyph 1: Shield -->
         <div class="glyph-btn" id="g1" onclick="toggleGlyph('g1')">
           <svg viewBox="0 0 24 24">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
         </div>
 
-        <!-- Glyph 2: Heart -->
         <div class="glyph-btn" id="g2" onclick="toggleGlyph('g2')">
           <svg viewBox="0 0 24 24">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
           </svg>
         </div>
 
-        <!-- Glyph 3: Circle -->
         <div class="glyph-btn" id="g3" onclick="toggleGlyph('g3')">
           <svg viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10"></circle>
@@ -480,11 +516,9 @@
 
   <div style="height: 10px;"></div>
 
-  <!-- Dynamic Demo Elements -->
   <div id="demo-caption"></div>
   <div id="ghost-finger"></div>
 
-  <!-- Story Overlay -->
   <div class="story-modal" id="story-modal">
     <button class="close-story-btn" onclick="closeStory()">Back to The Mirror ✕</button>
     <div class="story-content">
@@ -508,48 +542,41 @@
         So we built gigantic, noisy things:
       </p>
       <ul style="padding-left: 1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
-        <li><strong>Empires and Kings:</strong> Rulers like Alexander marched across deserts, conquering countries because they feared dying without leaving a giant name carved in stone.</li>
-        <li><strong>Complicated Temples and Rules:</strong> People built tall gates and wrote thick books with thousands of commandments, saying: <em>"Unless you chant these secret words and pay the priest, the light will not love you."</em></li>
-        <li><strong>Machines and Screens:</strong> Today, our computers buzz with endless notifications, red alert dots, and algorithms whispering: <em>"Do more! Buy this! Check this message right now or you will fall behind!"</em></li>
+        <li><strong>Empires and Kings:</strong> Rulers marched across deserts, conquering countries because they feared dying without leaving a giant name carved in stone.</li>
+        <li><strong>Complicated Temples and Rules:</strong> People built tall gates and thick books, saying: <em>"Unless you chant these secret words, the light will not love you."</em></li>
+        <li><strong>Machines and Screens:</strong> Today, computers buzz with endless notifications: <em>"Do more! Buy this! Check this message or you will fall behind!"</em></li>
       </ul>
 
       <h3>The Sages Who Smiled</h3>
       <p>
-        Every few centuries, wise men and women—like Thiruvalluvar sitting under a tree writing the <em>Tirukkural</em>, or the quiet forest wanderers who wrote the <em>Upanishads</em>, or the ancient elders by the campfire—stepped out of the noise and laughed gently.
+        Every few centuries, wise men and women stepped out of the noise and laughed gently: <strong>Stop making it so hard.</strong>
       </p>
       <p>
-        They told humanity: <strong>Stop making it so hard.</strong>
-      </p>
-      <p>
-        You do not need an army. You do not need to read 500 books on philosophy. You do not need an algorithm telling you how to live.
-      </p>
-      <p>
-        The entire secret to living an honorable, peaceful, and fearless life has only three simple rules:
+        You do not need an army. You do not need to read 500 books on philosophy. You do not need an algorithm telling you how to live. The entire secret has only three rules:
       </p>
 
       <h3>1. Calm the Breath (The Orb)</h3>
       <p>
-        When you run around in panic, the water in your bowl ripples like a storm. When the water is churning, the sun looks broken into jagged pieces. You think the world is crazy. 
-        Take three quiet, deep breaths. When the water goes still, the light is clear again.
+        When you panic, the water in your bowl ripples like a storm. When the water churns, the sun looks broken. Take three quiet breaths. When the water goes still, the light returns.
       </p>
 
       <h3>2. Do One True Thing (The Arrow)</h3>
       <p>
-        Do not run in fifty directions trying to be busy. Pick the one thing that actually matters today—finish your work, build your craft, or hold the hand of someone who is hurting. Do it with your whole heart, then put your tools away.
+        Do not run in fifty directions trying to look busy. Pick the one thing that actually matters today. Do it with your whole heart, then put your tools away.
       </p>
 
       <h3>3. Keep Clean Hands (The Three Balances)</h3>
       <p>
-        Before you close your eyes at night, ask three quiet questions:
+        Before you sleep at night, ask three quiet questions:
       </p>
       <ul style="padding-left: 1.25rem; display:flex; flex-direction:column; gap:0.4rem;">
         <li><strong>The Shield:</strong> Did I tell the truth today? Did I play fair?</li>
-        <li><strong>The Heart:</strong> Did I put my armor down to rest, eat with my family, and sleep?</li>
-        <li><strong>The Circle:</strong> Did I stay humble, remembering that I am just a wave in a vast, beautiful ocean?</li>
+        <li><strong>The Heart:</strong> Did I put my armor down to rest and be with family?</li>
+        <li><strong>The Circle:</strong> Did I stay humble, remembering that I am just a wave in a vast ocean?</li>
       </ul>
 
       <p>
-        If you lived honestly today, you are already complete. Tomorrow morning, the board wipes clean. You wake up, greet the Sun, and wipe the glass once more.
+        If you lived honestly today, you are already complete. Tomorrow morning, the board wipes clean. Wake up, greet the Sun, and wipe the glass once more.
       </p>
     </div>
   </div>
@@ -566,7 +593,31 @@
     let startTime = null;
     let isDemoing = false;
 
-    // Daily Clean Slate Engine
+    // Breath Tier Profiles
+    const TIERS = [
+      { inhale: 3000, hold: 4000,  exhale: 6000 },  // Tier 0: Universal Gentle (3-4-6)
+      { inhale: 2000, hold: 8000,  exhale: 4000 },  // Tier 1: Focused Siddha (2-8-4, 1:4:2)
+      { inhale: 3000, hold: 12000, exhale: 6000 }   // Tier 2: Deep Siddha (3-12-6, 1:4:2)
+    ];
+    let currentTierIdx = 0;
+
+    function cycleTier() {
+      if (isDemoing) return;
+      currentTierIdx = (currentTierIdx + 1) % TIERS.length;
+      localStorage.setItem('m_tier', currentTierIdx);
+      updateTierUI();
+      if (isRunning) {
+        startTime = performance.now(); // reset cycle phase smoothly
+      }
+    }
+
+    function updateTierUI() {
+      for (let i = 0; i < 3; i++) {
+        document.getElementById(`pip-${i}`).classList.toggle('active', i === currentTierIdx);
+      }
+    }
+
+    // Daily Clean Slate
     function checkDayRollover() {
       const today = new Date().toDateString();
       const lastSession = localStorage.getItem('m_date');
@@ -579,7 +630,6 @@
       }
     }
 
-    // Force deterministic UI sync from localStorage
     function syncUIFromStorage() {
       if (localStorage.getItem('m_vec') === '1') {
         vectorBtn.classList.add('active');
@@ -596,6 +646,8 @@
         }
       });
 
+      currentTierIdx = parseInt(localStorage.getItem('m_tier') || '0', 10);
+      updateTierUI();
       checkHarmony();
     }
 
@@ -608,19 +660,10 @@
       }
     });
 
-    // Universal Breath Cycle: 3s Inhale, 4s Hold, 6s Exhale (13s)
-    const T_INHALE = 3000;
-    const T_HOLD   = 4000;
-    const T_EXHALE = 6000;
-    const T_CYCLE  = T_INHALE + T_HOLD + T_EXHALE;
-
     function togglePulse() {
       if (isDemoing) return;
-      if (!isRunning) {
-        startPulse();
-      } else {
-        stopPulse();
-      }
+      if (!isRunning) startPulse();
+      else stopPulse();
     }
 
     function startPulse() {
@@ -640,18 +683,20 @@
 
     function loop(now) {
       if (!isRunning) return;
-      let elapsed = (now - startTime) % T_CYCLE;
+      const tier = TIERS[currentTierIdx];
+      const cycleTotal = tier.inhale + tier.hold + tier.exhale;
+      let elapsed = (now - startTime) % cycleTotal;
 
-      if (elapsed < T_INHALE) {
-        let p = elapsed / T_INHALE;
+      if (elapsed < tier.inhale) {
+        let p = elapsed / tier.inhale;
         let scale = 1 + (p * 2.2);
         orb.style.transform = `scale(${scale})`;
         orb.style.opacity = 0.6 + (p * 0.4);
-      } else if (elapsed < T_INHALE + T_HOLD) {
+      } else if (elapsed < tier.inhale + tier.hold) {
         orb.style.transform = 'scale(3.2)';
         orb.style.opacity = '1';
       } else {
-        let p = (elapsed - T_INHALE - T_HOLD) / T_EXHALE;
+        let p = (elapsed - tier.inhale - tier.hold) / tier.exhale;
         let scale = 3.2 - (p * 2.2);
         orb.style.transform = `scale(${scale})`;
         orb.style.opacity = 1 - (p * 0.4);
@@ -660,7 +705,6 @@
       animFrame = requestAnimationFrame(loop);
     }
 
-    // Real User Actions
     function toggleVector() {
       if (isDemoing) return;
       vectorBtn.classList.toggle('active');
@@ -699,9 +743,7 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       Direct-Visual Demonstration Engine (Sandboxed & Safe)
-       ------------------------------------------------------------- */
+    // Direct Sandboxed Demonstration
     async function startWordlessDemo() {
       if (isDemoing) return;
       isDemoing = true;
@@ -712,7 +754,6 @@
       const wasRunning = isRunning;
       stopPulse();
 
-      // Clear UI visually for the demo
       vectorBtn.classList.remove('active');
       document.getElementById('g1').classList.remove('checked');
       document.getElementById('g2').classList.remove('checked');
@@ -744,57 +785,43 @@
         await new Promise(r => setTimeout(r, 200));
         finger.style.transform = 'translate(-50%, -50%) scale(1)';
 
-        if (actionType === 'breath') {
-          startPulse();
-        } else if (actionType === 'vector') {
-          vectorBtn.classList.add('active');
-        } else if (actionType === 'g1') {
-          document.getElementById('g1').classList.add('checked');
-        } else if (actionType === 'g2') {
-          document.getElementById('g2').classList.add('checked');
-        } else if (actionType === 'g3') {
-          document.getElementById('g3').classList.add('checked');
-        }
+        if (actionType === 'breath') startPulse();
+        else if (actionType === 'vector') vectorBtn.classList.add('active');
+        else if (actionType === 'g1') document.getElementById('g1').classList.add('checked');
+        else if (actionType === 'g2') document.getElementById('g2').classList.add('checked');
+        else if (actionType === 'g3') document.getElementById('g3').classList.add('checked');
         checkHarmony();
       };
 
-      // 1. Breath Stage
       showCaption("1. Breathe: Clear your mind");
       await moveAndActivate(stage, 'breath');
       await new Promise(r => setTimeout(r, 6500));
       stopPulse();
 
-      // 2. Singular Vector
       showCaption("2. Finish today's one vital move");
       await moveAndActivate(vectorBtn, 'vector');
       await new Promise(r => setTimeout(r, 1400));
 
-      // 3. Shield
       showCaption("3. Truth: Clean hands today");
       await moveAndActivate(document.getElementById('g1'), 'g1');
       await new Promise(r => setTimeout(r, 1100));
 
-      // 4. Heart
       showCaption("4. Sanctuary: Rest & power down");
       await moveAndActivate(document.getElementById('g2'), 'g2');
       await new Promise(r => setTimeout(r, 1100));
 
-      // 5. Circle
       showCaption("5. Humility: Part of the vast whole");
       await moveAndActivate(document.getElementById('g3'), 'g3');
       await new Promise(r => setTimeout(r, 1300));
 
-      // Culmination
       showCaption("All aligned. The mirror is clear.");
       await new Promise(r => setTimeout(r, 2000));
 
-      // Reset Hand-off
       showCaption("Demo finished. Your turn.");
       finger.style.opacity = '0';
       await new Promise(r => setTimeout(r, 1500));
       hideCaption();
 
-      // Clean restoration of user's genuine state
       isDemoing = false;
       syncUIFromStorage();
       if (wasRunning) startPulse();
