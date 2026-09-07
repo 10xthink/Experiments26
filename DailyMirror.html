@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>The Mirror</title>
+  <style>
+    :root {
+      --bg: #07080a;
+      --card: #11141a;
+      --gold: #d4a373;
+      --gold-dim: rgba(212, 163, 115, 0.15);
+      --gold-glow: rgba(212, 163, 115, 0.4);
+      --border: #1e2430;
+      --active: #60a5fa;
+      --active-dim: rgba(96, 165, 250, 0.2);
+      --muted: #8896ab;
+      --text-story: #d1d5db;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--bg);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1rem;
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Top Bar with Harmonized Text & Vector Glyphs */
+    .top-bar {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.25rem 0.5rem;
+      z-index: 100;
+    }
+
+    .top-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #141820;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1;
+      transition: all 0.2s ease;
+    }
+    .icon-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .icon-btn svg {
+      stroke: var(--muted);
+      transition: stroke 0.2s ease;
+    }
+    .icon-btn:hover svg {
+      stroke: var(--gold);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #252d3d;
+      transition: all 0.4s ease;
+    }
+    .status-dot.lit {
+      background: var(--gold);
+      box-shadow: 0 0 14px var(--gold);
+    }
+
+    /* Main Ergonomic Container */
+    .container {
+      max-width: 440px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      margin: auto 0;
+    }
+
+    /* 1. Universal Breathing Orb */
+    .orb-stage {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      transition: all 0.5s ease;
+    }
+    .orb {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 0%, var(--gold) 45%, transparent 75%);
+      box-shadow: 0 0 25px var(--gold-glow);
+      transition: transform 0.1s linear, opacity 0.3s ease;
+      opacity: 0.6;
+    }
+    .orb-stage.running .ring {
+      border-color: var(--gold-glow);
+      box-shadow: 0 0 15px var(--gold-dim);
+    }
+
+    /* 2. The Singular Vector Arrow */
+    .vector-gate {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+    .vector-symbol {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .vector-symbol svg {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke: #667085;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: all 0.3s ease;
+    }
+    .vector-symbol.active {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+      box-shadow: 0 0 20px var(--gold-glow);
+      transform: scale(1.08);
+    }
+    .vector-symbol.active svg {
+      stroke: var(--gold);
+      filter: drop-shadow(0 0 6px var(--gold));
+    }
+
+    /* 3. Trinity of Conscience */
+    .trinity-row {
+      display: flex;
+      gap: 1.25rem;
+      align-items: center;
+      justify-content: center;
+      background: var(--card);
+      padding: 0.75rem 1.25rem;
+      border-radius: 36px;
+      border: 1px solid var(--border);
+    }
+    .glyph-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .glyph-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: #526077;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: all 0.3s ease;
+    }
+    .glyph-btn.checked {
+      background: var(--active-dim);
+      border-color: var(--active);
+      box-shadow: 0 0 12px var(--active-dim);
+      transform: translateY(-2px);
+    }
+    .glyph-btn.checked svg {
+      stroke: var(--active);
+      filter: drop-shadow(0 0 4px var(--active));
+    }
+
+    /* Clarification Drawer & Contrasts */
+    .guide-text {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.4;
+      max-width: 340px;
+      display: none;
+      animation: fadeIn 0.3s ease forwards;
+    }
+    .guide-text strong {
+      color: var(--gold);
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 3px;
+    }
+    .contrast-box {
+      margin-top: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 6px;
+      border-left: 2px solid var(--border);
+      font-size: 0.75rem;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .contrast-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: baseline;
+    }
+    .tag-bad { color: #f87171; font-weight: 700; font-family: monospace; font-size: 0.68rem; }
+    .tag-good { color: #4ade80; font-weight: 700; font-family: monospace; font-size: 0.68rem; }
+    .contrast-text { color: var(--muted); line-height: 1.3; }
+    .contrast-text strong { color: #cbd5e1; display: inline; font-size: 0.75rem; }
+
+    body.show-guide .guide-text { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Ghost Pointer & Demo Caption */
+    #ghost-finger {
+      position: fixed;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(212,163,115,0.45);
+      border: 2px solid var(--gold);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%,-50%) scale(1);
+      transition: top 0.75s cubic-bezier(0.25,1,0.5,1), left 0.75s cubic-bezier(0.25,1,0.5,1), transform 0.2s ease, opacity 0.3s ease;
+      z-index: 1000;
+      box-shadow: 0 0 15px var(--gold);
+    }
+    #demo-caption {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(17, 20, 26, 0.96);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 0.5rem 1.1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      letter-spacing: 0.03em;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 1001;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+
+    /* The Story Overlay */
+    .story-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(7, 8, 10, 0.96);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1.5rem;
+      overflow-y: auto;
+      user-select: text;
+    }
+    .story-modal.open { display: flex; }
+    .story-content {
+      max-width: 540px;
+      width: 100%;
+      color: var(--text-story);
+      line-height: 1.7;
+      font-size: 0.95rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding-bottom: 3rem;
+    }
+    .story-content h2 {
+      font-size: 1.4rem;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+    .story-content .story-quote {
+      font-style: italic;
+      color: var(--muted);
+      border-left: 2px solid var(--gold);
+      padding-left: 1rem;
+      margin: 0.5rem 0;
+    }
+    .story-content h3 {
+      font-size: 1.05rem;
+      color: #fff;
+      margin-top: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.3rem;
+    }
+    .close-story-btn {
+      align-self: flex-end;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s ease;
+    }
+    .close-story-btn:hover {
+      color: #fff;
+      border-color: var(--gold);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar: Fully Harmonized Muted Controls -->
+  <div class="top-bar">
+    <div class="top-group">
+      <!-- 1. Help Toggle -->
+      <button class="icon-btn" id="help-toggle" onclick="toggleGuide()" title="Help & Examples">?</button>
+    </div>
+
+    <!-- Center: Master Harmony Indicator -->
+    <div class="status-dot" id="master-dot"></div>
+
+    <div class="top-group">
+      <!-- 2. Demo Trigger (Wireframe Eye) -->
+      <button class="icon-btn" id="demo-btn" onclick="startWordlessDemo()" title="Watch Demo">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </button>
+
+      <!-- 3. Story Sheet (Harmonized Spark Glyph ✧) -->
+      <button class="icon-btn" onclick="openStory()" title="The Story of the Mirror">✧</button>
+    </div>
+  </div>
+
+  <div class="container">
+    
+    <!-- 1. The Breathing Orb -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem;">
+      <div class="orb-stage" id="stage" onclick="togglePulse()">
+        <div class="ring"></div>
+        <div class="orb" id="orb"></div>
+      </div>
+      <div class="guide-text">
+        <strong>1. Clear the Glass (Breathe)</strong>
+        Follow the light: Inhale as it grows. Hold in stillness. Exhale as it shrinks. Wipe away yesterday's static.
+      </div>
+    </div>
+
+    <!-- 2. The Arrow / Singular Vector -->
+    <div class="vector-gate">
+      <div class="vector-symbol" id="vector-btn" onclick="toggleVector()">
+        <svg viewBox="0 0 24 24">
+          <line x1="12" y1="19" x2="12" y2="5"></line>
+          <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+      </div>
+      <div class="guide-text">
+        <strong>2. The Frontier Vector</strong>
+        Choose one real action today. When settled, tap the arrow to light it.
+        <div class="contrast-box">
+          <div class="contrast-row">
+            <span class="tag-bad">✕ TRAP</span>
+            <span class="contrast-text">Clearing 40 messages and feeling busy.</span>
+          </div>
+          <div class="contrast-row">
+            <span class="tag-good">✓ TRUE</span>
+            <span class="contrast-text"><strong>Built the core algorithm module / Cared for sick child.</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. The Trinity of Conscience -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem;">
+      <div class="trinity-row">
+        <!-- Glyph 1: Shield -->
+        <div class="glyph-btn" id="g1" onclick="toggleGlyph('g1')">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
+
+        <!-- Glyph 2: Heart -->
+        <div class="glyph-btn" id="g2" onclick="toggleGlyph('g2')">
+          <svg viewBox="0 0 24 24">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </div>
+
+        <!-- Glyph 3: Circle -->
+        <div class="glyph-btn" id="g3" onclick="toggleGlyph('g3')">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </div>
+      </div>
+
+      <div class="guide-text">
+        <strong>3. Evening Balance</strong>
+        <div class="contrast-box">
+          <div class="contrast-row">
+            <span class="tag-good">Shield</span>
+            <span class="contrast-text">Honesty: Left unlit without guilt if you compromised today.</span>
+          </div>
+          <div class="contrast-row">
+            <span class="tag-good">Heart</span>
+            <span class="contrast-text">Sanctuary: Screens powered down for dinner, family, and sleep.</span>
+          </div>
+          <div class="contrast-row">
+            <span class="tag-good">Circle</span>
+            <span class="contrast-text">Humility: No arrogance in victory; you are part of the vast whole.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="height: 10px;"></div>
+
+  <!-- Dynamic Demo Elements -->
+  <div id="demo-caption"></div>
+  <div id="ghost-finger"></div>
+
+  <!-- Story Overlay -->
+  <div class="story-modal" id="story-modal">
+    <button class="close-story-btn" onclick="closeStory()">Back to The Mirror ✕</button>
+    <div class="story-content">
+      <h2>The Story of the Mirror</h2>
+      <div class="story-quote">
+        "You do not become the sunlight. You are the mirror remembering how to wipe away the dust."
+      </div>
+
+      <p>
+        Imagine a great, warm Sun shining high in the sky. Down on the ground, someone places a thousand bowls filled with water. In every single bowl, you see a bright, dancing sun. 
+      </p>
+      <p>
+        A child looks at the yard and laughs: <em>"Look! A thousand little suns!"</em> But an elder smiles and points up: <em>"There is only one Sun. The bowls are just catching the light."</em>
+      </p>
+
+      <h3>The Big Human Game</h3>
+      <p>
+        For sixty-five thousand years, humans have played a strange game. Whenever we forgot about the Sun, we got scared. We thought our little bowl was all alone in the dark.
+      </p>
+      <p>
+        So we built gigantic, noisy things:
+      </p>
+      <ul style="padding-left: 1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
+        <li><strong>Empires and Kings:</strong> Rulers like Alexander marched across deserts, conquering countries because they feared dying without leaving a giant name carved in stone.</li>
+        <li><strong>Complicated Temples and Rules:</strong> People built tall gates and wrote thick books with thousands of commandments, saying: <em>"Unless you chant these secret words and pay the priest, the light will not love you."</em></li>
+        <li><strong>Machines and Screens:</strong> Today, our computers buzz with endless notifications, red alert dots, and algorithms whispering: <em>"Do more! Buy this! Check this message right now or you will fall behind!"</em></li>
+      </ul>
+
+      <h3>The Sages Who Smiled</h3>
+      <p>
+        Every few centuries, wise men and women—like Thiruvalluvar sitting under a tree writing the <em>Tirukkural</em>, or the quiet forest wanderers who wrote the <em>Upanishads</em>, or the ancient elders by the campfire—stepped out of the noise and laughed gently.
+      </p>
+      <p>
+        They told humanity: <strong>Stop making it so hard.</strong>
+      </p>
+      <p>
+        You do not need an army. You do not need to read 500 books on philosophy. You do not need an algorithm telling you how to live.
+      </p>
+      <p>
+        The entire secret to living an honorable, peaceful, and fearless life has only three simple rules:
+      </p>
+
+      <h3>1. Calm the Breath (The Orb)</h3>
+      <p>
+        When you run around in panic, the water in your bowl ripples like a storm. When the water is churning, the sun looks broken into jagged pieces. You think the world is crazy. 
+        Take three quiet, deep breaths. When the water goes still, the light is clear again.
+      </p>
+
+      <h3>2. Do One True Thing (The Arrow)</h3>
+      <p>
+        Do not run in fifty directions trying to be busy. Pick the one thing that actually matters today—finish your work, build your craft, or hold the hand of someone who is hurting. Do it with your whole heart, then put your tools away.
+      </p>
+
+      <h3>3. Keep Clean Hands (The Three Balances)</h3>
+      <p>
+        Before you close your eyes at night, ask three quiet questions:
+      </p>
+      <ul style="padding-left: 1.25rem; display:flex; flex-direction:column; gap:0.4rem;">
+        <li><strong>The Shield:</strong> Did I tell the truth today? Did I play fair?</li>
+        <li><strong>The Heart:</strong> Did I put my armor down to rest, eat with my family, and sleep?</li>
+        <li><strong>The Circle:</strong> Did I stay humble, remembering that I am just a wave in a vast, beautiful ocean?</li>
+      </ul>
+
+      <p>
+        If you lived honestly today, you are already complete. Tomorrow morning, the board wipes clean. You wake up, greet the Sun, and wipe the glass once more.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const orb = document.getElementById('orb');
+    const vectorBtn = document.getElementById('vector-btn');
+    const masterDot = document.getElementById('master-dot');
+    const storyModal = document.getElementById('story-modal');
+    
+    let isRunning = false;
+    let animFrame = null;
+    let startTime = null;
+    let isDemoing = false;
+
+    // Daily Clean Slate Engine
+    function checkDayRollover() {
+      const today = new Date().toDateString();
+      const lastSession = localStorage.getItem('m_date');
+      if (lastSession !== today) {
+        localStorage.setItem('m_date', today);
+        localStorage.setItem('m_vec', '0');
+        localStorage.setItem('m_g1', '0');
+        localStorage.setItem('m_g2', '0');
+        localStorage.setItem('m_g3', '0');
+      }
+    }
+
+    // Force deterministic UI sync from localStorage
+    function syncUIFromStorage() {
+      if (localStorage.getItem('m_vec') === '1') {
+        vectorBtn.classList.add('active');
+      } else {
+        vectorBtn.classList.remove('active');
+      }
+
+      ['g1', 'g2', 'g3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (localStorage.getItem('m_' + id) === '1') {
+          el.classList.add('checked');
+        } else {
+          el.classList.remove('checked');
+        }
+      });
+
+      checkHarmony();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      checkDayRollover();
+      syncUIFromStorage();
+      if (localStorage.getItem('m_guide') === '1') {
+        document.body.classList.add('show-guide');
+        document.getElementById('help-toggle').style.color = 'var(--gold)';
+      }
+    });
+
+    // Universal Breath Cycle: 3s Inhale, 4s Hold, 6s Exhale (13s)
+    const T_INHALE = 3000;
+    const T_HOLD   = 4000;
+    const T_EXHALE = 6000;
+    const T_CYCLE  = T_INHALE + T_HOLD + T_EXHALE;
+
+    function togglePulse() {
+      if (isDemoing) return;
+      if (!isRunning) {
+        startPulse();
+      } else {
+        stopPulse();
+      }
+    }
+
+    function startPulse() {
+      isRunning = true;
+      stage.classList.add('running');
+      startTime = performance.now();
+      animFrame = requestAnimationFrame(loop);
+    }
+
+    function stopPulse() {
+      isRunning = false;
+      stage.classList.remove('running');
+      cancelAnimationFrame(animFrame);
+      orb.style.transform = 'scale(1)';
+      orb.style.opacity = '0.6';
+    }
+
+    function loop(now) {
+      if (!isRunning) return;
+      let elapsed = (now - startTime) % T_CYCLE;
+
+      if (elapsed < T_INHALE) {
+        let p = elapsed / T_INHALE;
+        let scale = 1 + (p * 2.2);
+        orb.style.transform = `scale(${scale})`;
+        orb.style.opacity = 0.6 + (p * 0.4);
+      } else if (elapsed < T_INHALE + T_HOLD) {
+        orb.style.transform = 'scale(3.2)';
+        orb.style.opacity = '1';
+      } else {
+        let p = (elapsed - T_INHALE - T_HOLD) / T_EXHALE;
+        let scale = 3.2 - (p * 2.2);
+        orb.style.transform = `scale(${scale})`;
+        orb.style.opacity = 1 - (p * 0.4);
+      }
+
+      animFrame = requestAnimationFrame(loop);
+    }
+
+    // Real User Actions
+    function toggleVector() {
+      if (isDemoing) return;
+      vectorBtn.classList.toggle('active');
+      localStorage.setItem('m_vec', vectorBtn.classList.contains('active') ? '1' : '0');
+      checkHarmony();
+    }
+
+    function toggleGlyph(id) {
+      if (isDemoing) return;
+      const el = document.getElementById(id);
+      el.classList.toggle('checked');
+      localStorage.setItem('m_' + id, el.classList.contains('checked') ? '1' : '0');
+      checkHarmony();
+    }
+
+    function toggleGuide() {
+      document.body.classList.toggle('show-guide');
+      const isShowing = document.body.classList.contains('show-guide');
+      document.getElementById('help-toggle').style.color = isShowing ? 'var(--gold)' : 'var(--muted)';
+      localStorage.setItem('m_guide', isShowing ? '1' : '0');
+    }
+
+    function openStory() { storyModal.classList.add('open'); }
+    function closeStory() { storyModal.classList.remove('open'); }
+
+    function checkHarmony() {
+      const v = vectorBtn.classList.contains('active');
+      const g1 = document.getElementById('g1').classList.contains('checked');
+      const g2 = document.getElementById('g2').classList.contains('checked');
+      const g3 = document.getElementById('g3').classList.contains('checked');
+      
+      if (v && g1 && g2 && g3) {
+        masterDot.classList.add('lit');
+      } else {
+        masterDot.classList.remove('lit');
+      }
+    }
+
+    /* -------------------------------------------------------------
+       Direct-Visual Demonstration Engine (Sandboxed & Safe)
+       ------------------------------------------------------------- */
+    async function startWordlessDemo() {
+      if (isDemoing) return;
+      isDemoing = true;
+
+      const finger = document.getElementById('ghost-finger');
+      const caption = document.getElementById('demo-caption');
+
+      const wasRunning = isRunning;
+      stopPulse();
+
+      // Clear UI visually for the demo
+      vectorBtn.classList.remove('active');
+      document.getElementById('g1').classList.remove('checked');
+      document.getElementById('g2').classList.remove('checked');
+      document.getElementById('g3').classList.remove('checked');
+      masterDot.classList.remove('lit');
+
+      const showCaption = (text) => {
+        caption.innerText = text;
+        caption.style.opacity = '1';
+        caption.style.transform = 'translateX(-50%) translateY(0)';
+      };
+
+      const hideCaption = () => {
+        caption.style.opacity = '0';
+        caption.style.transform = 'translateX(-50%) translateY(5px)';
+      };
+
+      const moveAndActivate = async (element, actionType) => {
+        const rect = element.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+
+        finger.style.opacity = '1';
+        finger.style.left = `${x}px`;
+        finger.style.top = `${y}px`;
+        await new Promise(r => setTimeout(r, 800));
+
+        finger.style.transform = 'translate(-50%, -50%) scale(0.7)';
+        await new Promise(r => setTimeout(r, 200));
+        finger.style.transform = 'translate(-50%, -50%) scale(1)';
+
+        if (actionType === 'breath') {
+          startPulse();
+        } else if (actionType === 'vector') {
+          vectorBtn.classList.add('active');
+        } else if (actionType === 'g1') {
+          document.getElementById('g1').classList.add('checked');
+        } else if (actionType === 'g2') {
+          document.getElementById('g2').classList.add('checked');
+        } else if (actionType === 'g3') {
+          document.getElementById('g3').classList.add('checked');
+        }
+        checkHarmony();
+      };
+
+      // 1. Breath Stage
+      showCaption("1. Breathe: Clear your mind");
+      await moveAndActivate(stage, 'breath');
+      await new Promise(r => setTimeout(r, 6500));
+      stopPulse();
+
+      // 2. Singular Vector
+      showCaption("2. Finish today's one vital move");
+      await moveAndActivate(vectorBtn, 'vector');
+      await new Promise(r => setTimeout(r, 1400));
+
+      // 3. Shield
+      showCaption("3. Truth: Clean hands today");
+      await moveAndActivate(document.getElementById('g1'), 'g1');
+      await new Promise(r => setTimeout(r, 1100));
+
+      // 4. Heart
+      showCaption("4. Sanctuary: Rest & power down");
+      await moveAndActivate(document.getElementById('g2'), 'g2');
+      await new Promise(r => setTimeout(r, 1100));
+
+      // 5. Circle
+      showCaption("5. Humility: Part of the vast whole");
+      await moveAndActivate(document.getElementById('g3'), 'g3');
+      await new Promise(r => setTimeout(r, 1300));
+
+      // Culmination
+      showCaption("All aligned. The mirror is clear.");
+      await new Promise(r => setTimeout(r, 2000));
+
+      // Reset Hand-off
+      showCaption("Demo finished. Your turn.");
+      finger.style.opacity = '0';
+      await new Promise(r => setTimeout(r, 1500));
+      hideCaption();
+
+      // Clean restoration of user's genuine state
+      isDemoing = false;
+      syncUIFromStorage();
+      if (wasRunning) startPulse();
+    }
+  </script>
+</body>
+</html>
