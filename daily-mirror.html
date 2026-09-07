@@ -4,7 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>The Mirror</title>
+
+  <!-- ===================================================================
+       1. STYLESHEET SYSTEM (Theme, Typography, Layout, Animations)
+       =================================================================== -->
   <style>
+    /* --- 1.1 Root Design Tokens --- */
     :root {
       --bg: #07080a;
       --card: #11141a;
@@ -18,7 +23,14 @@
       --text-story: #d1d5db;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+    /* --- 1.2 Base Reset & Viewport Constraints --- */
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      user-select: none; 
+      -webkit-tap-highlight-color: transparent; 
+    }
     body {
       background: var(--bg);
       color: #fff;
@@ -28,11 +40,11 @@
       align-items: center;
       justify-content: space-between;
       padding: 1.25rem 1rem;
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       overflow-x: hidden;
     }
 
-    /* Top Navigation Bar */
+    /* --- 1.3 Top Navigation Bar Styles --- */
     .top-bar {
       width: 100%;
       max-width: 440px;
@@ -42,13 +54,11 @@
       padding: 0.25rem 0.5rem;
       z-index: 100;
     }
-
     .top-group {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
-
     .icon-btn {
       width: 38px;
       height: 38px;
@@ -76,14 +86,12 @@
     .icon-btn:hover svg {
       stroke: var(--gold);
     }
-
     .status-group {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 4px;
     }
-
     .status-dot {
       width: 8px;
       height: 8px;
@@ -95,7 +103,6 @@
       background: var(--gold);
       box-shadow: 0 0 14px var(--gold);
     }
-
     .temporal-whisper {
       font-size: 0.65rem;
       color: #526077;
@@ -104,7 +111,7 @@
       transition: color 0.3s ease;
     }
 
-    /* Main Container */
+    /* --- 1.4 Central Workspace Container --- */
     .container {
       max-width: 440px;
       width: 100%;
@@ -115,7 +122,7 @@
       margin: auto 0;
     }
 
-    /* 1. Breathing Light */
+    /* --- 1.5 Breathing Orb Canvas --- */
     .orb-stage {
       position: relative;
       width: 180px;
@@ -147,7 +154,7 @@
       box-shadow: 0 0 15px var(--gold-dim);
     }
 
-    /* 2. The Main Move */
+    /* --- 1.6 The Arrow / Vector Button --- */
     .vector-gate {
       display: flex;
       flex-direction: column;
@@ -188,7 +195,7 @@
       filter: drop-shadow(0 0 6px var(--gold));
     }
 
-    /* 3. Three Evening Questions */
+    /* --- 1.7 Evening Trinity Glyphs --- */
     .trinity-row {
       display: flex;
       gap: 1.25rem;
@@ -232,13 +239,13 @@
       filter: drop-shadow(0 0 4px var(--active));
     }
 
-    /* Guide Drawers */
+    /* --- 1.8 Help Drawers & Contrast Boxes --- */
     .guide-text {
       font-size: 0.82rem;
       color: var(--muted);
       text-align: center;
       line-height: 1.4;
-      max-width: 340px;
+      max-width: 350px;
       display: none;
       animation: fadeIn 0.3s ease forwards;
     }
@@ -258,7 +265,7 @@
       text-align: left;
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
+      gap: 0.4rem;
     }
     .contrast-row {
       display: flex;
@@ -270,7 +277,7 @@
     .contrast-text { color: var(--muted); line-height: 1.3; }
     .contrast-text strong { color: #cbd5e1; display: inline; font-size: 0.75rem; }
 
-    /* Rhythm Selector */
+    /* --- 1.9 Rhythm Pill Selector Inside Help --- */
     .rhythm-selector {
       display: flex;
       gap: 0.35rem;
@@ -308,7 +315,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Demo Elements */
+    /* --- 1.10 Ghost Finger & Demo Engine Overlays --- */
     #ghost-finger {
       position: fixed;
       width: 28px;
@@ -343,7 +350,7 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
     }
 
-    /* Story Sheet */
+    /* --- 1.11 Story Sheet (Modal System) --- */
     .story-modal {
       position: fixed;
       top: 0;
@@ -438,39 +445,54 @@
 </head>
 <body>
 
+  <!-- ===================================================================
+       2. TOP NAVIGATION (Help, Solar Status Whisper, Demo, Story)
+       =================================================================== -->
   <div class="top-bar">
     <div class="top-group">
+      <!-- Help / Explanations Toggle Button -->
       <button class="icon-btn" id="help-toggle" onclick="toggleGuide()" title="Help & Clarifications">?</button>
     </div>
 
+    <!-- Center: Master Dot & Solar Temporal Whisper -->
     <div class="status-group">
       <div class="status-dot" id="master-dot"></div>
       <div class="temporal-whisper" id="temporal-whisper">Dawn</div>
     </div>
 
     <div class="top-group">
+      <!-- Wordless Walkthrough Demo Trigger -->
       <button class="icon-btn" id="demo-btn" onclick="startWordlessDemo()" title="Watch Walkthrough">
         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
           <circle cx="12" cy="12" r="3"></circle>
         </svg>
       </button>
+      <!-- The Story Modal Trigger (Clean Spark ✧) -->
       <button class="icon-btn" onclick="openStory()" title="The Story of the Mirror">✧</button>
     </div>
   </div>
 
+  <!-- ===================================================================
+       3. MAIN WORKSPACE CONTAINER
+       =================================================================== -->
   <div class="container">
     
+    <!-- -----------------------------------------------------------------
+         MODULE 3: THE BREATHING LIGHT (The First Pillar)
+         ----------------------------------------------------------------- -->
     <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem;">
       <div class="orb-stage" id="stage" onclick="togglePulse()">
         <div class="ring" id="ring"></div>
         <div class="orb" id="orb"></div>
       </div>
 
+      <!-- Breathing Help Drawer -->
       <div class="guide-text">
         <strong>1. Settle the Water (Breathe)</strong>
         Follow the light: Inhale as it gently expands, hold in quiet stillness, and exhale as it softly shrinks. When your lungs empty, flow straight into the next breath like an ocean wave.
 
+        <!-- Breath Rhythm Selector (Gentle Wave, Deep Well, Mountain Still) -->
         <div class="rhythm-selector">
           <button class="rhythm-btn active" id="r-0" onclick="setTier(0)">Gentle Wave</button>
           <button class="rhythm-btn" id="r-1" onclick="setTier(1)">Deep Well</button>
@@ -484,12 +506,15 @@
           </div>
           <div class="contrast-row">
             <span class="tag-good">Wisdom</span>
-            <span class="contrast-text">Deep, ancient breathwork requires learning physical locks (<em>Bandhas</em>) from a living teacher to protect your blood vessels. <strong>Never force breath retention alone.</strong></span>
+            <span class="contrast-text">Deep, ancient breathwork requires learning physical locks (<em>Bandhas</em>) from a living teacher to protect your blood vessels. <strong>Never force long breath retention alone.</strong></span>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- -----------------------------------------------------------------
+         MODULE 4: TODAY'S MAIN STONE (The Arrow - Second Pillar)
+         ----------------------------------------------------------------- -->
     <div class="vector-gate">
       <div class="vector-symbol" id="vector-btn" onclick="toggleVector()">
         <svg viewBox="0 0 24 24">
@@ -497,44 +522,58 @@
           <polyline points="5 12 12 5 19 12"></polyline>
         </svg>
       </div>
+
+      <!-- Arrow Help Drawer: Including the Everyday Compass & Clues -->
       <div class="guide-text">
         <strong>2. Today's Main Stone</strong>
         Pick the single real thing that matters most today. When it is placed, tap the arrow to light your victory.
+        
         <div class="contrast-box">
+          <!-- The Everyday Compass (Jung/Aristotle simplified) -->
+          <div class="contrast-row">
+            <span class="tag-good">How to Find It</span>
+            <span class="contrast-text"><strong>Look at what you are dodging.</strong> The task, phone call, or difficult page that makes you want to check messages or clean your desk is almost always today's stone. Friction is your compass.</span>
+          </div>
           <div class="contrast-row">
             <span class="tag-bad">✕ KICKING DUST</span>
-            <span class="contrast-text">Clearing 40 quick messages and feeling drained.</span>
+            <span class="contrast-text">Clearing 40 quick messages just to feel busy.</span>
           </div>
           <div class="contrast-row">
             <span class="tag-good">✓ REAL STONE</span>
-            <span class="contrast-text"><strong>Built the core module / Comforted a sick child.</strong></span>
+            <span class="contrast-text"><strong>Built the engine / Looked after a sick friend / Solved the tough problem.</strong></span>
           </div>
           <div class="contrast-row">
             <span class="tag-bad">✕ PHANTOM GUILT</span>
-            <span class="contrast-text">Finished by 11 AM, then panicked and created fake tasks to look busy.</span>
+            <span class="contrast-text">Done by 11 AM, then panicked and made up fake chores to feel worthy.</span>
           </div>
           <div class="contrast-row">
             <span class="tag-good">✓ THE MARGIN</span>
-            <span class="contrast-text"><strong>Arrow lit. Stone placed. Let the afternoon be peaceful.</strong></span>
+            <span class="contrast-text"><strong>Arrow lit. Stone placed. Enjoy your quiet afternoon without guilt.</strong></span>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- -----------------------------------------------------------------
+         MODULE 5: THREE EVENING BALANCES (Third Pillar)
+         ----------------------------------------------------------------- -->
     <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem;">
       <div class="trinity-row">
+        <!-- Shield: Honesty -->
         <div class="glyph-btn" id="g1" onclick="toggleGlyph('g1')">
           <svg viewBox="0 0 24 24">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
         </div>
 
+        <!-- Heart: Sanctuary & Rest -->
         <div class="glyph-btn" id="g2" onclick="toggleGlyph('g2')">
           <svg viewBox="0 0 24 24">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
           </svg>
         </div>
 
+        <!-- Circle: Humility & The Whole -->
         <div class="glyph-btn" id="g3" onclick="toggleGlyph('g3')">
           <svg viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10"></circle>
@@ -543,6 +582,7 @@
         </div>
       </div>
 
+      <!-- Evening Balance Help Drawer -->
       <div class="guide-text">
         <strong>3. Three Questions at Sundown</strong>
         <div class="contrast-box">
@@ -556,7 +596,7 @@
           </div>
           <div class="contrast-row">
             <span class="tag-good">The Circle</span>
-            <span class="contrast-text">Humility: No arrogance in victory; you are a single drop in a vast ocean.</span>
+            <span class="contrast-text">Humility: No arrogance in victory; you are a single drop in a vast sea.</span>
           </div>
         </div>
       </div>
@@ -566,9 +606,13 @@
 
   <div style="height: 10px;"></div>
 
+  <!-- Dynamic Walkthrough Elements -->
   <div id="demo-caption"></div>
   <div id="ghost-finger"></div>
 
+  <!-- ===================================================================
+       6. THE STORY SHEET MODAL (Lineage, Archetypes, Compounding)
+       =================================================================== -->
   <div class="story-modal" id="story-modal">
     <button class="close-story-btn" onclick="closeStory()">Back to The Mirror ✕</button>
     <div class="story-content">
@@ -608,7 +652,13 @@
       <p>
         Do not run across twenty fields kicking up dust. Pick the single real task that matters today. Give it your whole heart, finish it, and put your tools away.
       </p>
-
+      
+     <div style="background: rgba(212, 163, 115, 0.08); border-left: 2px solid var(--gold); padding: 0.75rem 1rem; border-radius: 0 6px 6px 0; margin: 0.6rem 0; font-size: 0.88rem; line-height: 1.5;">
+      <strong style="color: var(--gold); display: block; margin-bottom: 0.25rem;">How to Spot Today's Stone:</strong>
+       Look at what you are dodging. The task, call, or tough page that suddenly makes you want to clean your desk, check messages, or open ten tabs is almost always today's stone. Friction is not a roadblock—it is a compass needle pointing straight at the real work.
+     </div>
+      
+      <!-- The Compounding Stone Masonry Visual -->
       <div style="background: #0d1017; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.75rem;">
         <div style="color: var(--gold); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase;">
           The Law of Compounding (One Stone vs. Scattered Dust)
@@ -660,6 +710,7 @@
         <li><strong>The Circle:</strong> Did I stay humble, remembering that I am just a wave in a vast sea?</li>
       </ul>
 
+      <!-- The Four Walkers Archetypes -->
       <h3>The Four Walkers: Finding Your Reflection</h3>
       <p>
         How does this look in ordinary life? Different people carry the mirror in their own way:
@@ -668,7 +719,7 @@
       <div class="walker-card">
         <div class="walker-title">The Builder (Craftsman / Maker / Worker)</div>
         <div class="walker-detail">
-          <strong>The Struggle:</strong> Answering endless emails, feeling frantic all day, yet finishing nothing meaningful.<br/>
+          <strong>The Clue:</strong> You sit down to work and suddenly feel the urge to clean your desk or check 10 tabs. The thing you're avoiding is the stone.<br/>
           <strong>The Shift:</strong> Silences alerts. By mid-morning, finishes the core design or writes the difficult letter. Lights the Arrow.<br/>
           <strong>The Margin:</strong> Refuses to invent fake chores just to feel busy. Treats a quiet afternoon as honest restoration.
         </div>
@@ -677,7 +728,7 @@
       <div class="walker-card">
         <div class="walker-title">The Caregiver (Parent / Family Anchor)</div>
         <div class="walker-detail">
-          <strong>The Struggle:</strong> Feeling behind because modern culture rarely measures folding laundry, listening, or soothing tears.<br/>
+          <strong>The Clue:</strong> Snappy and irritable from constant commotion. The flare says: you need presence, not more rushing.<br/>
           <strong>The Shift:</strong> Claims the true stone: <em>Sit with my child for 30 uninterrupted minutes without touching a phone.</em><br/>
           <strong>The Victory:</strong> Lights the Heart glyph at sundown with pride. Being fully present is vital work.
         </div>
@@ -686,8 +737,8 @@
       <div class="walker-card">
         <div class="walker-title">The Student (Young Learner / Seeker)</div>
         <div class="walker-detail">
-          <strong>The Struggle:</strong> Screen distraction, late-night doom-scrolling, exam dread.<br/>
-          <strong>The Shift:</strong> Uses the Gentle Wave breath before opening a book. Masters <em>one</em> tough problem instead of panicking over the entire course.<br/>
+          <strong>The Clue:</strong> Opening social feeds three times in ten minutes. The phone is a shield against the hard chapter.<br/>
+          <strong>The Shift:</strong> Uses Gentle Wave breath before opening the book. Solves problem #3—the exact one that caused dread.<br/>
           <strong>The Victory:</strong> Leaves the Shield unlit without shame if they cut corners, greeting the new dawn with an honest resolve.
         </div>
       </div>
@@ -695,7 +746,7 @@
       <div class="walker-card">
         <div class="walker-title">The Elder (Retiree / Seasoned Soul)</div>
         <div class="walker-detail">
-          <strong>The Struggle:</strong> Feeling unneeded now that formal work and deadlines have passed.<br/>
+          <strong>The Clue:</strong> An old friend's name keeps nagging at your thoughts, but you push it away.<br/>
           <strong>The Shift:</strong> The stone becomes gentle: <em>Tend the garden; mend an old rift; write down an ancestral tale.</em><br/>
           <strong>The Victory:</strong> The Circle (Humility & Unity) becomes their steady home. They know their drop is part of the great sea.
         </div>
@@ -707,7 +758,11 @@
     </div>
   </div>
 
+  <!-- ===================================================================
+       7. JAVASCRIPT APPLICATION ENGINE
+       =================================================================== -->
   <script>
+    /* --- 7.1 DOM Handles --- */
     const stage = document.getElementById('stage');
     const orb = document.getElementById('orb');
     const vectorBtn = document.getElementById('vector-btn');
@@ -715,12 +770,13 @@
     const storyModal = document.getElementById('story-modal');
     const whisperEl = document.getElementById('temporal-whisper');
     
+    /* --- 7.2 Application States --- */
     let isRunning = false;
     let animFrame = null;
     let startTime = null;
     let isDemoing = false;
 
-    // Breath Profiles (Gentle Wave, Deep Well, Mountain Still)
+    /* --- 7.3 Breath Engine Tiers (Gentle Wave, Deep Well, Mountain Still) --- */
     const TIERS = [
       { inhale: 3000, hold: 4000,  exhale: 6000 },  // 0: Gentle Wave (3-4-6)
       { inhale: 2000, hold: 8000,  exhale: 4000 },  // 1: Deep Well (2-8-4)
@@ -728,13 +784,13 @@
     ];
     let currentTierIdx = 0;
 
-    // Everyday Coaching Cues Across the Day
+    /* --- 7.4 Solar Day Temporal Whisper Engine --- */
     function updateTemporalWhisper() {
       const hour = new Date().getHours();
       if (hour >= 5 && hour < 12) {
         whisperEl.innerText = "Dawn • Pick One Stone";
       } else if (hour >= 12 && hour < 18) {
-        whisperEl.innerText = "Day • Place It Well";
+        whisperEl.innerText = "Noon • Place It Well";
       } else if (hour >= 18 && hour < 23) {
         whisperEl.innerText = "Dusk • Lay Armor Down";
       } else {
@@ -742,6 +798,7 @@
       }
     }
 
+    /* --- 7.5 Breath Tier Selector --- */
     function setTier(idx) {
       if (isDemoing) return;
       currentTierIdx = idx;
@@ -757,7 +814,7 @@
       }
     }
 
-    // Daily Clean Slate
+    /* --- 7.6 Daily Clean Slate (Midnight Reset Engine) --- */
     function checkDayRollover() {
       const today = new Date().toDateString();
       const lastSession = localStorage.getItem('m_date');
@@ -770,6 +827,7 @@
       }
     }
 
+    /* --- 7.7 Persistence & UI Synchronizer --- */
     function syncUIFromStorage() {
       if (localStorage.getItem('m_vec') === '1') {
         vectorBtn.classList.add('active');
@@ -791,6 +849,7 @@
       checkHarmony();
     }
 
+    /* --- 7.8 Initialization Lifecycle --- */
     window.addEventListener('DOMContentLoaded', () => {
       checkDayRollover();
       syncUIFromStorage();
@@ -801,6 +860,7 @@
       }
     });
 
+    /* --- 7.9 Orb Breathing Loop & Animation --- */
     function togglePulse() {
       if (isDemoing) return;
       if (!isRunning) startPulse();
@@ -846,6 +906,7 @@
       animFrame = requestAnimationFrame(loop);
     }
 
+    /* --- 7.10 User Action Handlers --- */
     function toggleVector() {
       if (isDemoing) return;
       vectorBtn.classList.toggle('active');
@@ -884,9 +945,7 @@
       }
     }
 
-    /* -------------------------------------------------------------
-       Walkthrough Demo Engine (Sandboxed & Non-Destructive)
-       ------------------------------------------------------------- */
+    /* --- 7.11 Sandboxed Interactive Walkthrough Demo Engine --- */
     async function startWordlessDemo() {
       if (isDemoing) return;
       isDemoing = true;
@@ -962,11 +1021,11 @@
       await moveAndActivate(document.getElementById('g3'), 'g3');
       await new Promise(r => setTimeout(r, 1300));
 
-      // Culmination
+      // Alignment Culmination
       showCaption("All aligned. The mirror is clear.");
       await new Promise(r => setTimeout(r, 2000));
 
-      // Hand-off
+      // Clean Hand-off
       showCaption("Demo finished. Your turn.");
       finger.style.opacity = '0';
       await new Promise(r => setTimeout(r, 1500));
