@@ -240,12 +240,14 @@
     }
 
     /* --- 1.8 Help Drawers & Contrast Boxes --- */
+    /* --- 1.8 Help Drawers & Contrast Boxes (Fixed Alignment) --- */
     .guide-text {
       font-size: 0.82rem;
       color: var(--muted);
       text-align: center;
       line-height: 1.4;
       max-width: 350px;
+      width: 100%;
       display: none;
       animation: fadeIn 0.3s ease forwards;
     }
@@ -257,7 +259,7 @@
     }
     .contrast-box {
       margin-top: 0.5rem;
-      padding: 0.6rem 0.8rem;
+      padding: 0.75rem 0.85rem;
       background: rgba(0, 0, 0, 0.45);
       border-radius: 6px;
       border-left: 2px solid var(--border);
@@ -265,18 +267,35 @@
       text-align: left;
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
+      gap: 0.5rem;
+      width: 100%;
     }
     .contrast-row {
       display: flex;
-      gap: 0.5rem;
       align-items: baseline;
+      gap: 0.75rem;
     }
-    .tag-bad { color: #f87171; font-weight: 700; font-family: monospace; font-size: 0.68rem; }
-    .tag-good { color: #4ade80; font-weight: 700; font-family: monospace; font-size: 0.68rem; }
-    .contrast-text { color: var(--muted); line-height: 1.3; }
-    .contrast-text strong { color: #cbd5e1; display: inline; font-size: 0.75rem; }
-
+    /* Fixed tag column width guarantees perfect left-to-right alignment */
+    .tag-bad, .tag-good {
+      width: 105px;
+      min-width: 105px;
+      font-weight: 700;
+      font-size: 0.68rem;
+      font-family: monospace;
+      letter-spacing: 0.02em;
+    }
+    .tag-bad { color: #f87171; }
+    .tag-good { color: #4ade80; }
+    .contrast-text { 
+      color: var(--muted); 
+      line-height: 1.35;
+      flex: 1;
+    }
+    .contrast-text strong { 
+      color: #cbd5e1; 
+      display: inline; 
+      font-size: 0.75rem; 
+    }
     /* --- 1.9 Rhythm Pill Selector Inside Help --- */
     .rhythm-selector {
       display: flex;
@@ -512,10 +531,10 @@
       </div>
     </div>
 
-    <!-- -----------------------------------------------------------------
-         MODULE 4: TODAY'S MAIN STONE (The Arrow - Second Pillar)
+   <!-- -----------------------------------------------------------------
+         MODULE 4: TODAY'S MAIN STONE (Centered & Flawlessly Aligned)
          ----------------------------------------------------------------- -->
-    <div class="vector-gate">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem; width: 100%;">
       <div class="vector-symbol" id="vector-btn" onclick="toggleVector()">
         <svg viewBox="0 0 24 24">
           <line x1="12" y1="19" x2="12" y2="5"></line>
@@ -523,37 +542,38 @@
         </svg>
       </div>
 
-      <!-- Arrow Help Drawer: Including the Everyday Compass & Clues -->
+      <!-- Arrow Help Drawer -->
       <div class="guide-text">
         <strong>2. Today's Main Stone</strong>
         Pick the single real thing that matters most today. When it is placed, tap the arrow to light your victory.
         
         <div class="contrast-box">
-          <!-- The Everyday Compass (Jung/Aristotle simplified) -->
-          <div class="contrast-row">
-            <span class="tag-good">How to Find It</span>
-            <span class="contrast-text"><strong>Look at what you are dodging.</strong> The task, phone call, or difficult page that makes you want to check messages or clean your desk is almost always today's stone. Friction is your compass.</span>
+          <!-- Full-Width Compass Banner -->
+          <div style="padding-bottom: 0.4rem; border-bottom: 1px solid rgba(255,255,255,0.06); line-height: 1.4;">
+            <span style="color: var(--gold); font-weight: 700; display: block; margin-bottom: 2px;">How to Spot the Stone:</span>
+            Look at what you are dodging. The task or phone call that makes you want to check messages or clean your desk is today's stone. Friction is your compass.
           </div>
+
+          <!-- Strict 2-Column Grid Rows -->
           <div class="contrast-row">
             <span class="tag-bad">✕ KICKING DUST</span>
             <span class="contrast-text">Clearing 40 quick messages just to feel busy.</span>
           </div>
           <div class="contrast-row">
             <span class="tag-good">✓ REAL STONE</span>
-            <span class="contrast-text"><strong>Built the engine / Looked after a sick friend / Solved the tough problem.</strong></span>
+            <span class="contrast-text"><strong>Built the engine / Looked after a sick friend.</strong></span>
           </div>
           <div class="contrast-row">
             <span class="tag-bad">✕ PHANTOM GUILT</span>
-            <span class="contrast-text">Done by 11 AM, then panicked and made up fake chores to feel worthy.</span>
+            <span class="contrast-text">Done by 11 AM, then panicked and made up fake chores.</span>
           </div>
           <div class="contrast-row">
             <span class="tag-good">✓ THE MARGIN</span>
-            <span class="contrast-text"><strong>Arrow lit. Stone placed. Enjoy your quiet afternoon without guilt.</strong></span>
+            <span class="contrast-text"><strong>Arrow lit. Stone placed. Enjoy a peaceful afternoon.</strong></span>
           </div>
         </div>
       </div>
     </div>
-
     <!-- -----------------------------------------------------------------
          MODULE 5: THREE EVENING BALANCES (Third Pillar)
          ----------------------------------------------------------------- -->
@@ -654,9 +674,9 @@
       </p>
       
      <div style="background: rgba(212, 163, 115, 0.08); border-left: 2px solid var(--gold); padding: 0.75rem 1rem; border-radius: 0 6px 6px 0; margin: 0.6rem 0; font-size: 0.88rem; line-height: 1.5;">
-      <strong style="color: var(--gold); display: block; margin-bottom: 0.25rem;">How to Spot Today's Stone:</strong>
-       Look at what you are dodging. The task, call, or tough page that suddenly makes you want to clean your desk, check messages, or open ten tabs is almost always today's stone. Friction is not a roadblock—it is a compass needle pointing straight at the real work.
-     </div>
+  <strong style="color: var(--gold); display: block; margin-bottom: 0.25rem;">How to Spot Today's Stone:</strong>
+  Look at what you are dodging. The task, call, or tough page that suddenly makes you want to clean your desk, check messages, or open ten tabs is almost always today's stone. Friction is not a roadblock—it is a compass needle pointing straight at the real work.
+</div>
       
       <!-- The Compounding Stone Masonry Visual -->
       <div style="background: #0d1017; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.75rem;">
