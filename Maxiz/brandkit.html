@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maxiz — Brand &amp; launch package</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1E211D;
+    --paper: #F7F6F2;
+    --sage: #4B6357;
+    --sage-deep: #33453B;
+    --stone: #8B8779;
+    --line: #DAD7CD;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+  h1, h2, h3 { font-family: 'Newsreader', Georgia, serif; font-weight: 500; color: var(--sage-deep); margin: 0; }
+  h1 { font-size: 42px; }
+  h2 { font-size: 26px; }
+  h3 { font-size: 18px; }
+  p { margin: 0 0 12px; }
+  a { color: var(--sage-deep); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 28px; }
+
+  .toc {
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    z-index: 10;
+    padding: 14px 0;
+  }
+  .toc .wrap { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+  .toc a { font-size: 13px; text-decoration: none; color: var(--ink); white-space: nowrap; }
+  .toc a:hover { color: var(--sage-deep); }
+  .toc .brand { font-family: 'Newsreader', serif; font-weight: 500; font-size: 16px; color: var(--sage-deep); margin-right: auto; }
+
+  .cover {
+    padding: 90px 0 70px;
+    border-bottom: 1px solid var(--line);
+  }
+  .cover .kicker { color: var(--stone); font-size: 14px; margin-bottom: 18px; }
+  .cover p.lead { font-size: 19px; max-width: 58ch; color: #4A4D46; margin-top: 18px; }
+  .cover .meta {
+    margin-top: 32px;
+    font-size: 13px;
+    color: var(--stone);
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+  }
+  .cover .meta code { background: #EFEDE4; padding: 1px 5px; border-radius: 3px; }
+
+  section { padding: 64px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+  section > .wrap > h2 { margin-bottom: 8px; }
+  section > .wrap > .section-sub { color: var(--stone); font-size: 14px; margin-bottom: 32px; }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+  }
+  .card h3 { margin-bottom: 10px; }
+  .card ul { margin: 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 14px; margin-top: 16px; }
+  .swatch { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .swatch .fill { height: 64px; }
+  .swatch .label { padding: 8px 10px; background: #fff; font-size: 12px; }
+  .swatch .label .hex { font-family: 'JetBrains Mono', monospace; color: var(--stone); display: block; margin-top: 2px; }
+
+  .type-row { display: flex; align-items: baseline; gap: 18px; border-bottom: 1px solid var(--line); padding: 14px 0; }
+  .type-row .tag { font-size: 12px; color: var(--stone); width: 130px; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; }
+  .type-row .sample.serif { font-family: 'Newsreader', serif; font-size: 26px; color: var(--ink); }
+  .type-row .sample.sans { font-family: 'Inter', sans-serif; font-size: 16px; color: var(--ink); }
+
+  .logo-showcase { display: flex; gap: 20px; flex-wrap: wrap; }
+  .logo-box {
+    flex: 1; min-width: 220px;
+    border: 1px solid var(--line); border-radius: 10px; padding: 30px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-box.light { background: #ffffff; }
+  .logo-box.dark { background: #1E211D; }
+  .logo-box.dark svg text { fill: #F7F6F2 !important; }
+  .logo-box svg { width: 100%; max-width: 260px; height: auto; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--sage-deep); color: #fff !important; text-decoration: none;
+    padding: 11px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; margin-top: 14px;
+  }
+  .btn:hover { background: var(--sage); }
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .mock-row { display: flex; gap: 22px; flex-wrap: wrap; }
+  .biz-card {
+    width: 300px; height: 175px;
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    display: flex; flex-direction: column; justify-content: center; padding: 0 24px; gap: 6px;
+  }
+  .biz-card.front { align-items: center; text-align: center; }
+  .biz-card .name { font-size: 15px; font-weight: 500; font-family: 'Newsreader', serif; }
+  .biz-card .role { font-size: 12px; color: var(--stone); }
+  .biz-card .contact { font-size: 11px; color: var(--ink); line-height: 1.7; margin-top: 6px; }
+  .biz-card .sub { font-size: 11px; color: var(--stone); line-height: 1.6; }
+
+  .flyer {
+    width: 260px; height: 368px;
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    padding: 26px 20px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .flyer .headline { font-family: 'Newsreader', serif; font-size: 22px; margin-top: 20px; }
+  .flyer .sub { font-size: 12px; color: var(--stone); }
+  .flyer .cta { margin-top: auto; background: #E7ECE7; color: var(--sage-deep); font-size: 12px; font-weight: 500; text-align: center; padding: 10px; border-radius: 5px; }
+
+  .social-post {
+    width: 320px; height: 320px;
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px;
+    text-align: center;
+  }
+  .social-post .headline { font-family: 'Newsreader', serif; font-size: 26px; }
+  .social-post .sub { font-size: 12px; color: var(--stone); }
+  .social-post .services { font-size: 11px; color: var(--sage-deep); margin-top: 10px; }
+
+  .copy-block { border-left: 3px solid var(--line); padding-left: 16px; margin-bottom: 22px; }
+  .copy-block .platform { font-size: 12px; color: var(--stone); font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; }
+  .copy-block p { white-space: pre-line; }
+
+  pre {
+    background: #22261F; color: #E8E6DD; padding: 20px; border-radius: 8px;
+    overflow-x: auto; font-size: 12.5px; line-height: 1.6; font-family: 'JetBrains Mono', monospace; max-height: 420px;
+  }
+  code { font-family: 'JetBrains Mono', monospace; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--stone); font-weight: 500; font-size: 12px; }
+
+  .checklist li { margin-bottom: 8px; }
+  .note {
+    background: #EFEDE4; border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 18px; font-size: 14px; color: #4A4D46;
+  }
+  .note.edit {
+    background: #E7ECE7; border-color: #C9D4CB;
+  }
+  .note code { font-family: 'JetBrains Mono', monospace; background: #fff; padding: 1px 5px; border-radius: 3px; }
+
+  footer { padding: 50px 0; text-align: center; color: var(--stone); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="toc">
+  <div class="wrap">
+    <span class="brand">Maxiz package</span>
+    <a href="#brief">Brand brief</a>
+    <a href="#logo">Logo kit</a>
+    <a href="#card">Business card</a>
+    <a href="#flyer">Flyer</a>
+    <a href="#website">Website</a>
+    <a href="#social">Social kit</a>
+    <a href="#handoff">Handoff notes</a>
+  </div>
+</div>
+
+<div class="cover">
+  <div class="wrap">
+    <p class="kicker">Brand &amp; launch package &middot; v2</p>
+    <h1>Maxiz — less is more</h1>
+    <p class="lead">Everything needed to launch the Maxiz brand: positioning, logo, business card, flyer, a ready-to-deploy website, and a social media kit — in one file.</p>
+    <div class="meta">
+      Prepared for handoff to a designer or developer. This is plain HTML — open it in any text editor to edit directly, no build tools required. Placeholder contact details appear throughout: search for <code>0412 345 678</code>, <code>hello@maxiz.com.au</code>, <code>www.maxiz.com.au</code> and replace with real details before publishing anything.
+    </div>
+  </div>
+</div>
+
+<section id="brief">
+  <div class="wrap">
+    <h2>Brand brief</h2>
+    <p class="section-sub">Positioning, audience, and design direction</p>
+
+    <div class="card">
+      <h3>What Maxiz is</h3>
+      <p>A business consulting service for small and medium businesses (SMBs) in Western Sydney, offering AI, website, social media, legal, and accounting support under one roof — one partner instead of five separate vendors.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Audience</h3>
+        <p>Small and medium business owners in Western Sydney — time-poor, juggling multiple functions themselves, looking for a single point of contact rather than five separate providers.</p>
+      </div>
+      <div class="card">
+        <h3>Key message</h3>
+        <p>One consulting partner, five essential services. "Less is more" — simplify who you rely on to run your business.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Tone of voice</h3>
+      <p>Professional but approachable — not corporate-stiff. Speaks to a busy owner, not a boardroom. Plain language, short sentences, no jargon.</p>
+    </div>
+
+    <div class="card">
+      <h3>Design principles</h3>
+      <ul>
+        <li>Restraint over decoration — every element earns its place or gets cut, not padded</li>
+        <li>One call to action, said the same way everywhere: "Message us on WhatsApp"</li>
+        <li>Plain serif wordmark, clean sans-serif body text, one accent color used sparingly</li>
+        <li>Generous white space, minimal borders, no gradients or drop shadows</li>
+        <li>Works identically in print (card, flyer) and digital (site, social)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="logo">
+  <div class="wrap">
+    <h2>Logo &amp; brand kit</h2>
+    <p class="section-sub">Wordmark, color palette, and typography</p>
+
+    <h3>Logo</h3>
+    <p>A plain serif wordmark — deliberately undecorated. No underline, no icon, no flourish that needs explaining. The restraint of the mark itself carries "less is more," rather than a decorative detail standing in for the idea.</p>
+    <div class="logo-showcase">
+      <div class="logo-box light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 200" width="680" height="200">
+<title>Maxiz logo</title>
+<desc>Plain serif wordmark reading "Maxiz" with the tagline "less is more" beneath.</desc>
+<text x="340" y="120" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="500" fill="#33453B" letter-spacing="1">Maxiz</text>
+<text x="340" y="160" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="20" fill="#8B8779">less is more</text>
+</svg>
+</div>
+      <div class="logo-box dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 200" width="680" height="200">
+<title>Maxiz logo</title>
+<desc>Plain serif wordmark reading "Maxiz" with the tagline "less is more" beneath.</desc>
+<text x="340" y="120" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="500" fill="#33453B" letter-spacing="1">Maxiz</text>
+<text x="340" y="160" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="20" fill="#8B8779">less is more</text>
+</svg>
+</div>
+    </div>
+    <div class="btn-row">
+      <a class="btn" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2ODAgMjAwIiB3aWR0aD0iNjgwIiBoZWlnaHQ9IjIwMCI+Cjx0aXRsZT5NYXhpeiBsb2dvPC90aXRsZT4KPGRlc2M+UGxhaW4gc2VyaWYgd29yZG1hcmsgcmVhZGluZyAiTWF4aXoiIHdpdGggdGhlIHRhZ2xpbmUgImxlc3MgaXMgbW9yZSIgYmVuZWF0aC48L2Rlc2M+Cjx0ZXh0IHg9IjM0MCIgeT0iMTIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjcyIiBmb250LXdlaWdodD0iNTAwIiBmaWxsPSIjMzM0NTNCIiBsZXR0ZXItc3BhY2luZz0iMSI+TWF4aXo8L3RleHQ+Cjx0ZXh0IHg9IjM0MCIgeT0iMTYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwgc2VyaWYiIGZvbnQtc3R5bGU9Iml0YWxpYyIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzhCODc3OSI+bGVzcyBpcyBtb3JlPC90ZXh0Pgo8L3N2Zz4K" download="maxiz-logo.svg">Download logo.svg</a>
+    </div>
+
+    <h3 style="margin-top:40px;">Color palette</h3>
+    <div class="swatches">
+      <div class="swatch"><div class="fill" style="background:#33453B;"></div><div class="label">Sage deep (primary)<span class="hex">#33453B</span></div></div>
+      <div class="swatch"><div class="fill" style="background:#4B6357;"></div><div class="label">Sage (accent)<span class="hex">#4B6357</span></div></div>
+      <div class="swatch"><div class="fill" style="background:#1E211D;"></div><div class="label">Ink (text)<span class="hex">#1E211D</span></div></div>
+      <div class="swatch"><div class="fill" style="background:#8B8779;"></div><div class="label">Stone (muted text)<span class="hex">#8B8779</span></div></div>
+      <div class="swatch"><div class="fill" style="background:#DAD7CD;"></div><div class="label">Line (borders)<span class="hex">#DAD7CD</span></div></div>
+      <div class="swatch"><div class="fill" style="background:#F7F6F2;border-bottom:1px solid #DAD7CD;"></div><div class="label">Paper (background)<span class="hex">#F7F6F2</span></div></div>
+    </div>
+
+    <h3 style="margin-top:40px;">Typography</h3>
+    <div class="type-row"><span class="tag">Headings</span><span class="sample serif">Newsreader (serif)</span></div>
+    <div class="type-row"><span class="tag">Body / UI</span><span class="sample sans">Inter (sans-serif)</span></div>
+    <p style="margin-top:14px; font-size:13px; color:var(--stone);">Both are free Google Fonts, already linked in the website file below. Fallbacks: Georgia for headings, system sans-serif for body.</p>
+  </div>
+</section>
+
+<section id="card">
+  <div class="wrap">
+    <h2>Business card</h2>
+    <p class="section-sub">Standard size 85 x 55mm — confirm bleed and safe zone with your printer</p>
+    <div class="mock-row">
+      <div class="biz-card front">
+        <div style="font-family:'Newsreader',serif; font-size:20px; font-weight:500; color:var(--sage-deep);">Maxiz</div>
+        <div style="font-size:11px; color:var(--stone); font-style:italic;">Less is more</div>
+        <div style="font-size:10px; color:var(--stone); margin-top:6px;">AI &middot; Web &middot; Social &middot; Legal &middot; Accounting</div>
+      </div>
+      <div class="biz-card">
+        <div class="name">Jane Smith</div>
+        <div class="role">Founder, Maxiz</div>
+        <div class="contact">
+          0412 345 678<br>
+          jane@maxiz.com.au<br>
+          www.maxiz.com.au
+        </div>
+        <div class="sub" style="margin-top:4px;">Western Sydney, NSW</div>
+      </div>
+    </div>
+    <p style="margin-top:18px; font-size:13px; color:var(--stone);">Front: logo mark only. Back: name, title, contact details, location. Replace placeholder name and contact info before printing.</p>
+  </div>
+</section>
+
+<section id="flyer">
+  <div class="wrap">
+    <h2>Flyer</h2>
+    <p class="section-sub">A5 (148 x 210mm), double-sided</p>
+    <div class="mock-row">
+      <div class="flyer">
+        <div style="font-size:15px; font-weight:500; font-family:'Newsreader',serif; color:var(--sage-deep);">Maxiz</div>
+        <div class="headline">One partner.<br>Every essential.</div>
+        <div class="sub">Business consulting for SMBs in Western Sydney</div>
+        <div style="margin-top:auto; font-size:11px; color:var(--sage-deep);">AI &middot; Website &middot; Social &middot; Legal &middot; Accounting</div>
+      </div>
+      <div class="flyer">
+        <div style="font-size:14px; font-weight:500;">Why one partner beats five</div>
+        <div style="font-size:12px; color:#4A4D46; line-height:1.7;">Running a small business means juggling AI tools, a website, social media, legal paperwork and the books — usually across five vendors who don't talk to each other. Maxiz brings it all under one roof.</div>
+        <div class="cta">Message us on WhatsApp</div>
+        <div style="font-size:11px; color:var(--stone);">0412 345 678 &middot; hello@maxiz.com.au &middot; www.maxiz.com.au</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:32px;">Brief</h3>
+    <table>
+      <tr><th>Purpose</th><td>Generate local awareness and leads for SMB consulting services in Western Sydney</td></tr>
+      <tr><th>Audience</th><td>SMB owners — time-poor, looking for a single point of contact</td></tr>
+      <tr><th>Format</th><td>A5, double-sided. Front: hook + services. Back: value prop + CTA + contact</td></tr>
+      <tr><th>Distribution</th><td>Letterbox drops, networking events, local business expos, partner locations</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="website">
+  <div class="wrap">
+    <h2>Website</h2>
+    <p class="section-sub">Single self-contained HTML file — no build step, no dependencies</p>
+    <p>A complete one-page site: plain wordmark, services and pricing menu, and a single consistent call to action ("Message us on WhatsApp") repeated throughout instead of competing buttons. Deploy by pushing <code>index.html</code> to a GitHub repo root and enabling GitHub Pages, or upload it to any static host.</p>
+    <div class="btn-row">
+      <a class="btn" href="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLjAiPgo8dGl0bGU+TWF4aXog4oCUIExlc3MgaXMgbW9yZTwvdGl0bGU+CjxtZXRhIG5hbWU9ImRlc2NyaXB0aW9uIiBjb250ZW50PSJPbmUgY29uc3VsdGluZyBwYXJ0bmVyIGZvciBBSSwgd2Vic2l0ZSwgc29jaWFsIG1lZGlhLCBsZWdhbCwgYW5kIGFjY291bnRpbmcgc3VwcG9ydCDigJQgYnVpbHQgZm9yIHNtYWxsIGFuZCBtZWRpdW0gYnVzaW5lc3NlcyBpbiBXZXN0ZXJuIFN5ZG5leS4iPgo8bGluayByZWw9InByZWNvbm5lY3QiIGhyZWY9Imh0dHBzOi8vZm9udHMuZ29vZ2xlYXBpcy5jb20iPgo8bGluayByZWw9InByZWNvbm5lY3QiIGhyZWY9Imh0dHBzOi8vZm9udHMuZ3N0YXRpYy5jb20iIGNyb3Nzb3JpZ2luPgo8bGluayBocmVmPSJodHRwczovL2ZvbnRzLmdvb2dsZWFwaXMuY29tL2NzczI/ZmFtaWx5PU5ld3NyZWFkZXI6aXRhbCxvcHN6LHdnaHRAMCw2Li43Miw0MDA7MCw2Li43Miw1MDA7MCw2Li43Miw2MDA7MSw2Li43Miw0MDAmZmFtaWx5PUludGVyOndnaHRANDAwOzUwMDs2MDAmZGlzcGxheT1zd2FwIiByZWw9InN0eWxlc2hlZXQiPgo8c3R5bGU+CiAgOnJvb3QgewogICAgLS1pbms6ICMxRTIxMUQ7CiAgICAtLXBhcGVyOiAjRjdGNkYyOwogICAgLS1zYWdlOiAjNEI2MzU3OwogICAgLS1zYWdlLWRlZXA6ICMzMzQ1M0I7CiAgICAtLXN0b25lOiAjOEI4Nzc5OwogICAgLS1saW5lOiAjREFEN0NEOwogICAgLS1tYXg6IDc2MHB4OwogIH0KCiAgKiB7IGJveC1zaXppbmc6IGJvcmRlci1ib3g7IH0KCiAgaHRtbCB7IHNjcm9sbC1iZWhhdmlvcjogc21vb3RoOyB9CgogIGJvZHkgewogICAgbWFyZ2luOiAwOwogICAgYmFja2dyb3VuZDogdmFyKC0tcGFwZXIpOwogICAgY29sb3I6IHZhcigtLWluayk7CiAgICBmb250LWZhbWlseTogJ0ludGVyJywgLWFwcGxlLXN5c3RlbSwgc2Fucy1zZXJpZjsKICAgIGZvbnQtc2l6ZTogMTdweDsKICAgIGxpbmUtaGVpZ2h0OiAxLjY7CiAgICAtd2Via2l0LWZvbnQtc21vb3RoaW5nOiBhbnRpYWxpYXNlZDsKICB9CgogIGgxLCBoMiwgaDMgewogICAgZm9udC1mYW1pbHk6ICdOZXdzcmVhZGVyJywgR2VvcmdpYSwgc2VyaWY7CiAgICBmb250LXdlaWdodDogNTAwOwogICAgbGluZS1oZWlnaHQ6IDEuMTU7CiAgICBtYXJnaW46IDA7CiAgICBjb2xvcjogdmFyKC0tc2FnZS1kZWVwKTsKICB9CgogIHAgeyBtYXJnaW46IDA7IH0KCiAgYSB7IGNvbG9yOiBpbmhlcml0OyB9CgogIC53cmFwIHsKICAgIG1heC13aWR0aDogMTA0MHB4OwogICAgbWFyZ2luOiAwIGF1dG87CiAgICBwYWRkaW5nOiAwIDMycHg7CiAgfQoKICAucHJvc2UgeyBtYXgtd2lkdGg6IHZhcigtLW1heCk7IH0KCiAgLnNraXAtbGluayB7CiAgICBwb3NpdGlvbjogYWJzb2x1dGU7CiAgICBsZWZ0OiAtOTk5cHg7CiAgICB0b3A6IDA7CiAgICBiYWNrZ3JvdW5kOiB2YXIoLS1zYWdlLWRlZXApOwogICAgY29sb3I6IHZhcigtLXBhcGVyKTsKICAgIHBhZGRpbmc6IDEwcHggMTZweDsKICAgIHotaW5kZXg6IDEwMDsKICB9CiAgLnNraXAtbGluazpmb2N1cyB7IGxlZnQ6IDE2cHg7IHRvcDogMTZweDsgfQoKICA6Zm9jdXMtdmlzaWJsZSB7CiAgICBvdXRsaW5lOiAycHggc29saWQgdmFyKC0tc2FnZSk7CiAgICBvdXRsaW5lLW9mZnNldDogM3B4OwogIH0KCiAgLyogSGVhZGVyICovCiAgaGVhZGVyIHsKICAgIHBhZGRpbmc6IDI4cHggMDsKICAgIGJvcmRlci1ib3R0b206IDFweCBzb2xpZCB2YXIoLS1saW5lKTsKICB9CiAgaGVhZGVyIC53cmFwIHsKICAgIGRpc3BsYXk6IGZsZXg7CiAgICBhbGlnbi1pdGVtczogY2VudGVyOwogICAganVzdGlmeS1jb250ZW50OiBzcGFjZS1iZXR3ZWVuOwogICAgZ2FwOiAyNHB4OwogIH0KICAubG9nbyB7CiAgICBmb250LWZhbWlseTogJ05ld3NyZWFkZXInLCBzZXJpZjsKICAgIGZvbnQtc2l6ZTogMjFweDsKICAgIGZvbnQtd2VpZ2h0OiA1MDA7CiAgICBjb2xvcjogdmFyKC0tc2FnZS1kZWVwKTsKICAgIHRleHQtZGVjb3JhdGlvbjogbm9uZTsKICAgIGxldHRlci1zcGFjaW5nOiAwLjAyZW07CiAgfQogIG5hdiB7IGRpc3BsYXk6IGZsZXg7IGdhcDogMjhweDsgfQogIG5hdiBhIHsKICAgIHRleHQtZGVjb3JhdGlvbjogbm9uZTsKICAgIGNvbG9yOiB2YXIoLS1pbmspOwogICAgZm9udC1zaXplOiAxNXB4OwogIH0KICBuYXYgYTpob3ZlciB7IGNvbG9yOiB2YXIoLS1zYWdlLWRlZXApOyB9CgogIEBtZWRpYSAobWF4LXdpZHRoOiA2NDBweCkgewogICAgbmF2IHsgZGlzcGxheTogbm9uZTsgfQogIH0KCiAgLyogU2hhcmVkIGJ1dHRvbnMg4oCUIG9uZSBDVEEgdmVyYiwgdXNlZCBldmVyeXdoZXJlICovCiAgLmJ0bi13aGF0c2FwcCB7CiAgICBkaXNwbGF5OiBpbmxpbmUtZmxleDsKICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7CiAgICBnYXA6IDlweDsKICAgIGJhY2tncm91bmQ6IHZhcigtLXNhZ2UtZGVlcCk7CiAgICBjb2xvcjogdmFyKC0tcGFwZXIpOwogICAgdGV4dC1kZWNvcmF0aW9uOiBub25lOwogICAgcGFkZGluZzogMTRweCAyNnB4OwogICAgYm9yZGVyLXJhZGl1czogNHB4OwogICAgZm9udC1zaXplOiAxNXB4OwogICAgZm9udC13ZWlnaHQ6IDUwMDsKICB9CiAgLmJ0bi13aGF0c2FwcDpob3ZlciB7IGJhY2tncm91bmQ6IHZhcigtLXNhZ2UpOyB9CiAgLmJ0bi13aGF0c2FwcCBzdmcgeyB3aWR0aDogMTdweDsgaGVpZ2h0OiAxN3B4OyBmbGV4LXNocmluazogMDsgfQogIC5idG4td2hhdHNhcHAuc21hbGwgewogICAgcGFkZGluZzogOXB4IDE2cHg7CiAgICBmb250LXNpemU6IDEzLjVweDsKICAgIGJvcmRlci1yYWRpdXM6IDRweDsKICB9CiAgLmJ0bi13aGF0c2FwcC5zbWFsbCBzdmcgeyB3aWR0aDogMTVweDsgaGVpZ2h0OiAxNXB4OyB9CgogIC8qIEhlcm8gKi8KICAuaGVybyB7CiAgICBwYWRkaW5nOiAxMTBweCAwIDEwMHB4OwogICAgYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkIHZhcigtLWxpbmUpOwogIH0KICAuaGVybyAudGFnIHsKICAgIGNvbG9yOiB2YXIoLS1zdG9uZSk7CiAgICBmb250LXNpemU6IDE1cHg7CiAgICBtYXJnaW4tYm90dG9tOiAyMnB4OwogIH0KICAuaGVybyBoMSB7CiAgICBmb250LXNpemU6IGNsYW1wKDM4cHgsIDZ2dywgNjBweCk7CiAgICBtYXgtd2lkdGg6IDEyY2g7CiAgfQogIC5oZXJvIC5zdWIgewogICAgbWF4LXdpZHRoOiA0NmNoOwogICAgbWFyZ2luLXRvcDogMjZweDsKICAgIGZvbnQtc2l6ZTogMTlweDsKICAgIGNvbG9yOiAjNEE0RDQ2OwogIH0KICAuaGVyby1jdGEgewogICAgbWFyZ2luLXRvcDogNDBweDsKICB9CgogIC8qIFNlY3Rpb24gc2hhcmVkICovCiAgc2VjdGlvbiB7IHBhZGRpbmc6IDg4cHggMDsgYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkIHZhcigtLWxpbmUpOyB9CiAgc2VjdGlvbjpsYXN0LW9mLXR5cGUgeyBib3JkZXItYm90dG9tOiBub25lOyB9CiAgLnNlY3Rpb24taGVhZCB7CiAgICBtYXgtd2lkdGg6IDU2Y2g7CiAgICBtYXJnaW4tYm90dG9tOiA0OHB4OwogIH0KICAuc2VjdGlvbi1oZWFkIGgyIHsKICAgIGZvbnQtc2l6ZTogY2xhbXAoMjhweCwgNHZ3LCAzNnB4KTsKICB9CiAgLnNlY3Rpb24taGVhZCBwIHsKICAgIG1hcmdpbi10b3A6IDE0cHg7CiAgICBjb2xvcjogIzRBNEQ0NjsKICAgIGZvbnQtc2l6ZTogMTdweDsKICB9CgogIC8qIFByb2JsZW0gc2VjdGlvbiAqLwogIC5wcm9ibGVtIHAgewogICAgZm9udC1zaXplOiAxOXB4OwogICAgY29sb3I6ICMzMzM2MkY7CiAgfQogIC5wcm9ibGVtIHAgKyBwIHsgbWFyZ2luLXRvcDogMjBweDsgfQoKICAvKiBTZXJ2aWNlcyDigJQgYm9yZGVyZWQgcm93cyAqLwogIC5wcmljaW5nLW5vdGUgewogICAgZm9udC1zaXplOiAxMy41cHg7CiAgICBjb2xvcjogdmFyKC0tc3RvbmUpOwogICAgbWFyZ2luLWJvdHRvbTogMjhweDsKICAgIG1heC13aWR0aDogNjJjaDsKICB9CiAgLnNlcnZpY2VzLWxpc3QgewogICAgYm9yZGVyLXRvcDogMXB4IHNvbGlkIHZhcigtLWxpbmUpOwogIH0KICAuc2VydmljZS1yb3cgewogICAgZGlzcGxheTogZ3JpZDsKICAgIGdyaWQtdGVtcGxhdGUtY29sdW1uczogMTYwcHggMWZyIGF1dG87CiAgICBnYXA6IDI0cHg7CiAgICBwYWRkaW5nOiAyNnB4IDA7CiAgICBib3JkZXItYm90dG9tOiAxcHggc29saWQgdmFyKC0tbGluZSk7CiAgICBhbGlnbi1pdGVtczogY2VudGVyOwogIH0KICAuc2VydmljZS1yb3cgaDMgewogICAgZm9udC1zaXplOiAyMHB4OwogICAgY29sb3I6IHZhcigtLWluayk7CiAgfQogIC5zZXJ2aWNlLXJvdyAuZGVzYyBwIHsKICAgIGNvbG9yOiAjNEE0RDQ2OwogICAgZm9udC1zaXplOiAxNXB4OwogICAgbWF4LXdpZHRoOiA0NGNoOwogIH0KICAuc2VydmljZS1yb3cgLmRlc2MgLm1ldGEgewogICAgY29sb3I6IHZhcigtLXN0b25lKTsKICAgIGZvbnQtc2l6ZTogMTNweDsKICAgIG1hcmdpbi10b3A6IDZweDsKICB9CiAgQG1lZGlhIChtYXgtd2lkdGg6IDcwMHB4KSB7CiAgICAuc2VydmljZS1yb3cgeyBncmlkLXRlbXBsYXRlLWNvbHVtbnM6IDFmcjsgZ2FwOiAxMHB4OyB0ZXh0LWFsaWduOiBsZWZ0OyB9CiAgfQoKICAvKiBGaW5hbCBDVEEgKi8KICAuZmluYWwtY3RhIHsKICAgIGJhY2tncm91bmQ6IHZhcigtLXNhZ2UtZGVlcCk7CiAgICBjb2xvcjogdmFyKC0tcGFwZXIpOwogICAgYm9yZGVyLWJvdHRvbTogbm9uZTsKICAgIHRleHQtYWxpZ246IGNlbnRlcjsKICB9CiAgLmZpbmFsLWN0YSBoMiB7IGNvbG9yOiB2YXIoLS1wYXBlcik7IG1heC13aWR0aDogMjBjaDsgbWFyZ2luOiAwIGF1dG87IH0KICAuZmluYWwtY3RhIHAgeyBjb2xvcjogI0Q5RTJEQzsgbWFyZ2luLXRvcDogMTZweDsgbWF4LXdpZHRoOiA0NmNoOyBmb250LXNpemU6IDE4cHg7IG1hcmdpbi1sZWZ0OiBhdXRvOyBtYXJnaW4tcmlnaHQ6IGF1dG87IH0KICAuZmluYWwtY3RhIC5oZXJvLWN0YSB7IG1hcmdpbi10b3A6IDM2cHg7IGRpc3BsYXk6IGZsZXg7IGp1c3RpZnktY29udGVudDogY2VudGVyOyB9CiAgLmZpbmFsLWN0YSAuYnRuLXdoYXRzYXBwIHsgYmFja2dyb3VuZDogdmFyKC0tcGFwZXIpOyBjb2xvcjogdmFyKC0tc2FnZS1kZWVwKTsgfQogIC5maW5hbC1jdGEgLmJ0bi13aGF0c2FwcDpob3ZlciB7IGJhY2tncm91bmQ6ICNFOUU2REQ7IH0KCiAgLyogRm9vdGVyICovCiAgZm9vdGVyIHsKICAgIHBhZGRpbmc6IDQ4cHggMDsKICB9CiAgZm9vdGVyIC53cmFwIHsKICAgIGRpc3BsYXk6IGZsZXg7CiAgICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47CiAgICBhbGlnbi1pdGVtczogZmxleC1zdGFydDsKICAgIGZsZXgtd3JhcDogd3JhcDsKICAgIGdhcDogMjRweDsKICB9CiAgZm9vdGVyIC5icmFuZCBoMyB7CiAgICBmb250LWZhbWlseTogJ05ld3NyZWFkZXInLCBzZXJpZjsKICAgIGZvbnQtc2l6ZTogMThweDsKICAgIGNvbG9yOiB2YXIoLS1zYWdlLWRlZXApOwogIH0KICBmb290ZXIgLmJyYW5kIHAgewogICAgY29sb3I6IHZhcigtLXN0b25lKTsKICAgIGZvbnQtc2l6ZTogMTRweDsKICAgIG1hcmdpbi10b3A6IDZweDsKICB9CiAgZm9vdGVyIC5jb250YWN0IHsKICAgIGZvbnQtc2l6ZTogMTRweDsKICAgIGNvbG9yOiAjNEE0RDQ2OwogICAgZGlzcGxheTogZmxleDsKICAgIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47CiAgICBnYXA6IDZweDsKICB9CiAgZm9vdGVyIC5jb250YWN0IGEgeyB0ZXh0LWRlY29yYXRpb246IG5vbmU7IH0KICBmb290ZXIgLmNvbnRhY3QgYTpob3ZlciB7IGNvbG9yOiB2YXIoLS1zYWdlLWRlZXApOyB9CiAgZm9vdGVyIC5jb3B5cmlnaHQgewogICAgbWFyZ2luLXRvcDogNDBweDsKICAgIGZvbnQtc2l6ZTogMTNweDsKICAgIGNvbG9yOiB2YXIoLS1zdG9uZSk7CiAgfQoKICBAbWVkaWEgKHByZWZlcnMtcmVkdWNlZC1tb3Rpb246IHJlZHVjZSkgewogICAgaHRtbCB7IHNjcm9sbC1iZWhhdmlvcjogYXV0bzsgfQogIH0KPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KCjxhIGhyZWY9IiNtYWluIiBjbGFzcz0ic2tpcC1saW5rIj5Ta2lwIHRvIGNvbnRlbnQ8L2E+Cgo8aGVhZGVyPgogIDxkaXYgY2xhc3M9IndyYXAiPgogICAgPGEgaHJlZj0iIyIgY2xhc3M9ImxvZ28iPk1heGl6PC9hPgogICAgPG5hdiBhcmlhLWxhYmVsPSJQcmltYXJ5Ij4KICAgICAgPGEgaHJlZj0iI3NlcnZpY2VzIj5TZXJ2aWNlczwvYT4KICAgICAgPGEgaHJlZj0iI2NvbnRhY3QiPkNvbnRhY3Q8L2E+CiAgICA8L25hdj4KICAgIDxhIGhyZWY9Imh0dHBzOi8vd2EubWUvNjE0MTIzNDU2Nzg/dGV4dD1IaSUyME1heGl6JTJDJTIwSSUyN2QlMjBsaWtlJTIwdG8lMjBmaW5kJTIwb3V0JTIwbW9yZS4iIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIiBjbGFzcz0iYnRuLXdoYXRzYXBwIHNtYWxsIj4KICAgICAgPHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9ImN1cnJlbnRDb2xvciIgYXJpYS1oaWRkZW49InRydWUiPjxwYXRoIGQ9Ik0xNy41IDE0LjRjLS4zLS4xLTEuNy0uOC0yLTEtLjMtLjEtLjUtLjEtLjcuMS0uMi4zLS43IDEtLjkgMS4yLS4yLjItLjMuMi0uNi4xLS4zLS4xLTEuMy0uNS0yLjQtMS41LS45LS44LTEuNS0xLjgtMS43LTIuMS0uMi0uMyAwLS41LjEtLjYuMS0uMS4zLS4zLjQtLjUuMS0uMS4yLS4zLjMtLjQuMS0uMiAwLS40IDAtLjUgMC0uMS0uNy0xLjYtLjktMi4yLS4yLS41LS41LS41LS43LS41aC0uNmMtLjIgMC0uNS4xLS44LjQtLjMuMy0xIDEtMSAyLjRzMS4xIDIuOCAxLjIgM2MuMS4yIDIuMiAzLjMgNS4zIDQuNi43LjMgMS4zLjUgMS43LjcuNy4yIDEuNC4yIDEuOS4xLjYtLjEgMS43LS43IDItMS40LjItLjcuMi0xLjIuMS0xLjQtLjEtLjEtLjMtLjItLjYtLjN6Ii8+PHBhdGggZD0iTTEyIDJhMTAgMTAgMCAwIDAtOC42IDE1LjFMMiAyMmw1LTEuM0ExMCAxMCAwIDEgMCAxMiAyem0wIDE4LjJhOC4yIDguMiAwIDAgMS00LjItMS4ybC0uMy0uMi0zIC44LjgtMi45LS4yLS4zQTguMiA4LjIgMCAxIDEgMTIgMjAuMnoiLz48L3N2Zz4KICAgICAgTWVzc2FnZSB1cwogICAgPC9hPgogIDwvZGl2Pgo8L2hlYWRlcj4KCjxtYWluIGlkPSJtYWluIj4KCiAgPHNlY3Rpb24gY2xhc3M9Imhlcm8iPgogICAgPGRpdiBjbGFzcz0id3JhcCI+CiAgICAgIDxwIGNsYXNzPSJ0YWciPkxlc3MgaXMgbW9yZS48L3A+CiAgICAgIDxoMT5PbmUgY29uc3VsdGluZyBwYXJ0bmVyIGZvciBldmVyeXRoaW5nIHlvdXIgYnVzaW5lc3MgbmVlZHMgdG8gcnVuLjwvaDE+CiAgICAgIDxwIGNsYXNzPSJzdWIiPkFJLCB3ZWJzaXRlLCBzb2NpYWwgbWVkaWEsIGxlZ2FsLCBhbmQgYWNjb3VudGluZyDigJQgdW5kZXIgb25lIHJvb2YsIHNvIHlvdSBzcGVuZCBsZXNzIHRpbWUgbWFuYWdpbmcgcHJvdmlkZXJzIGFuZCBtb3JlIHRpbWUgcnVubmluZyB5b3VyIGJ1c2luZXNzLjwvcD4KICAgICAgPGRpdiBjbGFzcz0iaGVyby1jdGEiPgogICAgICAgIDxhIGhyZWY9Imh0dHBzOi8vd2EubWUvNjE0MTIzNDU2Nzg/dGV4dD1IaSUyME1heGl6JTJDJTIwSSUyN2QlMjBsaWtlJTIwdG8lMjBmaW5kJTIwb3V0JTIwbW9yZS4iIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIiBjbGFzcz0iYnRuLXdoYXRzYXBwIj4KICAgICAgICAgIDxzdmcgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJjdXJyZW50Q29sb3IiIGFyaWEtaGlkZGVuPSJ0cnVlIj48cGF0aCBkPSJNMTcuNSAxNC40Yy0uMy0uMS0xLjctLjgtMi0xLS4zLS4xLS41LS4xLS43LjEtLjIuMy0uNyAxLS45IDEuMi0uMi4yLS4zLjItLjYuMS0uMy0uMS0xLjMtLjUtMi40LTEuNS0uOS0uOC0xLjUtMS44LTEuNy0yLjEtLjItLjMgMC0uNS4xLS42LjEtLjEuMy0uMy40LS41LjEtLjEuMi0uMy4zLS40LjEtLjIgMC0uNCAwLS41IDAtLjEtLjctMS42LS45LTIuMi0uMi0uNS0uNS0uNS0uNy0uNWgtLjZjLS4yIDAtLjUuMS0uOC40LS4zLjMtMSAxLTEgMi40czEuMSAyLjggMS4yIDNjLjEuMiAyLjIgMy4zIDUuMyA0LjYuNy4zIDEuMy41IDEuNy43LjcuMiAxLjQuMiAxLjkuMS42LS4xIDEuNy0uNyAyLTEuNC4yLS43LjItMS4yLjEtMS40LS4xLS4xLS4zLS4yLS42LS4zeiIvPjxwYXRoIGQ9Ik0xMiAyYTEwIDEwIDAgMCAwLTguNiAxNS4xTDIgMjJsNS0xLjNBMTAgMTAgMCAxIDAgMTIgMnptMCAxOC4yYTguMiA4LjIgMCAwIDEtNC4yLTEuMmwtLjMtLjItMyAuOC44LTIuOS0uMi0uM0E4LjIgOC4yIDAgMSAxIDEyIDIwLjJ6Ii8+PC9zdmc+CiAgICAgICAgICBNZXNzYWdlIHVzIG9uIFdoYXRzQXBwCiAgICAgICAgPC9hPgogICAgICA8L2Rpdj4KICAgIDwvZGl2PgogIDwvc2VjdGlvbj4KCiAgPHNlY3Rpb24gY2xhc3M9InByb2JsZW0iPgogICAgPGRpdiBjbGFzcz0id3JhcCI+CiAgICAgIDxkaXYgY2xhc3M9InNlY3Rpb24taGVhZCI+CiAgICAgICAgPGgyPlJ1bm5pbmcgYSBzbWFsbCBidXNpbmVzcyBzaG91bGRuJ3QgbWVhbiBydW5uaW5nIGZpdmUgcmVsYXRpb25zaGlwcy48L2gyPgogICAgICA8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0icHJvc2UiPgogICAgICAgIDxwPkJldHdlZW4gbWFuYWdpbmcgQUkgdG9vbHMsIHVwZGF0aW5nIHlvdXIgd2Vic2l0ZSwgc3RheWluZyBhY3RpdmUgb24gc29jaWFsIG1lZGlhLCBjaGFzaW5nIGxlZ2FsIHBhcGVyd29yaywgYW5kIGtlZXBpbmcgdGhlIGJvb2tzIHN0cmFpZ2h0IOKAlCBtb3N0IFNNQiBvd25lcnMgZW5kIHVwIHN0cmV0Y2hlZCBhY3Jvc3MgYSBoYW5kZnVsIG9mIHByb3ZpZGVycyB3aG8gZG9uJ3QgdGFsayB0byBlYWNoIG90aGVyLjwvcD4KICAgICAgICA8cD5NYXhpeiBicmluZ3MgaXQgYWxsIHVuZGVyIG9uZSByb29mLiBMZXNzIGFkbWluLCBsZXNzIGNoYXNpbmcsIGxlc3Mgbm9pc2UuIEp1c3QgdGhlIHN1cHBvcnQgeW91IG5lZWQsIHdvcmtpbmcgdG9nZXRoZXIuPC9wPgogICAgICA8L2Rpdj4KICAgIDwvZGl2PgogIDwvc2VjdGlvbj4KCiAgPHNlY3Rpb24gaWQ9InNlcnZpY2VzIj4KICAgIDxkaXYgY2xhc3M9IndyYXAiPgogICAgICA8ZGl2IGNsYXNzPSJzZWN0aW9uLWhlYWQiPgogICAgICAgIDxoMj5TZXJ2aWNlcyBhbmQgcHJpY2luZzwvaDI+CiAgICAgICAgPHA+Rml2ZSBzZXJ2aWNlcywgb25lIHBvaW50IG9mIGNvbnRhY3QuPC9wPgogICAgICA8L2Rpdj4KICAgICAgPHAgY2xhc3M9InByaWNpbmctbm90ZSI+UHJpY2VzIHNob3duIGFyZSB0eXBpY2FsIHN0YXJ0aW5nIHJhbmdlcyBpbiBBVUQgZm9yIHN0cmFpZ2h0Zm9yd2FyZCBTTUIgcHJvamVjdHMg4oCUIGFjdHVhbCBxdW90ZXMgZGVwZW5kIG9uIHNjb3BlLiBNZXNzYWdlIHVzIGZvciBhbiBleGFjdCBwcmljZSBhbmQgdGltZWxpbmUuPC9wPgogICAgICA8ZGl2IGNsYXNzPSJzZXJ2aWNlcy1saXN0Ij4KCiAgICAgICAgPGRpdiBjbGFzcz0ic2VydmljZS1yb3ciPgogICAgICAgICAgPGgzPkFJPC9oMz4KICAgICAgICAgIDxkaXYgY2xhc3M9ImRlc2MiPgogICAgICAgICAgICA8cD5QcmFjdGljYWwgQUkgdG9vbHMgYW5kIGF1dG9tYXRpb24gdGhhdCBzYXZlIHlvdSB0aW1lLjwvcD4KICAgICAgICAgICAgPHAgY2xhc3M9Im1ldGEiPkZyb20gJDgwMCBBVUQgJm1pZGRvdDsgMSZuZGFzaDsyIHdlZWtzPC9wPgogICAgICAgICAgPC9kaXY+CiAgICAgICAgICA8YSBjbGFzcz0iYnRuLXdoYXRzYXBwIHNtYWxsIiBocmVmPSJodHRwczovL3dhLm1lLzYxNDEyMzQ1Njc4P3RleHQ9SGklMjBNYXhpeiUyQyUyMEklMjdkJTIwbGlrZSUyMHRvJTIwZW5xdWlyZSUyMGFib3V0JTIweW91ciUyMEFJJTIwc2VydmljZS4iIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIj4KICAgICAgICAgICAgPHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9ImN1cnJlbnRDb2xvciIgYXJpYS1oaWRkZW49InRydWUiPjxwYXRoIGQ9Ik0xNy41IDE0LjRjLS4zLS4xLTEuNy0uOC0yLTEtLjMtLjEtLjUtLjEtLjcuMS0uMi4zLS43IDEtLjkgMS4yLS4yLjItLjMuMi0uNi4xLS4zLS4xLTEuMy0uNS0yLjQtMS41LS45LS44LTEuNS0xLjgtMS43LTIuMS0uMi0uMyAwLS41LjEtLjYuMS0uMS4zLS4zLjQtLjUuMS0uMS4yLS4zLjMtLjQuMS0uMiAwLS40IDAtLjUgMC0uMS0uNy0xLjYtLjktMi4yLS4yLS41LS41LS41LS43LS41aC0uNmMtLjIgMC0uNS4xLS44LjQtLjMuMy0xIDEtMSAyLjRzMS4xIDIuOCAxLjIgM2MuMS4yIDIuMiAzLjMgNS4zIDQuNi43LjMgMS4zLjUgMS43LjcuNy4yIDEuNC4yIDEuOS4xLjYtLjEgMS43LS43IDItMS40LjItLjcuMi0xLjIuMS0xLjQtLjEtLjEtLjMtLjItLjYtLjN6Ii8+PHBhdGggZD0iTTEyIDJhMTAgMTAgMCAwIDAtOC42IDE1LjFMMiAyMmw1LTEuM0ExMCAxMCAwIDEgMCAxMiAyem0wIDE4LjJhOC4yIDguMiAwIDAgMS00LjItMS4ybC0uMy0uMi0zIC44LjgtMi45LS4yLS4zQTguMiA4LjIgMCAxIDEgMTIgMjAuMnoiLz48L3N2Zz4KICAgICAgICAgICAgTWVzc2FnZSB1cwogICAgICAgICAgPC9hPgogICAgICAgIDwvZGl2PgoKICAgICAgICA8ZGl2IGNsYXNzPSJzZXJ2aWNlLXJvdyI+CiAgICAgICAgICA8aDM+V2Vic2l0ZTwvaDM+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJkZXNjIj4KICAgICAgICAgICAgPHA+QSBzaXRlIHRoYXQgd29ya3MgYXMgaGFyZCBhcyB5b3UgZG8uPC9wPgogICAgICAgICAgICA8cCBjbGFzcz0ibWV0YSI+RnJvbSAkMSwyMDAgQVVEICZtaWRkb3Q7IDImbmRhc2g7NCB3ZWVrczwvcD4KICAgICAgICAgIDwvZGl2PgogICAgICAgICAgPGEgY2xhc3M9ImJ0bi13aGF0c2FwcCBzbWFsbCIgaHJlZj0iaHR0cHM6Ly93YS5tZS82MTQxMjM0NTY3OD90ZXh0PUhpJTIwTWF4aXolMkMlMjBJJTI3ZCUyMGxpa2UlMjB0byUyMGVucXVpcmUlMjBhYm91dCUyMHlvdXIlMjBXZWJzaXRlJTIwc2VydmljZS4iIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIj4KICAgICAgICAgICAgPHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9ImN1cnJlbnRDb2xvciIgYXJpYS1oaWRkZW49InRydWUiPjxwYXRoIGQ9Ik0xNy41IDE0LjRjLS4zLS4xLTEuNy0uOC0yLTEtLjMtLjEtLjUtLjEtLjcuMS0uMi4zLS43IDEtLjkgMS4yLS4yLjItLjMuMi0uNi4xLS4zLS4xLTEuMy0uNS0yLjQtMS41LS45LS44LTEuNS0xLjgtMS43LTIuMS0uMi0uMyAwLS41LjEtLjYuMS0uMS4zLS4zLjQtLjUuMS0uMS4yLS4zLjMtLjQuMS0uMiAwLS40IDAtLjUgMC0uMS0uNy0xLjYtLjktMi4yLS4yLS41LS41LS41LS43LS41aC0uNmMtLjIgMC0uNS4xLS44LjQtLjMuMy0xIDEtMSAyLjRzMS4xIDIuOCAxLjIgM2MuMS4yIDIuMiAzLjMgNS4zIDQuNi43LjMgMS4zLjUgMS43LjcuNy4yIDEuNC4yIDEuOS4xLjYtLjEgMS43LS43IDItMS40LjItLjcuMi0xLjIuMS0xLjQtLjEtLjEtLjMtLjItLjYtLjN6Ii8+PHBhdGggZD0iTTEyIDJhMTAgMTAgMCAwIDAtOC42IDE1LjFMMiAyMmw1LTEuM0ExMCAxMCAwIDEgMCAxMiAyem0wIDE4LjJhOC4yIDguMiAwIDAgMS00LjItMS4ybC0uMy0uMi0zIC44LjgtMi45LS4yLS4zQTguMiA4LjIgMCAxIDEgMTIgMjAuMnoiLz48L3N2Zz4KICAgICAgICAgICAgTWVzc2FnZSB1cwogICAgICAgICAgPC9hPgogICAgICAgIDwvZGl2PgoKICAgICAgICA8ZGl2IGNsYXNzPSJzZXJ2aWNlLXJvdyI+CiAgICAgICAgICA8aDM+U29jaWFsIG1lZGlhPC9oMz4KICAgICAgICAgIDxkaXYgY2xhc3M9ImRlc2MiPgogICAgICAgICAgICA8cD5Db25zaXN0ZW50LCBvbi1icmFuZCBjb250ZW50IHRoYXQga2VlcHMgeW91IHZpc2libGUuPC9wPgogICAgICAgICAgICA8cCBjbGFzcz0ibWV0YSI+RnJvbSAkNDAwIEFVRC9tbyAmbWlkZG90OyBPbmdvaW5nPC9wPgogICAgICAgICAgPC9kaXY+CiAgICAgICAgICA8YSBjbGFzcz0iYnRuLXdoYXRzYXBwIHNtYWxsIiBocmVmPSJodHRwczovL3dhLm1lLzYxNDEyMzQ1Njc4P3RleHQ9SGklMjBNYXhpeiUyQyUyMEklMjdkJTIwbGlrZSUyMHRvJTIwZW5xdWlyZSUyMGFib3V0JTIweW91ciUyMFNvY2lhbCUyMG1lZGlhJTIwc2VydmljZS4iIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIj4KICAgICAgICAgICAgPHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9ImN1cnJlbnRDb2xvciIgYXJpYS1oaWRkZW49InRydWUiPjxwYXRoIGQ9Ik0xNy41IDE0LjRjLS4zLS4xLTEuNy0uOC0yLTEtLjMtLjEtLjUtLjEtLjcuMS0uMi4zLS43IDEtLjkgMS4yLS4yLjItLjMuMi0uNi4xLS4zLS4xLTEuMy0uNS0yLjQtMS41LS45LS44LTEuNS0xLjgtMS43LTIuMS0uMi0uMyAwLS41LjEtLjYuMS0uMS4zLS4zLjQtLjUuMS0uMS4yLS4zLjMtLjQuMS0uMiAwLS40IDAtLjUgMC0uMS0uNy0xLjYtLjktMi4yLS4yLS41LS41LS41LS43LS41aC0uNmMtLjIgMC0uNS4xLS44LjQtLjMuMy0xIDEtMSAyLjRzMS4xIDIuOCAxLjIgM2MuMS4yIDIuMiAzLjMgNS4zIDQuNi43LjMgMS4zLjUgMS43LjcuNy4yIDEuNC4yIDEuOS4xLjYtLjEgMS43LS43IDItMS40LjItLjcuMi0xLjIuMS0xLjQtLjEtLjEtLjMtLjItLjYtLjN6Ii8+PHBhdGggZD0iTTEyIDJhMTAgMTAgMCAwIDAtOC42IDE1LjFMMiAyMmw1LTEuM0ExMCAxMCAwIDEgMCAxMiAyem0wIDE4LjJhOC4yIDguMiAwIDAgMS00LjItMS4ybC0uMy0uMi0zIC44LjgtMi45LS4yLS4zQTguMiA4LjIgMCAxIDEgMTIgMjAuMnoiLz48L3N2Zz4KICAgICAgICAgICAgTWVzc2FnZSB1cwogICAgICAgICAgPC9hPgogICAgICAgIDwvZGl2PgoKICAgICAgICA8ZGl2IGNsYXNzPSJzZXJ2aWNlLXJvdyI+CiAgICAgICAgICA8aDM+TGVnYWw8L2gzPgogICAgICAgICAgPGRpdiBjbGFzcz0iZGVzYyI+CiAgICAgICAgICAgIDxwPkNvbnRyYWN0cywgY29tcGxpYW5jZSwgYW5kIHRoZSBwYXBlcndvcmsgdGhhdCBwcm90ZWN0cyB5b3VyIGJ1c2luZXNzLjwvcD4KICAgICAgICAgICAgPHAgY2xhc3M9Im1ldGEiPkZyb20gJDM1MCBBVUQgJm1pZGRvdDsgMyZuZGFzaDs1IGRheXM8L3A+CiAgICAgICAgICA8L2Rpdj4KICAgICAgICAgIDxhIGNsYXNzPSJidG4td2hhdHNhcHAgc21hbGwiIGhyZWY9Imh0dHBzOi8vd2EubWUvNjE0MTIzNDU2Nzg/dGV4dD1IaSUyME1heGl6JTJDJTIwSSUyN2QlMjBsaWtlJTIwdG8lMjBlbnF1aXJlJTIwYWJvdXQlMjB5b3VyJTIwTGVnYWwlMjBzZXJ2aWNlLiIgdGFyZ2V0PSJfYmxhbmsiIHJlbD0ibm9vcGVuZXIiPgogICAgICAgICAgICA8c3ZnIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iY3VycmVudENvbG9yIiBhcmlhLWhpZGRlbj0idHJ1ZSI+PHBhdGggZD0iTTE3LjUgMTQuNGMtLjMtLjEtMS43LS44LTItMS0uMy0uMS0uNS0uMS0uNy4xLS4yLjMtLjcgMS0uOSAxLjItLjIuMi0uMy4yLS42LjEtLjMtLjEtMS4zLS41LTIuNC0xLjUtLjktLjgtMS41LTEuOC0xLjctMi4xLS4yLS4zIDAtLjUuMS0uNi4xLS4xLjMtLjMuNC0uNS4xLS4xLjItLjMuMy0uNC4xLS4yIDAtLjQgMC0uNSAwLS4xLS43LTEuNi0uOS0yLjItLjItLjUtLjUtLjUtLjctLjVoLS42Yy0uMiAwLS41LjEtLjguNC0uMy4zLTEgMS0xIDIuNHMxLjEgMi44IDEuMiAzYy4xLjIgMi4yIDMuMyA1LjMgNC42LjcuMyAxLjMuNSAxLjcuNy43LjIgMS40LjIgMS45LjEuNi0uMSAxLjctLjcgMi0xLjQuMi0uNy4yLTEuMi4xLTEuNC0uMS0uMS0uMy0uMi0uNi0uM3oiLz48cGF0aCBkPSJNMTIgMmExMCAxMCAwIDAgMC04LjYgMTUuMUwyIDIybDUtMS4zQTEwIDEwIDAgMSAwIDEyIDJ6bTAgMTguMmE4LjIgOC4yIDAgMCAxLTQuMi0xLjJsLS4zLS4yLTMgLjguOC0yLjktLjItLjNBOC4yIDguMiAwIDEgMSAxMiAyMC4yeiIvPjwvc3ZnPgogICAgICAgICAgICBNZXNzYWdlIHVzCiAgICAgICAgICA8L2E+CiAgICAgICAgPC9kaXY+CgogICAgICAgIDxkaXYgY2xhc3M9InNlcnZpY2Utcm93Ij4KICAgICAgICAgIDxoMz5BY2NvdW50aW5nPC9oMz4KICAgICAgICAgIDxkaXYgY2xhc3M9ImRlc2MiPgogICAgICAgICAgICA8cD5Cb29ra2VlcGluZywgcmVwb3J0aW5nLCBhbmQgZmluYW5jaWFsIGNsYXJpdHkgeW91IGNhbiBhY3R1YWxseSB1bmRlcnN0YW5kLjwvcD4KICAgICAgICAgICAgPHAgY2xhc3M9Im1ldGEiPkZyb20gJDI1MCBBVUQvbW8gJm1pZGRvdDsgT25nb2luZzwvcD4KICAgICAgICAgIDwvZGl2PgogICAgICAgICAgPGEgY2xhc3M9ImJ0bi13aGF0c2FwcCBzbWFsbCIgaHJlZj0iaHR0cHM6Ly93YS5tZS82MTQxMjM0NTY3OD90ZXh0PUhpJTIwTWF4aXolMkMlMjBJJTI3ZCUyMGxpa2UlMjB0byUyMGVucXVpcmUlMjBhYm91dCUyMHlvdXIlMjBBY2NvdW50aW5nJTIwc2VydmljZS4iIHRhcmdldD0iX2JsYW5rIiByZWw9Im5vb3BlbmVyIj4KICAgICAgICAgICAgPHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9ImN1cnJlbnRDb2xvciIgYXJpYS1oaWRkZW49InRydWUiPjxwYXRoIGQ9Ik0xNy41IDE0LjRjLS4zLS4xLTEuNy0uOC0yLTEtLjMtLjEtLjUtLjEtLjcuMS0uMi4zLS43IDEtLjkgMS4yLS4yLjItLjMuMi0uNi4xLS4zLS4xLTEuMy0uNS0yLjQtMS41LS45LS44LTEuNS0xLjgtMS43LTIuMS0uMi0uMyAwLS41LjEtLjYuMS0uMS4zLS4zLjQtLjUuMS0uMS4yLS4zLjMtLjQuMS0uMiAwLS40IDAtLjUgMC0uMS0uNy0xLjYtLjktMi4yLS4yLS41LS41LS41LS43LS41aC0uNmMtLjIgMC0uNS4xLS44LjQtLjMuMy0xIDEtMSAyLjRzMS4xIDIuOCAxLjIgM2MuMS4yIDIuMiAzLjMgNS4zIDQuNi43LjMgMS4zLjUgMS43LjcuNy4yIDEuNC4yIDEuOS4xLjYtLjEgMS43LS43IDItMS40LjItLjcuMi0xLjIuMS0xLjQtLjEtLjEtLjMtLjItLjYtLjN6Ii8+PHBhdGggZD0iTTEyIDJhMTAgMTAgMCAwIDAtOC42IDE1LjFMMiAyMmw1LTEuM0ExMCAxMCAwIDEgMCAxMiAyem0wIDE4LjJhOC4yIDguMiAwIDAgMS00LjItMS4ybC0uMy0uMi0zIC44LjgtMi45LS4yLS4zQTguMiA4LjIgMCAxIDEgMTIgMjAuMnoiLz48L3N2Zz4KICAgICAgICAgICAgTWVzc2FnZSB1cwogICAgICAgICAgPC9hPgogICAgICAgIDwvZGl2PgoKICAgICAgPC9kaXY+CiAgICA8L2Rpdj4KICA8L3NlY3Rpb24+CgogIDxzZWN0aW9uIGNsYXNzPSJmaW5hbC1jdGEiIGlkPSJjb250YWN0Ij4KICAgIDxkaXYgY2xhc3M9IndyYXAiPgogICAgICA8aDI+UmVhZHkgdG8gc2ltcGxpZnkgaG93IHlvdXIgYnVzaW5lc3MgcnVucz88L2gyPgogICAgICA8cD5NZXNzYWdlIHVzIG9uIFdoYXRzQXBwIGFuZCB3ZSdsbCBzaG93IHlvdSB3aGVyZSBNYXhpeiBjYW4gdGFrZSB0aGUgbG9hZCBvZmYuPC9wPgogICAgICA8ZGl2IGNsYXNzPSJoZXJvLWN0YSI+CiAgICAgICAgPGEgaHJlZj0iaHR0cHM6Ly93YS5tZS82MTQxMjM0NTY3OD90ZXh0PUhpJTIwTWF4aXolMkMlMjBJJTI3ZCUyMGxpa2UlMjB0byUyMGJvb2slMjBhJTIwZnJlZSUyMGNvbnN1bHQuIiB0YXJnZXQ9Il9ibGFuayIgcmVsPSJub29wZW5lciIgY2xhc3M9ImJ0bi13aGF0c2FwcCI+CiAgICAgICAgICA8c3ZnIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iY3VycmVudENvbG9yIiBhcmlhLWhpZGRlbj0idHJ1ZSI+PHBhdGggZD0iTTE3LjUgMTQuNGMtLjMtLjEtMS43LS44LTItMS0uMy0uMS0uNS0uMS0uNy4xLS4yLjMtLjcgMS0uOSAxLjItLjIuMi0uMy4yLS42LjEtLjMtLjEtMS4zLS41LTIuNC0xLjUtLjktLjgtMS41LTEuOC0xLjctMi4xLS4yLS4zIDAtLjUuMS0uNi4xLS4xLjMtLjMuNC0uNS4xLS4xLjItLjMuMy0uNC4xLS4yIDAtLjQgMC0uNSAwLS4xLS43LTEuNi0uOS0yLjItLjItLjUtLjUtLjUtLjctLjVoLS42Yy0uMiAwLS41LjEtLjguNC0uMy4zLTEgMS0xIDIuNHMxLjEgMi44IDEuMiAzYy4xLjIgMi4yIDMuMyA1LjMgNC42LjcuMyAxLjMuNSAxLjcuNy43LjIgMS40LjIgMS45LjEuNi0uMSAxLjctLjcgMi0xLjQuMi0uNy4yLTEuMi4xLTEuNC0uMS0uMS0uMy0uMi0uNi0uM3oiLz48cGF0aCBkPSJNMTIgMmExMCAxMCAwIDAgMC04LjYgMTUuMUwyIDIybDUtMS4zQTEwIDEwIDAgMSAwIDEyIDJ6bTAgMTguMmE4LjIgOC4yIDAgMCAxLTQuMi0xLjJsLS4zLS4yLTMgLjguOC0yLjktLjItLjNBOC4yIDguMiAwIDEgMSAxMiAyMC4yeiIvPjwvc3ZnPgogICAgICAgICAgTWVzc2FnZSB1cyBvbiBXaGF0c0FwcAogICAgICAgIDwvYT4KICAgICAgPC9kaXY+CiAgICA8L2Rpdj4KICA8L3NlY3Rpb24+Cgo8L21haW4+Cgo8Zm9vdGVyPgogIDxkaXYgY2xhc3M9IndyYXAiPgogICAgPGRpdiBjbGFzcz0iYnJhbmQiPgogICAgICA8aDM+TWF4aXo8L2gzPgogICAgICA8cD5MZXNzIGlzIG1vcmUuPGJyPldlc3Rlcm4gU3lkbmV5LCBOU1c8L3A+CiAgICA8L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImNvbnRhY3QiPgogICAgICA8YSBocmVmPSJ0ZWw6KzYxNDEyMzQ1Njc4Ij4wNDEyIDM0NSA2Nzg8L2E+CiAgICAgIDxhIGhyZWY9Im1haWx0bzpoZWxsb0BtYXhpei5jb20uYXUiPmhlbGxvQG1heGl6LmNvbS5hdTwvYT4KICAgICAgPGEgaHJlZj0iaHR0cHM6Ly93d3cubWF4aXouY29tLmF1Ij53d3cubWF4aXouY29tLmF1PC9hPgogICAgPC9kaXY+CiAgPC9kaXY+CiAgPGRpdiBjbGFzcz0id3JhcCI+CiAgICA8cCBjbGFzcz0iY29weXJpZ2h0Ij4mY29weTsgMjAyNiBNYXhpei4gQWxsIHJpZ2h0cyByZXNlcnZlZC48L3A+CiAgPC9kaXY+CjwvZm9vdGVyPgoKPC9ib2R5Pgo8L2h0bWw+Cg==" download="index.html">Download index.html</a>
+    </div>
+
+    <div class="note edit" style="margin-top:24px;">
+      <strong>To fill in real details:</strong> open <code>index.html</code> in any text editor and find-and-replace these placeholder strings — each appears multiple times (once per WhatsApp button, and again in the footer):
+      <ul style="margin-top:10px;">
+        <li><code>61412345678</code> — WhatsApp number (used in every <code>wa.me</code> link, digits only, country code first, no plus sign or spaces)</li>
+        <li><code>0412 345 678</code> — displayed phone number (footer)</li>
+        <li><code>hello@maxiz.com.au</code> / <code>jane@maxiz.com.au</code> — email addresses</li>
+        <li><code>www.maxiz.com.au</code> — website domain</li>
+        <li>The five price/duration lines in the services section (search for <code>AUD</code>)</li>
+      </ul>
+    </div>
+
+    <h3 style="margin-top:30px;">Source (reference copy)</h3>
+    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Maxiz — Less is more&lt;/title&gt;
+&lt;meta name=&quot;description&quot; content=&quot;One consulting partner for AI, website, social media, legal, and accounting support — built for small and medium businesses in Western Sydney.&quot;&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;family=Inter:wght@400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root {
+    --ink: #1E211D;
+    --paper: #F7F6F2;
+    --sage: #4B6357;
+    --sage-deep: #33453B;
+    --stone: #8B8779;
+    --line: #DAD7CD;
+    --max: 760px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: &#x27;Inter&#x27;, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: &#x27;Newsreader&#x27;, Georgia, serif;
+    font-weight: 500;
+    line-height: 1.15;
+    margin: 0;
+    color: var(--sage-deep);
+  }
+
+  p { margin: 0; }
+
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  .prose { max-width: var(--max); }
+
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: 0;
+    background: var(--sage-deep);
+    color: var(--paper);
+    padding: 10px 16px;
+    z-index: 100;
+  }
+  .skip-link:focus { left: 16px; top: 16px; }
+
+  :focus-visible {
+    outline: 2px solid var(--sage);
+    outline-offset: 3px;
+  }
+
+  /* Header */
+  header {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  header .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .logo {
+    font-family: &#x27;Newsreader&#x27;, serif;
+    font-size: 21px;
+    font-weight: 500;
+    color: var(--sage-deep);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  nav { display: flex; gap: 28px; }
+  nav a {
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 15px;
+  }
+  nav a:hover { color: var(--sage-deep); }
+
+  @media (max-width: 640px) {
+    nav { display: none; }
+  }
+
+  /* Shared buttons — one CTA verb, used everywhere */
+  .btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--sage-deep);
+    color: var(--paper);
+    text-decoration: none;
+    padding: 14px 26px;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .btn-whatsapp:hover { background: var(--sage); }
+  .btn-whatsapp svg { width: 17px; height: 17px; flex-shrink: 0; }
+  .btn-whatsapp.small {
+    padding: 9px 16px;
+    font-size: 13.5px;
+    border-radius: 4px;
+  }
+  .btn-whatsapp.small svg { width: 15px; height: 15px; }
+
+  /* Hero */
+  .hero {
+    padding: 110px 0 100px;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero .tag {
+    color: var(--stone);
+    font-size: 15px;
+    margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-size: clamp(38px, 6vw, 60px);
+    max-width: 12ch;
+  }
+  .hero .sub {
+    max-width: 46ch;
+    margin-top: 26px;
+    font-size: 19px;
+    color: #4A4D46;
+  }
+  .hero-cta {
+    margin-top: 40px;
+  }
+
+  /* Section shared */
+  section { padding: 88px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+  .section-head {
+    max-width: 56ch;
+    margin-bottom: 48px;
+  }
+  .section-head h2 {
+    font-size: clamp(28px, 4vw, 36px);
+  }
+  .section-head p {
+    margin-top: 14px;
+    color: #4A4D46;
+    font-size: 17px;
+  }
+
+  /* Problem section */
+  .problem p {
+    font-size: 19px;
+    color: #33362F;
+  }
+  .problem p + p { margin-top: 20px; }
+
+  /* Services — bordered rows */
+  .pricing-note {
+    font-size: 13.5px;
+    color: var(--stone);
+    margin-bottom: 28px;
+    max-width: 62ch;
+  }
+  .services-list {
+    border-top: 1px solid var(--line);
+  }
+  .service-row {
+    display: grid;
+    grid-template-columns: 160px 1fr auto;
+    gap: 24px;
+    padding: 26px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+  .service-row h3 {
+    font-size: 20px;
+    color: var(--ink);
+  }
+  .service-row .desc p {
+    color: #4A4D46;
+    font-size: 15px;
+    max-width: 44ch;
+  }
+  .service-row .desc .meta {
+    color: var(--stone);
+    font-size: 13px;
+    margin-top: 6px;
+  }
+  @media (max-width: 700px) {
+    .service-row { grid-template-columns: 1fr; gap: 10px; text-align: left; }
+  }
+
+  /* Final CTA */
+  .final-cta {
+    background: var(--sage-deep);
+    color: var(--paper);
+    border-bottom: none;
+    text-align: center;
+  }
+  .final-cta h2 { color: var(--paper); max-width: 20ch; margin: 0 auto; }
+  .final-cta p { color: #D9E2DC; margin-top: 16px; max-width: 46ch; font-size: 18px; margin-left: auto; margin-right: auto; }
+  .final-cta .hero-cta { margin-top: 36px; display: flex; justify-content: center; }
+  .final-cta .btn-whatsapp { background: var(--paper); color: var(--sage-deep); }
+  .final-cta .btn-whatsapp:hover { background: #E9E6DD; }
+
+  /* Footer */
+  footer {
+    padding: 48px 0;
+  }
+  footer .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  footer .brand h3 {
+    font-family: &#x27;Newsreader&#x27;, serif;
+    font-size: 18px;
+    color: var(--sage-deep);
+  }
+  footer .brand p {
+    color: var(--stone);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+  footer .contact {
+    font-size: 14px;
+    color: #4A4D46;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  footer .contact a { text-decoration: none; }
+  footer .contact a:hover { color: var(--sage-deep); }
+  footer .copyright {
+    margin-top: 40px;
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;a href=&quot;#main&quot; class=&quot;skip-link&quot;&gt;Skip to content&lt;/a&gt;
+
+&lt;header&gt;
+  &lt;div class=&quot;wrap&quot;&gt;
+    &lt;a href=&quot;#&quot; class=&quot;logo&quot;&gt;Maxiz&lt;/a&gt;
+    &lt;nav aria-label=&quot;Primary&quot;&gt;
+      &lt;a href=&quot;#services&quot;&gt;Services&lt;/a&gt;
+      &lt;a href=&quot;#contact&quot;&gt;Contact&lt;/a&gt;
+    &lt;/nav&gt;
+    &lt;a href=&quot;https://wa.me/61412345678?text=Hi%20Maxiz%2C%20I%27d%20like%20to%20find%20out%20more.&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; class=&quot;btn-whatsapp small&quot;&gt;
+      &lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;currentColor&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.7.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.6-.3z&quot;/&gt;&lt;path d=&quot;M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z&quot;/&gt;&lt;/svg&gt;
+      Message us
+    &lt;/a&gt;
+  &lt;/div&gt;
+&lt;/header&gt;
+
+&lt;main id=&quot;main&quot;&gt;
+
+  &lt;section class=&quot;hero&quot;&gt;
+    &lt;div class=&quot;wrap&quot;&gt;
+      &lt;p class=&quot;tag&quot;&gt;Less is more.&lt;/p&gt;
+      &lt;h1&gt;One consulting partner for everything your business needs to run.&lt;/h1&gt;
+      &lt;p class=&quot;sub&quot;&gt;AI, website, social media, legal, and accounting — under one roof, so you spend less time managing providers and more time running your business.&lt;/p&gt;
+      &lt;div class=&quot;hero-cta&quot;&gt;
+        &lt;a href=&quot;https://wa.me/61412345678?text=Hi%20Maxiz%2C%20I%27d%20like%20to%20find%20out%20more.&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; class=&quot;btn-whatsapp&quot;&gt;
+          &lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;currentColor&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.7.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.6-.3z&quot;/&gt;&lt;path d=&quot;M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z&quot;/&gt;&lt;/svg&gt;
+          Message us on WhatsApp
+        &lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;problem&quot;&gt;
+    &lt;div class=&quot;wrap&quot;&gt;
+      &lt;div class=&quot;section-head&quot;&gt;
+        &lt;h2&gt;Running a small business shouldn&#x27;t mean running five relationships.&lt;/h2&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;prose&quot;&gt;
+        &lt;p&gt;Between managing AI tools, updating your website, staying active on social media, chasing legal paperwork, and keeping the books straight — most SMB owners end up stretched across a handful of providers who don&#x27;t talk to each other.&lt;/p&gt;
+        &lt;p&gt;Maxiz brings it all under one roof. Less admin, less chasing, less noise. Just the support you need, working together.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section id=&quot;services&quot;&gt;
+    &lt;div class=&quot;wrap&quot;&gt;
+      &lt;div class=&quot;section-head&quot;&gt;
+        &lt;h2&gt;Services and pricing&lt;/h2&gt;
+        &lt;p&gt;Five services, one point of contact.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;p class=&quot;pricing-note&quot;&gt;Prices shown are typical starting ranges in AUD for straightforward SMB projects — actual quotes depend on scope. Message us for an exact price and timeline.&lt;/p&gt;
+      &lt;div class=&quot;services-list&quot;&gt;
+
+        &lt;div class=&quot;service-row&quot;&gt;
+          &lt;h3&gt;AI&lt;/h3&gt;
+          &lt;div class=&quot;desc&quot;&gt;
+            &lt;p&gt;Practical AI tools and automation that save you time.&lt;/p&gt;
+            &lt;p class=&quot;meta&quot;&gt;From $800 AUD &amp;middot; 1&amp;ndash;2 weeks&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;a class=&quot;btn-whatsapp small&quot; href=&quot;https://wa.me/61412345678?text=Hi%20Maxiz%2C%20I%27d%20like%20to%20enquire%20about%20your%20AI%20service.&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
+            &lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;currentColor&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.7.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.6-.3z&quot;/&gt;&lt;path d=&quot;M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z&quot;/&gt;&lt;/svg&gt;
+            Message us
+          &lt;/a&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;service-row&quot;&gt;
+          &lt;h3&gt;Website&lt;/h3&gt;
+          &lt;div class=&quot;desc&quot;&gt;
+            &lt;p&gt;A site that works as hard as you do.&lt;/p&gt;
+            &lt;p class=&quot;meta&quot;&gt;From $1,200 AUD &amp;middot; 2&amp;ndash;4 weeks&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;a class=&quot;btn-whatsapp small&quot; href=&quot;https://wa.me/61412345678?text=Hi%20Maxiz%2C%20I%27d%20like%20to%20enquire%20about%20your%20Website%20service.&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
+            &lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;currentColor&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.7.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.6-.3z&quot;/&gt;&lt;path d=&quot;M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z&quot;/&gt;&lt;/svg&gt;
+            Message us
+          &lt;/a&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;service-row&quot;&gt;
+          &lt;h3&gt;Social media&lt;/h3&gt;
+          &lt;div class=&quot;desc&quot;&gt;
+            &lt;p&gt;Consistent, on-brand content that keeps you visible.&lt;/p&gt;
+            &lt;p class=&quot;meta&quot;&gt;From $400 AUD/mo &amp;middot; Ongoing&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;a class=&quot;btn-whatsapp small&quot; href=&quot;https://wa.me/61412345678?text=Hi%20Maxiz%2C%20I%27d%20like%20to%20enquire%20about%20your%20Social%20media%20service.&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
+            &lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;currentColor&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.7.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.6-.3z&quot;/&gt;&lt;path d=&quot;M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z&quot;/&gt;&lt;/svg&gt;
+            Message us
+          &lt;/a&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;service-row&quot;&gt;
+          &lt;h3&gt;Legal&lt;/h3&gt;
+          &lt;div class=&quot;desc&quot;&gt;
+            &lt;p&gt;Contracts, compliance, and the paperwork that protects your business.&lt;/p&gt;
+            &lt;p class=&quot;meta&quot;&gt;From $350 AUD &amp;middot; 3&amp;ndash;5 days&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;a class=&quot;btn-whatsapp small&quot; href=&quot;https://wa.me/61412345678?text=Hi%20Maxiz%2C%20I%27d%20like%20to%20enquire%20about%20your%20Legal%20service.&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
+            &lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;currentColor&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.7.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.6-.3z&quot;/&gt;&lt;path d=&quot;M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z&quot;/&gt;&lt;/svg&gt;
+            Message us
+          &lt;/a&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;service-row&quot;&gt;
+          &lt;h3&gt;Accounting&lt;/h3&gt;
+          &lt;div class=&quot;desc&quot;&gt;
+            &lt;p&gt;Bookkeeping, reporting, and financial clarity you can actually understand.&lt;/p&gt;
+            &lt;p class=&quot;meta&quot;&gt;From $250 AUD/mo &amp;middot; Ongoing&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;a class=&quot;btn-whatsapp small&quot; href=&quot;https://wa.me/61412345678?text=Hi%20Maxiz%2C%20I%27d%20like%20to%20enquire%20about%20your%20Accounting%20service.&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
+            &lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;currentColor&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.7.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.6-.3z&quot;/&gt;&lt;path d=&quot;M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z&quot;/&gt;&lt;/svg&gt;
+            Message us
+          &lt;/a&gt;
+        &lt;/div&gt;
+
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;final-cta&quot; id=&quot;contact&quot;&gt;
+    &lt;div class=&quot;wrap&quot;&gt;
+      &lt;h2&gt;Ready to simplify how your business runs?&lt;/h2&gt;
+      &lt;p&gt;Message us on WhatsApp and we&#x27;ll show you where Maxiz can take the load off.&lt;/p&gt;
+      &lt;div class=&quot;hero-cta&quot;&gt;
+        &lt;a href=&quot;https://wa.me/61412345678?text=Hi%20Maxiz%2C%20I%27d%20like%20to%20book%20a%20free%20consult.&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; class=&quot;btn-whatsapp&quot;&gt;
+          &lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;currentColor&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.7.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.6-.3z&quot;/&gt;&lt;path d=&quot;M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z&quot;/&gt;&lt;/svg&gt;
+          Message us on WhatsApp
+        &lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+&lt;/main&gt;
+
+&lt;footer&gt;
+  &lt;div class=&quot;wrap&quot;&gt;
+    &lt;div class=&quot;brand&quot;&gt;
+      &lt;h3&gt;Maxiz&lt;/h3&gt;
+      &lt;p&gt;Less is more.&lt;br&gt;Western Sydney, NSW&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;contact&quot;&gt;
+      &lt;a href=&quot;tel:+61412345678&quot;&gt;0412 345 678&lt;/a&gt;
+      &lt;a href=&quot;mailto:hello@maxiz.com.au&quot;&gt;hello@maxiz.com.au&lt;/a&gt;
+      &lt;a href=&quot;https://www.maxiz.com.au&quot;&gt;www.maxiz.com.au&lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;wrap&quot;&gt;
+    &lt;p class=&quot;copyright&quot;&gt;&amp;copy; 2026 Maxiz. All rights reserved.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/footer&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+  </div>
+</section>
+
+<section id="social">
+  <div class="wrap">
+    <h2>Social &amp; messaging kit</h2>
+    <p class="section-sub">Post copy for WhatsApp, Instagram/Facebook, and LinkedIn, plus a square post visual</p>
+
+    <div class="mock-row" style="margin-bottom:30px;">
+      <div class="social-post">
+        <div style="font-family:'Newsreader',serif; font-size:20px; font-weight:500; color:var(--sage-deep);">Maxiz</div>
+        <div style="font-size:11px; color:var(--stone); font-style:italic; margin-top:-6px;">less is more</div>
+        <div class="headline">One partner.<br>Every essential.</div>
+        <div class="sub">Business consulting for SMBs in Western Sydney</div>
+        <div class="services">AI &middot; Website &middot; Social &middot; Legal &middot; Accounting</div>
+      </div>
+    </div>
+
+    <div class="copy-block">
+      <div class="platform">whatsapp — broadcast / status</div>
+      <p>Running your business shouldn't mean juggling 5 different providers.
+Maxiz brings AI, website, social media, legal, and accounting support together — one team, one point of contact.
+Less admin. Less chasing. Less is more.
+hello@maxiz.com.au | 0412 345 678</p>
+    </div>
+
+    <div class="copy-block">
+      <div class="platform">instagram / facebook — caption</div>
+      <p>One partner. Every essential.
+AI &middot; Website &middot; Social &middot; Legal &middot; Accounting — all under one roof, built for Western Sydney SMBs.
+Stop managing five vendors. Start working with one team that gets it.
+Message us on WhatsApp — link in bio.
+#WesternSydney #SmallBusiness #BusinessConsulting #LessIsMore</p>
+    </div>
+
+    <div class="copy-block">
+      <div class="platform">linkedin — post</div>
+      <p>Most SMB owners we talk to are stretched across five different providers — an AI tool here, a web developer there, an accountant who never returns calls.
+None of them talk to each other. All of them eat your time.
+Maxiz was built to fix that: one consulting partner covering AI, website, social media, legal, and accounting — so you get clarity instead of chaos.
+If that sounds familiar, let's talk.</p>
+    </div>
+
+    <div class="copy-block">
+      <div class="platform">follow-up message</div>
+      <p>Quick one — still juggling 5 providers for your business support? Maxiz does AI, web, social, legal and accounting under one roof. Happy to walk you through it, no pressure.</p>
+    </div>
+
+    <div class="note">The square post above is SVG-based; export it as a PNG at 1080x1080px before uploading, since Instagram, Facebook, and WhatsApp don't accept SVG uploads directly.</div>
+  </div>
+</section>
+
+<section id="handoff">
+  <div class="wrap">
+    <h2>Handoff notes</h2>
+    <p class="section-sub">For the designer or developer picking this up</p>
+    <div class="card">
+      <h3>Before anything goes live</h3>
+      <ul class="checklist">
+        <li>Replace all placeholder contact details: "Jane Smith", "0412 345 678", "hello@maxiz.com.au" / "jane@maxiz.com.au", "www.maxiz.com.au", and the WhatsApp number "61412345678" embedded in every <code>wa.me</code> link</li>
+        <li>Confirm real business address if one should appear (currently just "Western Sydney, NSW")</li>
+        <li>Confirm real pricing for each of the five services — current figures are placeholder starting ranges</li>
+        <li>Export the logo and social post SVGs to PNG for platforms that don't accept SVG uploads</li>
+        <li>Set up print-ready files (CMYK, bleed, safe zone) for the business card and flyer before sending to a printer</li>
+        <li>Register a domain and connect it to the GitHub Pages deployment (or chosen host) if a custom domain is wanted</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Files included in this package</h3>
+      <ul>
+        <li>This document — full brand brief, specs, and copy, editable directly in a text editor</li>
+        <li><code>maxiz-logo.svg</code> — downloadable from the logo section above</li>
+        <li><code>index.html</code> — the full website, downloadable from the website section above, or copy the source block directly</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Maxiz brand &amp; launch package — prepared as a single reference file for design and development handoff.
+</footer>
+
+</body>
+</html>
