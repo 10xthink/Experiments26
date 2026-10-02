@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From idea to exit: what a small business needs and costs</title>
+<style>
+:root{
+  --bg:#f6f7f5; --ink:#1e2926; --muted:#66746f; --line:#e1e6e3;
+  --accent:#4a7c6d; --accent-dark:#2f5a4d; --accent-soft:#e6efeb;
+  --d:#4a7c6d; --e:#b98413; --o:#1e2926;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:"Avenir Next","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+main{max-width:700px;margin:0 auto;padding:48px 20px 48px}
+h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.2;margin:0 0 12px}
+h1{font-size:clamp(1.9rem,6.5vw,2.6rem)}
+h2{font-size:1.5rem}
+h3{font-size:1.15rem}
+p{margin:0 0 12px}
+a{color:var(--accent-dark)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.muted{color:var(--muted)} .small{font-size:.88rem} .fine{font-size:.82rem;color:var(--muted)}
+.primary{display:inline-block;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:14px 26px;font-weight:600;text-decoration:none}
+.primary:hover{background:var(--accent-dark)}
+.secondary{background:transparent;border:2px solid var(--accent);color:var(--accent-dark);border-radius:999px;padding:10px 20px;font-weight:600}
+.quiet{background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:6px 0;font-size:.9rem}
+.quiet:hover{color:var(--ink)}
+.actions{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+
+/* about you */
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin:22px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.f label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
+.f select,.f input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.f select:focus,.f input:focus{border-color:var(--accent);outline:0}
+
+/* summary */
+.big2{font-family:var(--serif);font-size:clamp(2rem,8vw,2.9rem);line-height:1.1;margin:4px 0 6px}
+.s3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px}
+.s3>div{background:var(--accent-soft);border-radius:14px;padding:12px 14px}
+.s3 b{display:block;font-family:var(--serif);font-weight:400;font-size:1.3rem;line-height:1.25}
+.s3 span{font-size:.82rem;color:var(--muted);line-height:1.3;display:block}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:.82rem;font-weight:600;padding:2px 11px 2px 9px;border-radius:99px;border:1.5px solid currentColor;white-space:nowrap}
+.chip i{width:9px;height:9px;border-radius:50%;background:currentColor;display:inline-block}
+.c-d{color:var(--d)} .c-e{color:var(--e)} .c-o{color:var(--o)}
+.splitrow{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.splitrow:first-of-type{border-top:0}
+.splitrow .chip{flex:0 0 auto;margin-top:2px}
+.splitrow p{margin:0;font-size:.95rem}
+
+/* filter */
+.seg{display:inline-flex;background:#e9edea;border-radius:999px;padding:4px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:999px;padding:8px 16px;font-size:.92rem}
+.seg button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.1);font-weight:600}
+
+/* timeline */
+.tl{position:relative;margin:22px 0}
+.tl:before{content:"";position:absolute;left:19px;top:24px;bottom:24px;width:2px;background:var(--line)}
+.stage{position:relative;padding-left:58px;margin-bottom:14px}
+.node{position:absolute;left:0;top:16px;width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.1rem;z-index:1}
+.stage.open .node{background:var(--accent);color:#fff}
+.here{position:absolute;left:-6px;top:58px;background:var(--ink);color:#fff;font-size:.66rem;line-height:1;padding:4px 6px;border-radius:99px;z-index:2;white-space:nowrap}
+.srow{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.srow:hover{border-color:var(--accent)}
+.stage.open .srow{border-color:var(--accent)}
+.sname{font-family:var(--serif);font-size:1.4rem}
+.sspan{color:var(--muted);font-size:.9rem;margin-left:8px}
+.sblurb{display:block;color:var(--muted);font-size:.93rem;margin:2px 0 8px}
+.scost b{font-weight:600}
+.scost small{color:var(--muted);margin-left:6px}
+.cbar{height:8px;background:#e9edea;border-radius:4px;position:relative;margin:8px 0}
+.cbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.cbar .hi{background:#b9d3c9} .cbar .lo{background:var(--accent)}
+.mixbar{display:flex;gap:2px;height:6px;border-radius:3px;overflow:hidden;margin:10px 0 4px;background:#e9edea}
+.mixbar i{display:block;height:100%}
+.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.items{display:none;padding:6px 0 4px}
+.stage.open .items{display:block}
+.it{display:flex;gap:14px;padding:16px 4px;border-top:1px solid var(--line)}
+.it:first-child{border-top:0}
+.chk{flex:0 0 auto;width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;color:transparent;font-size:.95rem;margin-top:2px}
+.chk:hover{border-color:var(--accent)}
+.it.done .chk{background:var(--accent);border-color:var(--accent);color:#fff}
+.ib{flex:1;min-width:0}
+.ititle{font-weight:600}
+.it.done .ititle{color:var(--muted)}
+.it.skip{opacity:.5} .it.skip .ititle{text-decoration:line-through}
+.iw{color:var(--muted);font-size:.93rem;margin:2px 0 8px}
+.itag{font-size:.9rem;margin:0 0 6px}
+.itag .chip{margin-right:8px}
+.icost{font-size:.92rem;margin:0 0 4px}
+.icost b{font-weight:600}
+.mxl{font-size:.9rem;background:var(--accent-soft);border-radius:10px;padding:8px 12px;margin:8px 0 4px}
+.link{background:none;border:0;padding:0;color:var(--accent-dark);text-decoration:underline;text-underline-offset:3px;font-size:.9rem}
+.ilinks{font-size:.88rem;margin:4px 0}
+
+/* calc */
+.calc{background:var(--accent-soft);border-radius:16px;padding:18px;margin:8px 0 14px}
+.money{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:0 12px}
+.money:focus-within{border-color:var(--accent)}
+.money input{border:0;outline:0;background:transparent;width:100%;padding:11px 0;font-size:1.05rem}
+.calc .f{margin-bottom:12px}
+.answer{background:#fff;border-radius:14px;padding:16px 18px;margin-top:6px}
+.answer .big{font-family:var(--serif);font-size:2rem;line-height:1.15}
+.mrow{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--line);font-size:.95rem}
+.mrow:first-of-type{border-top:0}
+.disc{font-size:.82rem;color:var(--muted);margin-top:28px}
+.disc button{font-size:.82rem;padding:0}
+.print-only{display:none}
+@media print{
+  body{background:#fff;font-size:11pt}
+  .noprint,.actions,.seg,.quiet,.link,.secondary,.primary,.chk,.disc button{display:none!important}
+  main{padding:0;max-width:none}
+  .items{display:block!important}
+  .stage{break-inside:avoid-page;page-break-inside:avoid}
+  .srow{border-color:#999}
+  .it{break-inside:avoid}
+  .print-only{display:block}
+  .card{border-color:#999}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+
+<p class="muted small" id="brandline"></p>
+<h1>From idea to exit: what a small business needs, and what it costs</h1>
+<p class="muted">Five stages, every job you will meet on the way, an honest cost range for each, and a suggestion on what to do yourself and where to get help. Tap a stage to open it.</p>
+
+<div class="print-only" id="printHead"></div>
+
+<div class="card noprint-none" id="about">
+  <h3>Tell us a little</h3>
+  <div class="grid">
+    <div class="f"><label for="now">Where are you now?</label>
+      <select id="now"><option value="0">Just thinking about it</option><option value="1">Starting up</option><option value="2">Up and running</option><option value="3">Growing</option><option value="4">Thinking about selling or closing</option></select></div>
+    <div class="f"><label for="kind">Kind of business</label>
+      <select id="kind"><option value="trade">Trades and services</option><option value="retail">Shop, cafe or hospitality</option><option value="online">Online or professional services</option></select></div>
+    <div class="f"><label for="entity">How you trade</label>
+      <select id="entity"><option value="sole">Sole trader</option><option value="co">Company (Pty Ltd)</option></select></div>
+    <div class="f"><label for="staff">Will you hire people?</label>
+      <select id="staff"><option value="0">No, just me</option><option value="1">Yes, within three years</option></select></div>
+    <div class="f"><label for="biz">Business name (optional)</label><input id="biz" type="text" autocomplete="off"></div>
+    <div class="f"><label for="founder">Your name (optional)</label><input id="founder" type="text" autocomplete="off"></div>
+  </div>
+</div>
+
+<div class="card" id="sum" aria-live="polite"></div>
+<div class="card" id="split"></div>
+
+<div class="actions" style="margin-top:8px" id="filterWrap">
+  <span class="muted small">Show</span>
+  <div class="seg" role="group" aria-label="Filter items" id="filter"></div>
+</div>
+
+<div class="tl" id="journey"></div>
+
+<div class="card" id="cta"></div>
+
+<p class="disc">Estimates in Australian dollars for a small business, spread evenly across each stage. Prices, fees and rules change and differ by state, trade and provider. This is general information, not tax, legal or financial advice. Confirm details with the <a href="https://www.ato.gov.au" target="_blank" rel="noopener">ATO</a>, <a href="https://asic.gov.au" target="_blank" rel="noopener">ASIC</a>, <a href="https://www.business.gov.au" target="_blank" rel="noopener">business.gov.au</a> or a professional. Your answers stay on this device.
+<br><button class="quiet" data-act="print">Print or save as PDF</button> <button class="quiet" data-act="reset">Start again</button></p>
+
+</main>
+
+<script>
+(function(){
+"use strict";
+
+/* ===== EDIT THESE to brand and connect the tool ===== */
+var CONFIG={
+  brand:"Maxiz",
+  email:"",     /* e.g. "hello@yourdomain.com.au". Leave blank to offer "copy my results" instead. */
+  phone:"",
+  website:"",
+  showOffers:true   /* set false to hide all service offers */
+};
+
+var STAGES=[
+ {n:"Wishing",span:"Before you launch",months:0,blurb:"Test the idea before you spend a cent."},
+ {n:"Starting",span:"Your first 3 months",months:3,blurb:"Become legal, visible and able to get paid."},
+ {n:"Running",span:"Months 4 to 12",months:9,blurb:"Build the habits that keep you in business."},
+ {n:"Growing",span:"Years 2 and 3",months:24,blurb:"Add people, systems and reach."},
+ {n:"Exiting",span:"When you are ready",months:0,blurb:"Sell, hand over or close well."}
+];
+var TAGS={d:"Do it yourself",e:"Either",o:"Get help"};
+var KINDS={trade:"Trades and services",retail:"Shop, cafe or hospitality",online:"Online or professional services"};
+
+/* s=stage, t=title, w=why, g=d|e|o, r=reason, o=once [lo,hi], y=per year, m=per month,
+   only=staff|co|sole, bt=by business kind, be=by entity, mx=service offer, lk=[url,label], c=cost note */
+var ITEMS=[
+ /* 0 Wishing */
+ {s:0,t:"Test the idea with real customers",w:"Talk to 5 to 10 people who would pay. Ask what they use now and what frustrates them.",g:"d",r:"It is free, and the answers matter most when you hear them yourself."},
+ {s:0,t:"Work out your personal runway",w:"Add up your living costs and how many months you can cope with little or no income.",g:"d",r:"Only you know your numbers, and a simple spreadsheet is enough."},
+ {s:0,t:"Sketch a one-page plan",w:"What you sell, who to, at what price, and how customers will find you.",g:"d",r:"Writing it yourself is what makes you think it through.",lk:["https://www.business.gov.au","Planning help at business.gov.au"]},
+ {s:0,t:"Have a first chat with an accountant",w:"Ask about sole trader or company, GST and how much tax to set aside. Many give a free first meeting.",g:"o",r:"Structure mistakes are expensive to undo later.",o:[0,300]},
+ {s:0,t:"Check which licences and insurance you need",w:"Rules vary by trade and by state. Find out before you spend on tools or a website.",g:"d",r:"Free to research with the official licence finder.",lk:["https://www.business.gov.au","Licence finder at business.gov.au"]},
+ {s:0,t:"Check your name is free",w:"Search ASIC business names, .com.au domains and social handles before printing anything.",g:"d",r:"Free searches that take minutes."},
+ {s:0,t:"Sketch your price and what a job costs you",w:"Price from your costs plus a fair profit, not just from what competitors charge.",g:"d",r:"You refine this in the Running stage."},
+
+ /* 1 Starting */
+ {s:1,t:"Get your ABN and register your business name",w:"An ABN is free. A business name is only needed if you trade under something other than your own name.",g:"d",r:"Free, about 20 minutes, and you keep control of your own details.",o:[0,108],c:"The name fee covers 3 years",mx:{n:"Start My Business",p:199,per:"once"},lk:["https://www.abr.gov.au","Apply at abr.gov.au"]},
+ {s:1,t:"Register your company",only:"co",w:"A company is a separate legal entity. It adds yearly fees and more paperwork.",g:"e",r:"You can register directly with ASIC, but an accountant helps you decide if it suits you.",o:[636,1800],y:[342,342],c:"ASIC fee $636, then about $342 a year"},
+ {s:1,t:"Open a business bank account",w:"Keep business money apart from personal. Many banks offer low or zero-fee accounts.",g:"d",r:"Quick online, and you choose the bank.",m:[0,10]},
+ {s:1,t:"Get a business phone number",w:"A second SIM, eSIM or VoIP number keeps work calls separate and professional.",g:"d",r:"Simple to buy and set up yourself.",m:[15,40]},
+ {s:1,t:"Register your domain and business email",w:"A .com.au name with a matching email such as info@yourbrand.com.au builds trust.",g:"e",r:"DIY is fine if you are comfortable with settings. Otherwise a one-off setup avoids email problems.",y:[150,320],c:"Domain about $25 a year plus an email plan"},
+ {s:1,t:"Publish a simple website",w:"One page with what you do, where, your phone number and a way to enquire.",g:"e",r:"A website builder works for one page. Hire help if you need bookings or payments.",o:[0,3000],c:"A builder plan may add about $200 a year",mx:{n:"Get Me Online",p:199,per:"once"}},
+ {s:1,t:"Claim your Google Business Profile",w:"It puts you on Google Maps and in local searches. It is free.",g:"d",r:"Free, and Google verifies you directly.",mx:{n:"Get Me Found",p:199,per:"once"},lk:["https://www.google.com/business/","Start at google.com/business"]},
+ {s:1,t:"Claim one social media profile",w:"Choose the place your customers actually are. Add a few real photos or posts.",g:"d",r:"Free, and your own voice matters more than polish.",mx:{n:"Set Up My Social",p:199,per:"once"}},
+ {s:1,t:"Get the right insurance",w:"Cover the risks of your work, such as injury to others, damage to property or bad advice.",g:"e",r:"Comparison sites suit simple cover. Use a broker for higher-risk work.",y:[400,1200],bt:{trade:{y:[500,1500],t:"Get public liability insurance"},retail:{y:[800,2500],t:"Get public liability and property insurance"},online:{y:[500,2000],t:"Get professional indemnity insurance"}}},
+ {s:1,t:"Get licences and permits",w:"Trade, food, council and professional requirements vary by state. Apply before you start trading.",g:"d",r:"Applications are usually online. Use the official source, not a reseller.",o:[100,1500],bt:{trade:{o:[200,1500]},retail:{o:[300,2500]},online:{o:[0,800]}}},
+ {s:1,t:"Buy tools, equipment or opening stock",w:"Buy what you need to deliver the first jobs. Avoid stocking up on hope.",g:"d",r:"You know what you need, and second-hand often works.",o:[1000,10000],bt:{trade:{o:[1500,15000]},retail:{o:[5000,50000]},online:{o:[500,3000]}}},
+ {s:1,t:"Set up accounting software",w:"Connect it to your business bank so income and costs record themselves.",g:"e",r:"Do the software yourself. Ask an accountant to check the setup once.",m:[30,75]},
+ {s:1,t:"Open a tax savings account",w:"Move a share of every payment aside for tax and GST. Ask your accountant which percentage suits you.",g:"d",r:"A free habit that prevents the most common cash shock."},
+ {s:1,t:"Prepare quote and invoice terms",w:"Payment terms, deposits and what happens if a job changes. Clear terms prevent disputes.",g:"e",r:"Industry-body templates cover most jobs. A lawyer helps when jobs are large.",o:[0,1500]},
+ {s:1,t:"Create basic branding",w:"A name, simple logo, business cards or signage. Keep it plain until sales come in.",g:"e",r:"Do simple designs yourself. Pay a designer if your brand does a lot of the selling.",o:[0,1500]},
+ {s:1,t:"Line up your first customers",w:"Tell everyone you know, ask for introductions, and offer a launch price to your first few.",g:"d",r:"Nobody sells your business better than you.",o:[200,1000],c:"Small launch spend on flyers, signage or ads"},
+ {s:1,t:"Build a cash buffer",w:"Aim to hold about three months of running costs in reserve before you give up a wage.",g:"d",r:"It is your decision and your risk."},
+
+ /* 2 Running */
+ {s:2,t:"Keep your books up to date",w:"Record and match income and costs every week so tax time is easy.",g:"e",r:"An hour a week in your software is enough for many sole traders. A bookkeeper suits people who dislike it.",m:[0,300]},
+ {s:2,t:"Lodge your BAS",w:"If you are registered for GST you report to the ATO regularly, usually every quarter.",g:"e",r:"Confident with your software? DIY. Otherwise an accountant or BAS agent avoids costly errors.",y:[0,800],lk:["https://www.ato.gov.au","BAS information at ato.gov.au"]},
+ {s:2,t:"Do your yearly tax return with an accountant",w:"Claim what you are entitled to and get a yearly check on how you are going.",g:"o",r:"Tax rules are detailed. A good accountant often pays for themselves.",y:[400,1500],be:{co:{y:[1500,4000]}}},
+ {s:2,t:"Register for GST when you reach $75,000",w:"Registration is required once your yearly turnover reaches $75,000. You can register earlier if it suits you.",g:"e",r:"Registering is easy. Deciding when and how to charge is worth checking with an accountant.",lk:["https://www.ato.gov.au","GST registration at ato.gov.au"]},
+ {s:2,t:"Move tax money aside every week",w:"Transfer your set percentage into the tax account each time you are paid.",g:"d",r:"A five-minute weekly habit."},
+ {s:2,t:"Check cash flow weekly",w:"Know what is owed to you, what you owe, and what is in the bank. Chase late invoices quickly.",g:"d",r:"Your accounting software shows it on one screen."},
+ {s:2,t:"Review prices and job profit",w:"Compare what each job cost with what you charged. Raise prices if margins are thin.",g:"d",r:"You have the numbers and the customer relationships."},
+ {s:2,t:"Keep your website secure and updated",w:"Software updates, backups and hosting renewals quietly stop sites from breaking or being hacked.",g:"o",r:"Easy to forget, cheap to hand over.",y:[0,600],mx:{n:"Keep Online",p:199,per:"a year"}},
+ {s:2,t:"Market steadily",w:"Referrals, reviews, local search and one or two channels done consistently beat many done occasionally.",g:"e",r:"Do referrals and reviews yourself. Pay for help with ads once you know what works.",m:[50,500]},
+ {s:2,t:"Ask every happy customer for a review",w:"Google reviews are the strongest proof for local customers.",g:"d",r:"Free, and it works best coming from you."},
+ {s:2,t:"Pay yourself on a schedule",w:"Set a regular wage from the business and, if you can, add to your own super. Use the calculator below.",g:"d",r:"It is your money and your goals."},
+ {s:2,t:"Diary your renewals",w:"Insurance, licences, domain and ASIC dates. Set calendar reminders a month ahead.",g:"d",r:"A calendar does the job."},
+ {s:2,t:"Keep records for at least five years",w:"Keep invoices, receipts and bank records safe and easy to find.",g:"d",r:"Cloud storage or your accounting software does it."},
+
+ /* 3 Growing */
+ {s:3,t:"Review your structure",w:"As profit grows, a company or trust may suit you better. The right answer depends on your situation.",g:"o",r:"Tax and legal consequences are large. Get professional advice.",o:[300,1500]},
+ {s:3,t:"Hire your first person or contractor",only:"staff",w:"Employees and contractors are treated differently by law. Get the contract and pay rates right first.",g:"o",r:"Mistakes here can be costly, so get advice.",o:[300,1500],lk:["https://www.fairwork.gov.au","Pay and rules at fairwork.gov.au"]},
+ {s:3,t:"Set up payroll and super",only:"staff",w:"Pay staff, withhold tax and pay super on time. Super is paid on top of wages (12% at the time of writing).",g:"e",r:"Payroll software does most of it. An accountant can set it up correctly.",m:[20,150],c:"Super is a wage cost and is not included here"},
+ {s:3,t:"Take out workers' compensation insurance",only:"staff",w:"If you employ people you must cover them. Premiums depend on your state, industry and wages.",g:"o",r:"It is a legal requirement and the rules vary by state.",y:[500,4000]},
+ {s:3,t:"Put safety basics in place",only:"staff",w:"Write simple procedures, train new staff and record incidents.",g:"e",r:"Templates work for low-risk businesses. Get advice for higher-risk work.",o:[0,1500]},
+ {s:3,t:"Use job, quote and customer software",w:"Quoting, scheduling and follow-ups in one place save hours every week.",g:"e",r:"Try it yourself. Pay for setup help if you have many jobs.",m:[30,100]},
+ {s:3,t:"Write down how you do things",w:"Simple checklists for your main jobs let others help and raise the value of the business.",g:"d",r:"Nobody else knows your process."},
+ {s:3,t:"Step up your marketing",w:"Once you know which channel works, put more into it and measure the result.",g:"e",r:"Keep customer relationships in-house. Outsource ads or design work.",m:[100,600],c:"Extra spend on top of your steady marketing"},
+ {s:3,t:"Protect your name",w:"A registered trade mark stops others using your brand in your field. It is optional.",g:"o",r:"The process is detailed. An attorney helps avoid rejected filings.",o:[250,1500],lk:["https://www.ipaustralia.gov.au","Trade marks at ipaustralia.gov.au"]},
+ {s:3,t:"Protect your income",w:"Consider income protection for when you cannot work, and review your business insurance.",g:"e",r:"Comparing quotes yourself is fine. A broker explains the fine print.",y:[600,2400]},
+ {s:3,t:"Upgrade vehicles or equipment",w:"Buy when demand is proven and the return is clear.",g:"d",r:"Compare quotes and finance yourself. Check the tax treatment with your accountant.",o:[2000,15000]},
+ {s:3,t:"Meet your accountant every quarter",w:"Review profit, tax and plans four times a year, not just at tax time.",g:"o",r:"Regular advice is cheaper than fixing mistakes.",y:[600,2400]},
+ {s:3,t:"Raise prices each year",w:"Costs rise, so your prices should too. Tell customers early and stay fair.",g:"d",r:"It is your call."},
+
+ /* 4 Exiting */
+ {s:4,t:"Decide: sell, hand over or close",w:"Selling to a buyer, passing to family or staff, or closing all have different paperwork and tax.",g:"e",r:"Decide what you want yourself, then test it with an accountant."},
+ {s:4,t:"Tidy your books and paperwork",w:"Buyers want three years of clean numbers, with contracts and licences in order.",g:"e",r:"A bookkeeper or accountant can clean up years of records quickly.",o:[0,3000]},
+ {s:4,t:"Get a valuation",w:"Know what the business is worth before you speak to buyers.",g:"o",r:"An independent view prevents under- or over-pricing.",o:[500,5000]},
+ {s:4,t:"Get tax advice before you sell",w:"Small business capital gains tax concessions may reduce or remove tax on a sale. The rules are complex.",g:"o",r:"Getting this wrong is very costly.",o:[500,3000]},
+ {s:4,t:"Engage a broker (optional)",w:"A broker finds buyers and manages the sale. Fees are commonly a percentage of the price.",g:"e",r:"A broker reaches buyers you cannot, but you can sell without one.",o:[0,20000],c:"Range assumes a sale price of about $200,000"},
+ {s:4,t:"Have a lawyer draft the sale contract",w:"Covers price, what is included, warranties and hand-over support.",g:"o",r:"Gaps in the contract become disputes.",o:[2000,8000]},
+ {s:4,t:"Sort out staff entitlements",only:"staff",w:"Unpaid leave, notice and any redundancy must be paid or transferred correctly.",g:"o",r:"Obligations differ by award and contract.",nf:true,c:"Depends on your team and is not estimated here"},
+ {s:4,t:"Tell customers and hand over relationships",w:"Introduce the new owner personally and keep customers informed.",g:"d",r:"Trust passes through you."},
+ {s:4,t:"Cancel your registrations",w:"Lodge final BAS and tax returns, cancel GST and your ABN, and cancel the business name.",g:"e",r:"Simple online, but a wrong step can leave tax bills open.",o:[0,500],lk:["https://www.business.gov.au","Closing a business at business.gov.au"]},
+ {s:4,t:"Deregister your company",only:"co",w:"Companies must be properly closed or sold, not just abandoned.",g:"e",r:"Check the steps with ASIC or your accountant first.",o:[0,500]},
+ {s:4,t:"Shut down subscriptions and domains",w:"Cancel software, phone plans and renewals, or transfer them to the buyer.",g:"d",r:"A checklist and your logins."},
+ {s:4,t:"Keep records for at least five years",w:"Keep your business records safe after the business ends.",g:"d",r:"Cloud storage costs almost nothing."},
+ {s:4,t:"Plan what comes next",w:"Money, time and purpose after the business. Plan them before you sign.",g:"d",r:"It is personal."}
+];
+ITEMS.forEach(function(it,i){it.id="i"+i;});
+
+/* ---------- state ---------- */
+var KEY="au-biz-journey-v1";
+var S={now:0,kind:"trade",entity:"sole",staff:0,open:1,filter:"all",st:{},biz:"",founder:"",over:"",take:"",profit:""};
+try{var sv=JSON.parse(localStorage.getItem(KEY)||"null");if(sv){for(var k in sv)S[k]=sv[k];}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+/* ---------- helpers ---------- */
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function money(n){n=n>=100?Math.round(n/10)*10:Math.round(n);return "$"+n.toLocaleString("en-AU")}
+function rng(lo,hi){
+  if(hi<1)return "Free";
+  if(lo<1)return "Up to "+money(hi);
+  if(money(lo)===money(hi))return money(lo);
+  return money(lo)+" to "+money(hi);
+}
+function num(v){var x=parseFloat(v);return isFinite(x)&&x>0?x:0}
+function res(it){
+  var r={},k;for(k in it)r[k]=it[k];
+  var b=it.bt&&it.bt[S.kind];if(b)for(k in b)r[k]=b[k];
+  var e=it.be&&it.be[S.entity];if(e)for(k in e)r[k]=e[k];
+  return r;
+}
+function active(){
+  return ITEMS.filter(function(it){
+    if(it.only==="staff"&&!+S.staff)return false;
+    if(it.only==="co"&&S.entity!=="co")return false;
+    if(it.only==="sole"&&S.entity!=="sole")return false;
+    return true;
+  }).map(res);
+}
+function itemCost(it,st){
+  if(st<it.s)return[0,0];
+  var lo=0,hi=0,mo=STAGES[st].months;
+  if(st===it.s&&it.o){lo+=it.o[0];hi+=it.o[1];}
+  if(it.m){lo+=it.m[0]*mo;hi+=it.m[1]*mo;}
+  if(it.y){lo+=it.y[0]/12*mo;hi+=it.y[1]/12*mo;}
+  return[lo,hi];
+}
+function costText(it){
+  var p=[];
+  if(it.o&&it.o[1]>0)p.push(rng(it.o[0],it.o[1])+" once");
+  if(it.y&&it.y[1]>0)p.push(rng(it.y[0],it.y[1])+" a year");
+  if(it.m&&it.m[1]>0)p.push(rng(it.m[0],it.m[1])+" a month");
+  return p.length?p.join(" plus "):(it.nf?"Varies":"Free");
+}
+var W={d:0,e:0.5,o:1};
+function calc(){
+  var its=active().filter(function(it){return S.st[it.id]!=="skip"});
+  var per=STAGES.map(function(){return{lo:0,hi:0,sg:0,n:0,done:0,d:0,e:0,o:0}});
+  its.forEach(function(it){var p=per[it.s];p.n++;p[it.g]++;if(S.st[it.id]==="done")p.done++;});
+  for(var st=0;st<5;st++){its.forEach(function(it){var c=itemCost(it,st);per[st].lo+=c[0];per[st].hi+=c[1];per[st].sg+=c[0]+(c[1]-c[0])*W[it.g];});}
+  var cumLo=0,cumHi=0,cumSg=0;
+  per.forEach(function(p,i){if(i<4){cumLo+=p.lo;cumHi+=p.hi;cumSg+=p.sg;}p.cLo=cumLo;p.cHi=cumHi;p.cSg=cumSg;});
+  var rec=0;
+  its.forEach(function(it){if(it.s<=2){var w=W[it.g];
+    if(it.m)rec+=it.m[0]+(it.m[1]-it.m[0])*w;
+    if(it.y)rec+=(it.y[0]+(it.y[1]-it.y[0])*w)/12;}});
+  return{its:its,per:per,tot:[cumLo,cumHi,cumSg],start:[per[0].lo+per[1].lo,per[0].hi+per[1].hi,per[0].sg+per[1].sg],exit:[per[4].lo,per[4].hi,per[4].sg],typ:rec};
+}
+
+/* ---------- summary text for enquiries ---------- */
+function summaryText(){
+  var c=calc(),L=[],done=0,n=0;
+  c.per.forEach(function(p){done+=p.done;n+=p.n;});
+  L.push("Business journey summary");
+  L.push("Business: "+(S.biz||"(not entered)"));
+  L.push("Name: "+(S.founder||"(not entered)"));
+  L.push("Stage: "+STAGES[S.now].n);
+  L.push("Kind: "+KINDS[S.kind]);
+  L.push("Trading as: "+(S.entity==="co"?"Company":"Sole trader"));
+  L.push("Hiring: "+(+S.staff?"Yes":"No"));
+  L.push("Estimated first three years: about "+money(c.tot[2])+" (range "+rng(c.tot[0],c.tot[1])+")");
+  L.push("Progress: "+done+" of "+n+" steps done");
+  var mx=c.its.filter(function(it){return it.mx&&S.st[it.id]!=="done"});
+  if(mx.length){L.push("","I would like help with:");mx.forEach(function(it){L.push("- "+it.mx.n+" ($"+it.mx.p+" "+it.mx.per+"), for: "+it.t)});}
+  var oh=c.its.filter(function(it){return it.g==="o"&&it.s<=S.now+1&&S.st[it.id]!=="done"});
+  if(oh.length){L.push("","Professional help coming up:");oh.slice(0,8).forEach(function(it){L.push("- "+it.t)});}
+  return L.join("\n");
+}
+function copyText(t){
+  try{if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t);return;}}catch(e){}
+  var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);
+}
+function contact(name){
+  var sub=name?("Help with "+name):"My business journey results";
+  var body="Hi "+CONFIG.brand+",\n\n"+(name?"I would like help with "+name+".":"Here are my results. I would like to talk.")+"\n\n"+summaryText();
+  var msg=$("ctaMsg");
+  if(CONFIG.email){
+    location.href="mailto:"+CONFIG.email+"?subject="+encodeURIComponent(sub)+"&body="+encodeURIComponent(body);
+    if(msg)msg.textContent="Your email app should open with everything filled in.";
+  }else{
+    copyText(body);
+    if(msg)msg.textContent="Copied. Paste it into an email or message to "+CONFIG.brand+".";
+  }
+}
+
+/* ---------- render ---------- */
+function renderSummary(c){
+  $("sum").innerHTML=
+   '<p class="muted small" style="margin-bottom:0">Your first three years, if you follow the suggestions below</p>'+
+   '<div class="big2">about '+money(c.tot[2])+'</div>'+
+   '<p class="muted">Range: <b>'+rng(c.tot[0],c.tot[1])+'</b>. The low end is doing everything you can yourself. The high end is handing everything over. It leaves out your own pay, income tax, wages and GST you collect.</p>'+
+   '<div class="s3"><div><b>about '+money(c.start[2])+'</b><span>to get started (Wishing and Starting)</span></div>'+
+   '<div><b>about '+money(c.typ)+'</b><span>a month to keep it running, a starting estimate</span></div>'+
+   '<div><b>about '+money(c.exit[2])+'</b><span>when you eventually exit (not included above)</span></div></div>';
+}
+function renderSplit(c){
+  var d=c.its.filter(function(i){return i.g==="d"}).length,e=c.its.filter(function(i){return i.g==="e"}).length;
+  var o=c.its.filter(function(i){return i.g==="o"});
+  var names=o.slice(0,5).map(function(i){return i.t.toLowerCase()});
+  $("split").innerHTML=
+   '<h3>What to do yourself, and where to get help</h3>'+
+   '<div class="splitrow"><span class="chip c-d"><i></i>Do it yourself</span><p><b>'+d+' steps.</b> Free or cheap, quick, and easy to fix if you slip. Spend your time here and keep the money.</p></div>'+
+   '<div class="splitrow"><span class="chip c-e"><i></i>Either</span><p><b>'+e+' steps.</b> Start yourself. Hand over when your time is worth more than the fee, or when it stops being fun.</p></div>'+
+   '<div class="splitrow"><span class="chip c-o"><i></i>Get help</span><p><b>'+o.length+' steps</b> where a mistake costs more than the fee, such as '+names.join(", ")+(o.length>5?', and more':'')+'.</p></div>';
+}
+function renderFilter(){
+  $("filter").innerHTML=[["all","Everything"],["d","Do it yourself"],["o","Get help"]].map(function(x){
+    return '<button data-act="filter" data-v="'+x[0]+'" data-k="filter:'+x[0]+'" aria-pressed="'+(S.filter===x[0])+'">'+x[1]+'</button>';
+  }).join("");
+}
+function itemHTML(it){
+  var st=S.st[it.id],cls="it"+(st==="done"?" done":"")+(st==="skip"?" skip":"");
+  var h='<div class="'+cls+'"><button class="chk" data-act="done" data-id="'+it.id+'" data-k="done:'+it.id+'" role="checkbox" aria-checked="'+(st==="done")+'" aria-label="Mark as done: '+esc(it.t)+'">&#10003;</button><div class="ib">'+
+   '<div class="ititle">'+esc(it.t)+'</div><p class="iw">'+esc(it.w)+'</p>'+
+   '<p class="itag"><span class="chip c-'+it.g+'"><i></i>'+TAGS[it.g]+'</span>'+esc(it.r)+'</p>'+
+   '<p class="icost">Cost: <b>'+costText(it)+'</b>'+(it.c?' <span class="fine">('+esc(it.c)+')</span>':'')+'</p>';
+  if(it.mx&&CONFIG.showOffers)h+='<p class="mxl">'+esc(CONFIG.brand)+' can do this for you: <b>'+esc(it.mx.n)+', $'+it.mx.p+' '+it.mx.per+'</b>. <button class="link" data-act="ask" data-id="'+it.id+'" data-k="ask:'+it.id+'">Ask</button></p>';
+  if(it.lk)h+='<p class="ilinks"><a href="'+it.lk[0]+'" target="_blank" rel="noopener">'+esc(it.lk[1])+'</a></p>';
+  h+='<button class="quiet" data-act="skip" data-id="'+it.id+'" data-k="skip:'+it.id+'">'+(st==="skip"?'Bring back':'Not for me')+'</button></div></div>';
+  return h;
+}
+function calcHTML(c){
+  return '<div class="calc"><h3>What your business needs to earn</h3>'+
+   '<p class="muted small">A rough guide to how many jobs cover your costs and pay you. Change any number.</p>'+
+   '<div class="f"><label for="over">Running costs each month</label><div class="money"><span>$</span><input id="over" type="number" inputmode="decimal" min="0" placeholder="'+Math.round(c.typ)+'"></div></div>'+
+   '<div class="f"><label for="take">Take-home pay you want each month</label><div class="money"><span>$</span><input id="take" type="number" inputmode="decimal" min="0" placeholder="5000"></div></div>'+
+   '<div class="f"><label for="profit">Profit from a typical job (price minus what the job costs you)</label><div class="money"><span>$</span><input id="profit" type="number" inputmode="decimal" min="0" placeholder="300"></div></div>'+
+   '<div id="calcOut"></div></div>';
+}
+function updateCalc(){
+  var out=$("calcOut");if(!out)return;
+  var c=calc(),o=S.over!==""?num(S.over):c.typ,t=num(S.take),p=num(S.profit);
+  if(!p){out.innerHTML='<p class="note small muted">Enter the profit from a typical job to see your number.</p>';return;}
+  var need=o+t/0.8,jobs=Math.ceil(need/p);
+  out.innerHTML='<div class="answer"><div class="big">'+jobs+' job'+(jobs===1?'':'s')+' a month</div>'+
+   '<p class="muted small" style="margin:0">to cover about '+money(o)+' of running costs'+(t?' and pay you '+money(t)+' after setting roughly 20% aside for tax':'')+'. Tax depends on your situation, so ask your accountant for your real figure.</p></div>';
+}
+function renderJourney(c){
+  var h="";
+  var maxHi=Math.max.apply(null,c.per.map(function(p){return p.hi}))||1;
+  STAGES.forEach(function(sg,i){
+    var p=c.per[i],open=S.open===i;
+    var list=c.its.length?active().filter(function(it){return it.s===i}):[];
+    var mix=p.n?'<div class="mixbar" aria-hidden="true"><i style="width:'+(p.d/p.n*100)+'%;background:var(--d)"></i><i style="width:'+(p.e/p.n*100)+'%;background:var(--e)"></i><i style="width:'+(p.o/p.n*100)+'%;background:var(--o)"></i></div>':'';
+    h+='<div class="stage'+(open?' open':'')+'" id="st'+i+'"><span class="node">'+(i+1)+'</span>'+(+S.now===i?'<span class="here">You are here</span>':'')+
+      '<button class="srow" data-act="open" data-i="'+i+'" data-k="open:'+i+'" aria-expanded="'+open+'">'+
+      '<span class="sname">'+sg.n+'</span><span class="sspan">'+sg.span+'</span>'+
+      '<span class="sblurb">'+sg.blurb+'</span>'+
+      '<span class="scost"><b>'+(p.sg<1?'Free':'About '+money(p.sg))+'</b><small>'+(i===4?'at exit':'suggested spend in this stage')+'</small></span>'+
+      '<span class="cbar" aria-hidden="true"><i class="hi" style="width:'+(p.hi/maxHi*100)+'%"></i><i class="lo" style="width:'+(p.sg/maxHi*100)+'%"></i></span>'+
+      mix+
+      '<span class="meta"><span>'+p.d+' yourself, '+p.e+' either, '+p.o+' get help</span><span>'+p.done+' of '+p.n+' done</span></span>'+
+      '<span class="meta" style="margin-top:2px"><span>Range '+rng(p.lo,p.hi)+'</span>'+(i<4?'<span>Total so far about '+money(p.cSg)+'</span>':'')+'</span></button>'+
+      '<div class="items">';
+    if(i===2)h+=calcHTML(c);
+    var shown=list.filter(function(it){return S.filter==="all"||it.g==="e"||it.g===S.filter});
+    h+=shown.length?shown.map(itemHTML).join(""):'<p class="muted small" style="padding:10px 4px">Nothing in this stage matches the filter.</p>';
+    h+='</div></div>';
+  });
+  $("journey").innerHTML=h;
+  if($("over")){
+    [["over","over"],["take","take"],["profit","profit"]].forEach(function(p){
+      var el=$(p[0]);el.value=S[p[1]]||"";el.addEventListener("input",function(){S[p[1]]=el.value;save();updateCalc();});
+    });
+    updateCalc();
+  }
+}
+function renderCta(c){
+  var mx=c.its.filter(function(it){return it.mx&&S.st[it.id]!=="done"&&S.st[it.id]!=="skip"});
+  var h='<h3>Want a hand?</h3>';
+  if(CONFIG.showOffers&&mx.length){
+    var tot=mx.reduce(function(a,it){return a+it.mx.p},0);
+    h+='<p class="muted">Everything marked Do it yourself really is doable yourself. If you would rather not, '+esc(CONFIG.brand)+' offers these:</p>'+
+      mx.map(function(it){return '<div class="mrow"><span>'+esc(it.mx.n)+' <span class="fine">('+esc(it.t)+')</span></span><b>$'+it.mx.p+' '+it.mx.per+'</b></div>'}).join("")+
+      '<div class="mrow"><span>All together, first year</span><b>'+money(tot)+'</b></div>';
+  }else{
+    h+='<p class="muted">Send your results to '+esc(CONFIG.brand)+' if you would like to talk it through.</p>';
+  }
+  h+='<div class="actions" style="margin-top:14px"><button class="primary" data-act="send">'+(CONFIG.email?'Send my results to '+esc(CONFIG.brand):'Copy my results for '+esc(CONFIG.brand))+'</button></div><p id="ctaMsg" class="fine" role="status" style="margin-top:8px"></p>';
+  $("cta").innerHTML=h;
+  $("cta").className="card noprint";
+}
+function renderPrintHead(){
+  var foot=[CONFIG.website,CONFIG.phone,CONFIG.email].filter(Boolean).join("  |  ");
+  var d=new Date().toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric"});
+  $("printHead").innerHTML='<p><b>'+esc(S.biz||"My business")+'</b>'+(S.founder?' &middot; '+esc(S.founder):'')+' &middot; '+d+' &middot; '+KINDS[S.kind]+', '+(S.entity==="co"?'company':'sole trader')+'</p>'+(foot?'<p class="fine">Prepared with '+esc(CONFIG.brand)+'  |  '+esc(foot)+'</p>':'<p class="fine">Prepared with '+esc(CONFIG.brand)+'</p>');
+}
+function render(){
+  var ak=document.activeElement&&document.activeElement.dataset?document.activeElement.dataset.k:null;
+  var c=calc();
+  renderSummary(c);renderSplit(c);renderFilter();renderJourney(c);renderCta(c);renderPrintHead();
+  if(ak){var el=document.querySelector('[data-k="'+ak+'"]');if(el)el.focus({preventScroll:true});}
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b||!b.dataset.act)return;
+  var a=b.dataset.act;
+  if(a==="open"){var i=+b.dataset.i;S.open=(S.open===i)?-1:i;save();render();if(S.open===i){var r=$("st"+i);if(r)r.scrollIntoView({block:"start"});}}
+  else if(a==="done"){S.st[b.dataset.id]=S.st[b.dataset.id]==="done"?"":"done";save();render();}
+  else if(a==="skip"){S.st[b.dataset.id]=S.st[b.dataset.id]==="skip"?"":"skip";save();render();}
+  else if(a==="filter"){S.filter=b.dataset.v;save();render();}
+  else if(a==="ask"){var it=ITEMS.filter(function(x){return x.id===b.dataset.id})[0];contact(it.mx.n);}
+  else if(a==="send"){contact("");}
+  else if(a==="print"){window.print();}
+  else if(a==="reset"){if(confirm("Clear all your answers on this device?")){try{localStorage.removeItem(KEY);}catch(x){}location.reload();}}
+});
+["now","kind","entity","staff"].forEach(function(id){
+  var el=$(id);el.value=String(S[id]);
+  el.addEventListener("change",function(){
+    S[id]=(id==="now"||id==="staff")?+el.value:el.value;
+    if(id==="now")S.open=S.now;
+    save();render();
+  });
+});
+["biz","founder"].forEach(function(id){
+  var el=$(id);el.value=S[id]||"";
+  el.addEventListener("input",function(){S[id]=el.value;save();renderPrintHead();});
+});
+
+$("brandline").textContent="A free guide from "+CONFIG.brand;
+render();
+})();
+</script>
+</body>
+</html>
