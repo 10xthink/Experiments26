@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio Ops v0.1</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1c2230;--mute:#6b7280;--line:#e3e6ec;--brand:#2f5bea;--red:#d92d20;--redbg:#fef3f2;--amber:#b54708;--green:#067647}
+@media(prefers-color-scheme:dark){:root{--bg:#12151c;--card:#1b202b;--ink:#eef0f5;--mute:#98a1b3;--line:#2b3242;--brand:#6c8cff;--redbg:#3a1a18;--red:#ff6b5e;--amber:#f5a623;--green:#4cd08b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:76px}
+header{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+header h1{font-size:18px;margin:0}
+header small{color:var(--mute)}
+main{max-width:720px;margin:0 auto;padding:16px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;z-index:6}
+nav button{flex:1;padding:14px 0;border:0;background:none;color:var(--mute);font-size:15px;min-height:56px}
+nav button.on{color:var(--brand);font-weight:700;box-shadow:inset 0 3px 0 var(--brand)}
+button,input,select,textarea{font:inherit}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:12px 16px;min-height:44px;cursor:pointer}
+.btn.ghost{background:none;color:var(--brand);border:1px solid var(--line)}
+.btn.danger{background:none;color:var(--red);border:1px solid var(--line)}
+.btn.sm{padding:8px 12px;min-height:38px;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.between{justify-content:space-between}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0}
+.card.flag{border-color:var(--red);background:var(--redbg)}
+.mute{color:var(--mute);font-size:14px}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;border:1px solid var(--line);color:var(--mute)}
+.pill.pre{color:var(--green);border-color:var(--green)}
+.pill.post{color:var(--amber);border-color:var(--amber)}
+.attn{border:1px solid var(--red);background:var(--redbg);border-radius:12px;padding:12px;margin-bottom:12px}
+.attn b{color:var(--red)}
+.ok{border:1px solid var(--green);border-radius:12px;padding:12px;margin-bottom:12px;color:var(--green)}
+details{margin:10px 0}
+summary{font-weight:700;padding:10px 4px;cursor:pointer;list-style:none}
+summary::before{content:"▸ "}details[open] summary::before{content:"▾ "}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);width:min(520px,94vw);padding:16px}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+label{display:block;margin:10px 0 4px;font-size:14px;color:var(--mute)}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);min-height:44px}
+.banner{background:#fff7e6;color:#7a4b00;border:1px solid #f5c26b;border-radius:10px;padding:10px;margin-bottom:12px;font-size:14px}
+.fab{position:fixed;right:16px;bottom:72px;z-index:7;border-radius:99px;padding:14px 20px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+h2{font-size:17px;margin:18px 0 6px}
+</style>
+</head>
+<body>
+<header><h1>Studio Ops <small>v0.1</small></h1><small id="sync"></small></header>
+<main id="app"></main>
+<button class="btn fab" id="fab">+ New job</button>
+<nav>
+  <button data-v="board" class="on">Board</button>
+  <button data-v="clients">Clients</button>
+  <button data-v="data">Data</button>
+</nav>
+<dialog id="dlg"></dialog>
+<input type="file" id="file" accept=".json,application/json" hidden>
+
+<script>
+const KEY='studioOps.v1', SCHEMA=1, VER='0.1';
+const LABEL={intake:'Intake',agreed:'Agreed',prepaid:'Prepaid received',started:'Started',delivered:'Delivered',invoiced:'Invoiced',paid:'Paid / Done'};
+const FLOW={postpaid:['intake','agreed','started','delivered','invoiced','paid'],prepaid:['intake','agreed','prepaid','started','delivered','paid']};
+const NEXTLABEL={intake:'Agreed',agreed:'Start',prepaid:'Start',started:'Delivered',delivered:'Invoiced',invoiced:'Paid'};
+let S, view='board';
+const $=s=>document.querySelector(s), uid=()=>Math.random().toString(36).slice(2,10), now=()=>new Date().toISOString();
+const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'$'+Number(n||0).toLocaleString('en-AU');
+const days=iso=>Math.floor((Date.now()-new Date(iso))/864e5);
+const ago=iso=>{if(!iso)return 'never';const d=days(iso);return d<=0?'today':d===1?'1 day ago':d+' days ago'};
+
+function defaults(){return{schema:SCHEMA,appVersion:VER,updatedAt:now(),lastExportedAt:null,
+ team:['Person 1','Person 2','Person 3'],
+ services:[{id:uid(),name:'Simple website',price:199,billing:'postpaid'},{id:uid(),name:'Google Business Profile audit & fix',price:199,billing:'postpaid'},{id:uid(),name:'Social media copy',price:199,billing:'postpaid'}],
+ clients:[],jobs:[]}}
+function load(){try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+ if(!S||!S.schema)S=defaults()}
+function save(touch=true){if(touch)S.updatedAt=now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){alert('Could not save in this browser. Export your data now.')}render()}
+
+const flow=j=>FLOW[j.billing];
+const client=id=>S.clients.find(c=>c.id===id);
+const svc=id=>S.services.find(s=>s.id===id);
+const flagged=j=>j.billing==='postpaid'&&j.stage==='delivered';
+const stageAt=j=>(j.history||[]).slice(-1)[0]?.at||j.createdAt;
+
+function render(){
+  const flags=S.jobs.filter(flagged);
+  $('#sync').textContent=S.lastExportedAt?'Backup: '+ago(S.lastExportedAt):'Never backed up';
+  $('#fab').style.display=view==='board'?'':'none';
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view));
+  $('#app').innerHTML = view==='board'?boardHTML(flags):view==='clients'?clientsHTML():dataHTML();
+}
+
+function boardHTML(flags){
+  let h='';
+  if(flags.length){
+    const owed=flags.reduce((a,j)=>a+Number(j.price),0);
+    h+=`<div class="attn"><b>⚠ ${flags.length} job${flags.length>1?'s':''} delivered but not invoiced (${money(owed)})</b>`+
+      flags.map(j=>`<div class="mute">• ${esc(client(j.clientId)?.name||'?')} · ${esc(j.title)} · delivered ${ago(stageAt(j))}</div>`).join('')+`</div>`;
+  } else if(S.jobs.length) h+=`<div class="ok">✔ Nothing delivered is waiting on an invoice.</div>`;
+  if(!S.jobs.length) h+=`<div class="card">No jobs yet. Add a client first (Clients tab), then tap <b>+ New job</b>.</div>`;
+  const order=['intake','agreed','prepaid','started','delivered','invoiced','paid'];
+  for(const st of order){
+    const list=S.jobs.filter(j=>j.stage===st);
+    if(!list.length&&st==='prepaid')continue;
+    h+=`<details ${st!=='paid'&&list.length?'open':''}><summary>${LABEL[st]} (${list.length})</summary>${list.map(jobCard).join('')||'<div class="mute" style="padding:0 4px">Empty</div>'}</details>`;
+  }
+  return h;
+}
+function jobCard(j){
+  const f=flow(j), i=f.indexOf(j.stage), last=i===f.length-1;
+  const canToggle=['intake','agreed'].includes(j.stage);
+  return `<div class="card ${flagged(j)?'flag':''}">
+   <div class="row between"><b>${esc(client(j.clientId)?.name||'(no client)')}</b><span>${money(j.price)}</span></div>
+   <div>${esc(j.title)}</div>
+   <div class="row" style="margin:6px 0">
+     <span class="pill ${j.billing==='prepaid'?'pre':'post'}">${j.billing==='prepaid'?'Prepaid':'Postpaid'}</span>
+     <span class="pill">Owner: ${esc(j.owner||'–')}</span>
+     <span class="pill">${j.due?'Due '+esc(j.due):'No due date'}</span>
+     <span class="pill">In stage ${days(stageAt(j))}d</span>
+   </div>
+   ${flagged(j)?'<div style="color:var(--red);font-weight:700;margin-bottom:6px">⚠ NOT INVOICED</div>':''}
+   <div class="row">
+     ${last?'':`<button class="btn sm" onclick="move('${j.id}',1)">Move → ${nextLabel(j)}</button>`}
+     ${i>0?`<button class="btn ghost sm" onclick="move('${j.id}',-1)">← Back</button>`:''}
+     ${canToggle?`<button class="btn ghost sm" onclick="toggleBilling('${j.id}')">Make ${j.billing==='prepaid'?'postpaid':'prepaid'}</button>`:''}
+     <button class="btn ghost sm" onclick="jobForm('${j.id}')">Edit</button>
+   </div></div>`;
+}
+function nextLabel(j){const f=flow(j),n=f[f.indexOf(j.stage)+1];
+  return n==='prepaid'?'Prepaid received':n==='paid'?(j.billing==='prepaid'?'Done':'Paid'):LABEL[n]}
+
+function move(id,dir){
+  const j=S.jobs.find(x=>x.id===id),f=flow(j),i=f.indexOf(j.stage)+dir;
+  if(i<0||i>=f.length)return;
+  j.stage=f[i];(j.history=j.history||[]).push({stage:j.stage,at:now()});j.updatedAt=now();save();
+}
+function toggleBilling(id){
+  const j=S.jobs.find(x=>x.id===id);
+  j.billing=j.billing==='prepaid'?'postpaid':'prepaid';j.updatedAt=now();save();
+}
+
+/* ---------- Jobs form ---------- */
+function jobForm(id){
+  const j=id?S.jobs.find(x=>x.id===id):{clientId:'',serviceId:S.services[0]?.id,title:'',price:S.services[0]?.price||199,billing:S.services[0]?.billing||'postpaid',owner:S.team[0]||'',due:''};
+  if(!S.clients.length){alert('Add a client first (Clients tab).');return}
+  const d=$('#dlg');
+  d.innerHTML=`<h2 style="margin-top:0">${id?'Edit job':'New job'}</h2>
+  <label>Client</label><select id="f_client">${S.clients.map(c=>`<option value="${c.id}" ${c.id===j.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+  <label>Service</label><select id="f_svc">${S.services.map(s=>`<option value="${s.id}" ${s.id===j.serviceId?'selected':''}>${esc(s.name)}</option>`).join('')}</select>
+  <label>Job title / note</label><input id="f_title" value="${esc(j.title)}" placeholder="e.g. 5-page site for café">
+  <label>Price (AUD)</label><input id="f_price" type="number" inputmode="decimal" value="${j.price}">
+  <label>Billing</label><select id="f_bill"><option value="postpaid" ${j.billing==='postpaid'?'selected':''}>Postpaid (invoice after delivery)</option><option value="prepaid" ${j.billing==='prepaid'?'selected':''}>Prepaid (payment before starting)</option></select>
+  <label>Owner</label><select id="f_owner">${S.team.map(t=>`<option ${t===j.owner?'selected':''}>${esc(t)}</option>`).join('')}</select>
+  <label>Due date</label><input id="f_due" type="date" value="${esc(j.due)}">
+  <div class="row between" style="margin-top:16px">
+    <div>${id?`<button class="btn danger" onclick="delJob('${id}')">Delete</button>`:''}</div>
+    <div class="row"><button class="btn ghost" onclick="$('#dlg').close()">Cancel</button><button class="btn" onclick="saveJob('${id||''}')">Save</button></div>
+  </div>`;
+  d.showModal();
+  $('#f_svc').onchange=()=>{const s=svc($('#f_svc').value);if(s&&!id){$('#f_price').value=s.price;$('#f_bill').value=s.billing}};
+}
+function saveJob(id){
+  const v=k=>$('#f_'+k).value;
+  const data={clientId:v('client'),serviceId:v('svc'),title:v('title').trim()||svc(v('svc'))?.name||'Job',price:Number(v('price'))||0,billing:v('bill'),owner:v('owner'),due:v('due')};
+  if(id){
+    const j=S.jobs.find(x=>x.id===id);
+    const wasBill=j.billing;Object.assign(j,data);
+    if(wasBill!==j.billing&&!flow(j).includes(j.stage))j.stage='agreed';
+    j.updatedAt=now();
+  } else {
+    S.jobs.push({id:uid(),...data,stage:'intake',history:[{stage:'intake',at:now()}],createdAt:now(),updatedAt:now()});
+  }
+  $('#dlg').close();save();
+}
+function delJob(id){if(confirm('Delete this job?')){S.jobs=S.jobs.filter(j=>j.id!==id);$('#dlg').close();save()}}
+
+/* ---------- Clients ---------- */
+function clientsHTML(){
+  let h=`<div class="row between"><h2 style="margin:0">Clients (${S.clients.length})</h2><button class="btn sm" onclick="clientForm()">+ Add client</button></div>`;
+  if(!S.clients.length)h+=`<div class="card">No clients yet.</div>`;
+  h+=S.clients.map(c=>{
+    const js=S.jobs.filter(j=>j.clientId===c.id);
+    return `<div class="card" onclick="clientForm('${c.id}')" style="cursor:pointer">
+      <div class="row between"><b>${esc(c.name)}</b><span class="mute">${js.length} job${js.length===1?'':'s'}</span></div>
+      <div class="mute">${esc(c.contact||'No contact details')}</div>
+      ${c.notes?`<div style="margin-top:4px">${esc(c.notes)}</div>`:''}
+      <div class="mute" style="margin-top:4px">Last contact: ${ago(c.lastContact)}</div></div>`}).join('');
+  return h;
+}
+function clientForm(id){
+  const c=id?S.clients.find(x=>x.id===id):{name:'',contact:'',notes:''};
+  const d=$('#dlg');
+  d.innerHTML=`<h2 style="margin-top:0">${id?'Edit client':'New client'}</h2>
+  <label>Name / business</label><input id="c_name" value="${esc(c.name)}">
+  <label>Contact (phone, email)</label><input id="c_contact" value="${esc(c.contact)}">
+  <label>Notes</label><textarea id="c_notes" rows="3" placeholder="e.g. prefers SMS, busy Mon–Wed">${esc(c.notes)}</textarea>
+  ${id?`<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="c_touch" style="width:auto;min-height:0"> Log a client update today</label>`:''}
+  <div class="row between" style="margin-top:16px">
+    <div>${id?`<button class="btn danger" onclick="delClient('${id}')">Delete</button>`:''}</div>
+    <div class="row"><button class="btn ghost" onclick="$('#dlg').close()">Cancel</button><button class="btn" onclick="saveClient('${id||''}')">Save</button></div>
+  </div>`;
+  d.showModal();
+}
+function saveClient(id){
+  const name=$('#c_name').value.trim();if(!name){alert('Name is required');return}
+  const data={name,contact:$('#c_contact').value.trim(),notes:$('#c_notes').value.trim()};
+  if(id){const c=S.clients.find(x=>x.id===id);Object.assign(c,data);if($('#c_touch')?.checked)c.lastContact=now();c.updatedAt=now()}
+  else S.clients.push({id:uid(),...data,lastContact:null,updatedAt:now()});
+  $('#dlg').close();save();
+}
+function delClient(id){
+  if(S.jobs.some(j=>j.clientId===id)){alert('This client has jobs. Delete or reassign those first.');return}
+  if(confirm('Delete this client?')){S.clients=S.clients.filter(c=>c.id!==id);$('#dlg').close();save()}
+}
+
+/* ---------- Data / setup ---------- */
+function dataHTML(){
+  return `<h2 style="margin-top:0">Backup & handover</h2>
+  <div class="banner">Data lives only in this browser. Export at the end of every huddle and share the file with the team.</div>
+  <div class="card">
+    <div class="mute">Last export: ${S.lastExportedAt?new Date(S.lastExportedAt).toLocaleString('en-AU'):'never'}</div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" onclick="exportJSON()">Export JSON</button>
+      <button class="btn ghost" onclick="$('#file').click()">Import (replace all)</button>
+    </div>
+    <div class="mute" style="margin-top:8px">Import replaces everything on this device with the file's contents. Merge arrives in v0.4.</div>
+  </div>
+  <h2>Team</h2>
+  <div class="card"><label style="margin-top:0">Names (one per line, 3–4 people)</label>
+    <textarea id="s_team" rows="4">${esc(S.team.join('\n'))}</textarea>
+    <button class="btn sm" style="margin-top:8px" onclick="saveTeam()">Save team</button></div>
+  <h2>Services</h2>
+  ${S.services.map(s=>`<div class="card"><label style="margin-top:0">Name</label><input value="${esc(s.name)}" onchange="editSvc('${s.id}','name',this.value)">
+   <div class="row" style="margin-top:6px"><div style="flex:1"><label>Price (AUD)</label><input type="number" value="${s.price}" onchange="editSvc('${s.id}','price',this.value)"></div>
+   <div style="flex:1"><label>Default billing</label><select onchange="editSvc('${s.id}','billing',this.value)"><option value="postpaid" ${s.billing==='postpaid'?'selected':''}>Postpaid</option><option value="prepaid" ${s.billing==='prepaid'?'selected':''}>Prepaid</option></select></div></div>
+   <button class="btn danger sm" style="margin-top:8px" onclick="delSvc('${s.id}')">Remove</button></div>`).join('')}
+  ${S.services.length<3?`<button class="btn ghost sm" onclick="addSvc()">+ Add service</button>`:''}
+  <h2>Danger zone</h2>
+  <button class="btn danger" onclick="resetAll()">Erase everything on this device</button>
+  <p class="mute">Schema ${SCHEMA} · App v${VER}</p>`;
+}
+function saveTeam(){const t=$('#s_team').value.split('\n').map(x=>x.trim()).filter(Boolean).slice(0,4);if(t.length<1)return;S.team=t;save();alert('Team saved')}
+function editSvc(id,k,v){const s=svc(id);s[k]=k==='price'?(Number(v)||0):v;save(true)}
+function addSvc(){S.services.push({id:uid(),name:'New service',price:199,billing:'postpaid'});save()}
+function delSvc(id){if(S.jobs.some(j=>j.serviceId===id)){alert('Jobs use this service. Remove those first.');return}S.services=S.services.filter(s=>s.id!==id);save()}
+function resetAll(){if(confirm('Erase ALL data on this device? Export first if unsure.')&&confirm('Really erase?')){S=defaults();save()}}
+
+function exportJSON(){
+  const by=prompt('Exported by (your name)?','')||'';
+  S.lastExportedAt=now();
+  const out={...S,exportedBy:by,exportedAt:now()};
+  const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  const d=new Date();a.download=`ops-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  save(false);
+}
+$('#file').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{
+    const d=JSON.parse(r.result);
+    if(!d.schema||!Array.isArray(d.jobs)||!Array.isArray(d.clients))throw 0;
+    if(d.schema>SCHEMA){alert('This file is from a newer app version. Open it with the newer app.');return}
+    if(!confirm(`Replace all data here with this file?\nExported ${d.exportedAt?new Date(d.exportedAt).toLocaleString('en-AU'):'?'}${d.exportedBy?' by '+d.exportedBy:''}\n${d.clients.length} clients, ${d.jobs.length} jobs`))return;
+    S={...defaults(),...d};delete S.exportedBy;delete S.exportedAt;save(false);
+  }catch(err){alert('That file is not a valid Studio Ops export.')}};
+  r.readAsText(f);e.target.value='';
+};
+
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{view=b.dataset.v;render();scrollTo(0,0)});
+$('#fab').onclick=()=>jobForm();
+load();render();
+</script>
+</body>
+</html>
