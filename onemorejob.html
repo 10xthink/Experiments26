@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f6f5e">
+<title>One More</title>
+<style>
+  :root{
+    --bg:#faf8f5; --card:#ffffff; --ink:#1d1f1e; --muted:#6b706d; --line:#e6e2db;
+    --accent:#2f6f5e; --accent-ink:#ffffff; --accent-soft:#e3f0ec; --warm:#fff4e0; --warm-ink:#7a5200;
+    --danger:#b3261e;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#121413; --card:#1b1e1d; --ink:#eef0ee; --muted:#9aa09c; --line:#2b2f2d;
+      --accent:#5fb89e; --accent-ink:#0c1512; --accent-soft:#1d2e29; --warm:#2c2414; --warm-ink:#f0cf8a;
+      --danger:#f2b8b5;
+    }
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+  body{min-height:100vh;display:flex;justify-content:center}
+  main{width:100%;max-width:440px;padding:20px 18px calc(28px + env(safe-area-inset-bottom))}
+  h1{font-size:26px;line-height:1.15;margin:8px 0 6px;letter-spacing:-.02em}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:26px 0 10px;font-weight:600}
+  p{margin:0}
+  .sub{color:var(--muted);font-size:15px;line-height:1.45}
+  .brand{font-weight:700;letter-spacing:-.01em;color:var(--accent);font-size:15px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+  /* controls */
+  button,input,select{font:inherit;color:inherit}
+  .btn{display:block;width:100%;min-height:52px;border:0;border-radius:14px;background:var(--accent);
+    color:var(--accent-ink);font-weight:650;font-size:17px;cursor:pointer}
+  .btn:active{transform:scale(.99)}
+  .btn.ghost{background:transparent;color:var(--muted);font-weight:500;font-size:15px;min-height:44px}
+  .btn.danger{background:transparent;color:var(--danger);font-weight:600;font-size:15px;min-height:44px}
+  .link{background:none;border:0;padding:6px 2px;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+  .opts{display:grid;gap:8px}
+  .opt{position:relative;display:block;border:1.5px solid var(--line);background:var(--card);border-radius:14px;
+    padding:14px 16px;cursor:pointer;font-size:16px}
+  .opt input{position:absolute;opacity:0;inset:0;cursor:pointer}
+  .opt.on{border-color:var(--accent);background:var(--accent-soft)}
+  .opt small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+  .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .seg .opt{text-align:center;font-weight:650;font-size:20px;padding:12px 0}
+  .field{display:block;margin-bottom:14px}
+  .field span{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
+  .field input,.field select{width:100%;min-height:50px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);
+    background:var(--card);font-size:16px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .check{display:flex;gap:10px;align-items:center;font-size:15px;margin:6px 0 20px}
+  .check input{width:20px;height:20px;accent-color:var(--accent)}
+  .err{color:var(--danger);font-size:14px;margin:8px 0 0;min-height:18px}
+
+  /* home */
+  .week{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px 20px 20px;text-align:center}
+  .weeklabel{font-size:13px;color:var(--muted)}
+  .big{font-size:76px;font-weight:750;letter-spacing:-.04em;line-height:1;margin:10px 0 2px;font-variant-numeric:tabular-nums}
+  .big .of{font-size:34px;color:var(--muted);font-weight:600;letter-spacing:-.01em}
+  .bar{height:12px;border-radius:99px;background:var(--accent-soft);margin:18px 0 14px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .5s ease}
+  .stats{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:14px}
+  .stats b{font-weight:650}
+  .ramp{font-size:12px;color:var(--muted);margin-top:10px}
+
+  .nudge{margin-top:14px;border-radius:18px;padding:16px 18px;background:var(--warm);color:var(--warm-ink)}
+  .nudge.win{background:var(--accent);color:var(--accent-ink)}
+  .nudge .t{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;opacity:.85;margin-bottom:6px}
+  .nudge .l{font-weight:650;font-size:16px;line-height:1.35;margin-bottom:6px}
+  .nudge .b{font-size:15px;line-height:1.45}
+  .cta{margin-top:16px}
+
+  ul.recent{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  ul.recent li{padding:13px 16px;display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);font-size:15px;cursor:pointer}
+  ul.recent li:first-child{border-top:0}
+  ul.recent li:active{background:var(--accent-soft)}
+  ul.recent .what{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  ul.recent .what b{font-weight:650}
+  ul.recent .when{color:var(--muted);white-space:nowrap;font-size:14px}
+  ul.recent a{color:var(--accent);text-decoration:none;margin-left:6px}
+  .empty{color:var(--muted);font-size:15px;padding:16px;background:var(--card);border:1px dashed var(--line);border-radius:16px;text-align:center}
+  .hint{color:var(--muted);font-size:12.5px;text-align:center;margin-top:8px}
+
+  footer{margin-top:30px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.6}
+  footer .links{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 14px;margin-top:4px}
+
+  /* log sheet */
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+  .sheet form{width:100%;max-width:440px;background:var(--bg);border-radius:22px 22px 0 0;
+    padding:20px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+  .sheet h3{margin:0 0 14px;font-size:20px}
+  @media (min-width:600px){ .sheet{align-items:center} .sheet form{border-radius:22px} }
+
+  #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,30px);
+    background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;font-size:15px;opacity:0;
+    pointer-events:none;transition:all .25s ease;max-width:90vw;z-index:20;display:flex;gap:14px;align-items:center}
+  #toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+  #toast button{background:none;border:0;color:var(--accent);font-weight:700;cursor:pointer;font-size:15px;padding:0}
+  @media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- SETUP -->
+  <section id="setup" hidden>
+    <div class="brand">One More</div>
+    <h1 id="setupTitle">Let's get you applying.</h1>
+    <p class="sub" id="setupSub">20 seconds. No account. Everything stays on this device.</p>
+
+    <form id="setupForm" novalidate>
+      <h2>Where are you at?</h2>
+      <div class="opts" id="trackOpts">
+        <label class="opt"><input type="radio" name="track" value="start"> I haven't started yet<small>I want to apply but keep putting it off</small></label>
+        <label class="opt"><input type="radio" name="track" value="hope"> Applying, no replies<small>I send applications and hope</small></label>
+        <label class="opt"><input type="radio" name="track" value="momentum"> Applying, some luck<small>I get the odd reply and want to keep pace</small></label>
+      </div>
+
+      <h2>Weekly goal</h2>
+      <div class="seg" id="goalOpts">
+        <label class="opt"><input type="radio" name="goal" value="2"> 2</label>
+        <label class="opt"><input type="radio" name="goal" value="3"> 3</label>
+        <label class="opt"><input type="radio" name="goal" value="5"> 5</label>
+      </div>
+      <p class="sub" style="margin-top:8px;font-size:13px">Week 1 starts at 2, week 2 at 3, then you're on your goal. Small start, no overwhelm.</p>
+
+      <h2>Nudge me</h2>
+      <div class="two">
+        <label class="field"><span>Day</span>
+          <select id="remDay">
+            <option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option>
+            <option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="0">Sunday</option>
+          </select></label>
+        <label class="field"><span>Time</span><input type="time" id="remTime" value="08:00"></label>
+      </div>
+      <label class="check"><input type="checkbox" id="remICS" checked> Download a weekly calendar reminder</label>
+
+      <button class="btn" type="submit" id="setupBtn">Start week 1</button>
+      <p class="err" id="setupErr" role="alert"></p>
+      <button class="btn ghost" type="button" id="setupCancel" hidden>Cancel</button>
+    </form>
+  </section>
+
+  <!-- HOME -->
+  <section id="home" hidden>
+    <div class="row"><span class="brand">One More</span><span class="weeklabel" id="range"></span></div>
+
+    <div class="week">
+      <div class="weeklabel">Applications this week</div>
+      <div class="big"><span id="count">0</span><span class="of"> / <span id="goal">2</span></span></div>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar"><i id="fill"></i></div>
+      <div class="stats">
+        <span id="streak"></span>
+        <span id="vs"></span>
+      </div>
+      <div class="ramp" id="ramp"></div>
+    </div>
+
+    <div class="nudge" id="nudge">
+      <div class="t" id="nudgeT"></div>
+      <div class="l" id="nudgeL"></div>
+      <div class="b" id="nudgeB"></div>
+    </div>
+
+    <div class="cta"><button class="btn" id="openLog" type="button">+ Log application</button></div>
+
+    <h2>Recent</h2>
+    <div id="recentWrap"></div>
+
+    <footer>
+      <div>Your data lives on this device only.</div>
+      <div class="links">
+        <button class="link" id="exportBtn" type="button">Export</button>
+        <button class="link" id="importBtn" type="button">Import</button>
+        <button class="link" id="icsBtn" type="button">Calendar reminder</button>
+        <button class="link" id="editBtn" type="button">Edit setup</button>
+      </div>
+    </footer>
+  </section>
+</main>
+
+<!-- LOG / EDIT SHEET -->
+<div class="sheet" id="sheet" hidden>
+  <form id="logForm" novalidate>
+    <h3 id="sheetTitle">Log application</h3>
+    <label class="field"><span>Company</span><input id="fCompany" autocomplete="off" maxlength="80" placeholder="Acme"></label>
+    <label class="field"><span>Role</span><input id="fRole" autocomplete="off" maxlength="80" placeholder="Product designer"></label>
+    <label class="field"><span>Link (optional)</span><input id="fLink" inputmode="url" autocomplete="off" maxlength="500" placeholder="acme.com/jobs/123"></label>
+    <button class="btn" type="submit" id="logSubmit">Done ✓</button>
+    <p class="err" id="logErr" role="alert"></p>
+    <button class="btn danger" type="button" id="logDelete" hidden>Delete this application</button>
+    <button class="btn ghost" type="button" id="logCancel">Cancel</button>
+  </form>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+(function(){
+  'use strict';
+  var KEY = 'onemore.v1';
+  var DAY = 864e5;
+  var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var ICSDAYS = ['SU','MO','TU','WE','TH','FR','SA'];
+  var TRACKS = ['start','hope','momentum'];
+  var GOALS = [2,3,5];
+
+  var NUDGES = {
+    start: [
+      "Open one job. Just open it. Applying can wait.",
+      "Pick one role you'd be happy to get. Give it 10 minutes. Send it.",
+      "Imperfect and sent beats perfect and never sent.",
+      "Set a 10-minute timer. When it ends, hit send.",
+      "The first one is the hardest. After it, the next ones get easier.",
+      "You don't need to feel ready. You just need to send one."
+    ],
+    hope: [
+      "Tailor one line of your CV to the first bullet of the job ad. 3 minutes, real difference.",
+      "No reply in 7 days? That's normal. Log it and apply to another.",
+      "Use the same keywords the job ad uses. Many employers filter by them.",
+      "Apply early in a posting's life if you can. Early applicants tend to get seen more.",
+      "One application that names the company and why you want it beats three generic ones.",
+      "A job search usually takes many applications. Each one is progress, not a verdict."
+    ],
+    momentum: [
+      "Start with your best-fit role while your energy is high.",
+      "Send a short follow-up on any application that's 7+ days old.",
+      "Message one person at a company you applied to. Short and specific.",
+      "Consistency beats bursts. Steady weeks add up.",
+      "Reuse your strongest cover paragraph. Rewrite just the first two lines.",
+      "Keep the pace. A quiet inbox doesn't mean the work isn't working."
+    ]
+  };
+
+  /* ---------- state ---------- */
+  var state = load();
+  var toastTimer = null;
+  var editingId = null;
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){
+        var s = JSON.parse(raw);
+        if(s && Array.isArray(s.logs)) return s;
+      }
+    }catch(e){}
+    return {profile:null, logs:[]};
+  }
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch(e){ toast('Could not save in this browser. Use Export to keep a copy.'); }
+  }
+
+  /* ---------- week maths (weeks start Monday) ---------- */
+  function weekStart(t){
+    var d = new Date(t); d.setHours(0,0,0,0);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return d.getTime();
+  }
+  function addWeeks(ws, n){ var d = new Date(ws); d.setDate(d.getDate() + 7*n); return d.getTime(); }
+  function countIn(ws){
+    var n = 0;
+    for(var i=0;i<state.logs.length;i++){ if(weekStart(state.logs[i].ts) === ws) n++; }
+    return n;
+  }
+  function weekIdx(ws){ return Math.round((ws - weekStart(state.profile.start)) / (7*DAY)); }
+  function goalFor(i){
+    var g = state.profile.goal;
+    if(i <= 0) return Math.min(2, g);
+    if(i === 1) return Math.min(3, g);
+    return g;
+  }
+  function dayOfYear(d){ return Math.floor((d - new Date(d.getFullYear(),0,0)) / DAY); }
+
+  /* ---------- helpers ---------- */
+  function $(id){ return document.getElementById(id); }
+  function show(id){ ['setup','home'].forEach(function(s){ $(s).hidden = (s !== id); }); window.scrollTo(0,0); }
+  function toast(msg, undoFn){
+    var t = $('toast'); t.textContent = '';
+    var span = document.createElement('span'); span.textContent = msg; t.appendChild(span);
+    if(undoFn){
+      var b = document.createElement('button'); b.type='button'; b.textContent = 'Undo';
+      b.onclick = function(){ undoFn(); hideToast(); };
+      t.appendChild(b);
+    }
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, undoFn ? 6000 : 3500);
+  }
+  function hideToast(){ $('toast').classList.remove('show'); }
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function download(name, text, type){
+    var blob = new Blob([text], {type:type});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  }
+  function normLink(s){
+    s = (s||'').trim(); if(!s) return '';
+    if(!/^https?:\/\//i.test(s)) s = 'https://' + s;
+    try{ var u = new URL(s); return (u.protocol==='http:'||u.protocol==='https:') ? u.href : ''; }catch(e){ return ''; }
+  }
+  function ageLabel(ts){
+    var today = new Date(); today.setHours(0,0,0,0);
+    var d = new Date(ts); d.setHours(0,0,0,0);
+    var n = Math.round((today - d) / DAY);
+    return n <= 0 ? 'today' : n + 'd';
+  }
+  function fmtDay(t){ return new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short'}); }
+
+  /* ---------- setup ---------- */
+  function syncOpts(){
+    document.querySelectorAll('.opt').forEach(function(l){
+      var i = l.querySelector('input'); if(i) l.classList.toggle('on', i.checked);
+    });
+  }
+  function openSetup(isEdit){
+    var p = state.profile;
+    $('setupTitle').textContent = isEdit ? 'Edit setup' : "Let's get you applying.";
+    $('setupSub').hidden = isEdit;
+    $('setupBtn').textContent = isEdit ? 'Save' : 'Start week 1';
+    $('setupCancel').hidden = !isEdit;
+    $('setupErr').textContent = '';
+    document.querySelectorAll('input[name=track]').forEach(function(i){ i.checked = !!p && p.track === i.value; });
+    document.querySelectorAll('input[name=goal]').forEach(function(i){ i.checked = Number(i.value) === (p ? p.goal : 3); });
+    $('remDay').value = p ? String(p.remDay) : '1';
+    $('remTime').value = p ? p.remTime : '08:00';
+    $('remICS').checked = !isEdit;
+    syncOpts();
+    show('setup');
+  }
+  $('setupForm').addEventListener('change', syncOpts);
+  $('setupForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var t = document.querySelector('input[name=track]:checked');
+    var g = document.querySelector('input[name=goal]:checked');
+    if(!t){ $('setupErr').textContent = 'Pick where you are at so the tips fit you.'; return; }
+    state.profile = {
+      track: t.value,
+      goal: g ? Number(g.value) : 3,
+      remDay: Number($('remDay').value),
+      remTime: $('remTime').value || '08:00',
+      start: state.profile ? state.profile.start : Date.now()
+    };
+    save();
+    if($('remICS').checked) downloadICS();
+    render();
+  });
+  $('setupCancel').onclick = function(){ render(); };
+
+  /* ---------- calendar reminder (.ics) ---------- */
+  function downloadICS(){
+    var p = state.profile; if(!p) return;
+    var hm = p.remTime.split(':'), d = new Date();
+    d.setHours(Number(hm[0])||8, Number(hm[1])||0, 0, 0);
+    var diff = (p.remDay - d.getDay() + 7) % 7;
+    if(diff === 0 && d.getTime() < Date.now()) diff = 7;
+    d.setDate(d.getDate() + diff);
+    var e = new Date(d.getTime() + 15*60000);
+    function f(x){ return x.getFullYear()+pad(x.getMonth()+1)+pad(x.getDate())+'T'+pad(x.getHours())+pad(x.getMinutes())+'00'; }
+    var stamp = new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+    var lines = [
+      'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//One More//EN','CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT','UID:onemore-weekly@local','DTSTAMP:'+stamp,
+      'DTSTART:'+f(d),'DTEND:'+f(e),'RRULE:FREQ=WEEKLY;BYDAY='+ICSDAYS[p.remDay],
+      'SUMMARY:One More: send one application',
+      'DESCRIPTION:Open your tracker and send one application. Small and sent beats perfect and never sent.',
+      'BEGIN:VALARM','TRIGGER:PT0M','ACTION:DISPLAY','DESCRIPTION:Send one application','END:VALARM',
+      'END:VEVENT','END:VCALENDAR'
+    ];
+    download('one-more-reminder.ics', lines.join('\r\n'), 'text/calendar');
+  }
+
+  /* ---------- home ---------- */
+  function render(){
+    if(!state.profile){ openSetup(false); return; }
+    var now = Date.now();
+    var ws = weekStart(now);
+    var wi = weekIdx(ws);
+    var goal = goalFor(wi);
+    var count = countIn(ws);
+    var finalGoal = state.profile.goal;
+
+    $('range').textContent = fmtDay(ws) + ' to ' + fmtDay(addWeeks(ws,1) - DAY);
+    $('count').textContent = count;
+    $('goal').textContent = goal;
+    var pct = Math.min(100, Math.round(count / goal * 100));
+    $('fill').style.width = pct + '%';
+    $('bar').setAttribute('aria-valuenow', pct);
+    $('bar').setAttribute('aria-label', count + ' of ' + goal + ' applications this week');
+
+    // streak: consecutive weeks hitting that week's goal (this week counts once it's hit)
+    var streak = 0;
+    if(count >= goal) streak++;
+    for(var i = wi - 1; i >= 0; i--){
+      if(countIn(addWeeks(ws, i - wi)) >= goalFor(i)) streak++; else break;
+    }
+    $('streak').textContent = '';
+    var sb = document.createElement('b');
+    sb.textContent = streak > 0 ? '🔥 ' + streak + (streak === 1 ? ' week' : ' weeks') : 'Start your streak';
+    $('streak').appendChild(sb);
+
+    // vs last week
+    var vs = $('vs'); vs.textContent = '';
+    if(wi >= 1){
+      var last = countIn(addWeeks(ws,-1));
+      var diff = count - last;
+      var arrow = diff > 0 ? '(+' + diff + ' ↑)' : diff < 0 ? '(' + diff + ' ↓)' : '(same)';
+      vs.textContent = 'Last week: ' + last + ' ' + arrow;
+    }
+
+    $('ramp').textContent = goal < finalGoal ? 'Building up to ' + finalGoal + ' a week' : '';
+
+    // nudge
+    var n = $('nudge'), dow = new Date(now).getDay();
+    var pool = NUDGES[state.profile.track] || NUDGES.start;
+    var tip = pool[dayOfYear(new Date(now)) % pool.length];
+    if(count >= goal){
+      n.classList.add('win');
+      $('nudgeT').textContent = 'Goal hit 🎉';
+      $('nudgeL').textContent = count + ' / ' + goal + ' this week. That beats thinking about it.';
+      $('nudgeB').textContent = count > goal ? 'Extra ones are a bonus. Rest is allowed too.' : 'Anything extra is a bonus. Rest is allowed too.';
+    } else {
+      n.classList.remove('win');
+      $('nudgeT').textContent = DAYS[dow] + ' nudge';
+      var line;
+      if(count === 0){
+        if(wi === 0) line = 'Start small. Your goal this week is just ' + goal + '.';
+        else if(dow === 0 || dow >= 3) line = '0 this week. Zero is fine. Send one in the next 10 minutes?';
+        else line = 'Goal this week: ' + goal + '. Start with one.';
+      } else {
+        line = (goal - count) + ' more to hit your goal.';
+      }
+      $('nudgeL').textContent = line;
+      $('nudgeB').textContent = tip;
+    }
+
+    // recent (tap to edit or delete)
+    var wrap = $('recentWrap'); wrap.textContent = '';
+    var recent = state.logs.slice().sort(function(a,b){ return b.ts - a.ts; }).slice(0,8);
+    if(!recent.length){
+      var em = document.createElement('div'); em.className = 'empty';
+      em.textContent = 'Nothing logged yet. Your first one goes here.';
+      wrap.appendChild(em);
+    } else {
+      var ul = document.createElement('ul'); ul.className = 'recent';
+      recent.forEach(function(l){
+        var li = document.createElement('li');
+        li.tabIndex = 0; li.setAttribute('role','button');
+        li.setAttribute('aria-label','Edit ' + l.company + ', ' + l.role);
+        var what = document.createElement('span'); what.className = 'what';
+        var b = document.createElement('b'); b.textContent = l.company;
+        what.appendChild(b); what.appendChild(document.createTextNode(' · ' + l.role));
+        if(l.link){
+          var a = document.createElement('a'); a.href = l.link; a.target = '_blank'; a.rel = 'noopener noreferrer';
+          a.textContent = '↗'; a.setAttribute('aria-label','Open job link');
+          a.addEventListener('click', function(ev){ ev.stopPropagation(); });
+          what.appendChild(a);
+        }
+        var when = document.createElement('span'); when.className = 'when'; when.textContent = ageLabel(l.ts);
+        li.addEventListener('click', function(){ openSheet(l); });
+        li.addEventListener('keydown', function(ev){
+          if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); openSheet(l); }
+        });
+        li.appendChild(what); li.appendChild(when); ul.appendChild(li);
+      });
+      wrap.appendChild(ul);
+      var hint = document.createElement('p'); hint.className = 'hint';
+      hint.textContent = 'Tap an entry to edit or delete it.';
+      wrap.appendChild(hint);
+    }
+    show('home');
+  }
+
+  /* ---------- log / edit sheet ---------- */
+  function openSheet(entry){
+    editingId = entry ? entry.id : null;
+    $('sheetTitle').textContent = entry ? 'Edit application' : 'Log application';
+    $('logSubmit').textContent = entry ? 'Save' : 'Done ✓';
+    $('logDelete').hidden = !entry;
+    $('fCompany').value = entry ? entry.company : '';
+    $('fRole').value = entry ? entry.role : '';
+    $('fLink').value = entry ? entry.link : '';
+    $('logErr').textContent = '';
+    $('sheet').hidden = false;
+    setTimeout(function(){ $('fCompany').focus(); }, 30);
+  }
+  function closeSheet(){ $('sheet').hidden = true; editingId = null; }
+  $('openLog').onclick = function(){ openSheet(null); };
+  $('logCancel').onclick = closeSheet;
+  $('sheet').addEventListener('click', function(e){ if(e.target === $('sheet')) closeSheet(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !$('sheet').hidden) closeSheet(); });
+
+  $('logDelete').onclick = function(){
+    var idx = -1;
+    for(var i=0;i<state.logs.length;i++){ if(state.logs[i].id === editingId){ idx = i; break; } }
+    if(idx < 0){ closeSheet(); return; }
+    var removed = state.logs.splice(idx,1)[0];
+    save(); closeSheet(); render();
+    toast('Deleted', function(){ state.logs.push(removed); save(); render(); });
+  };
+
+  $('logForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var c = $('fCompany').value.trim(), r = $('fRole').value.trim();
+    if(!c || !r){ $('logErr').textContent = 'Add the company and the role. That is all we need.'; return; }
+    var link = normLink($('fLink').value);
+
+    if(editingId){
+      for(var k=0;k<state.logs.length;k++){
+        if(state.logs[k].id === editingId){
+          state.logs[k].company = c; state.logs[k].role = r; state.logs[k].link = link;
+        }
+      }
+      save(); closeSheet(); render(); toast('Saved ✓');
+      return;
+    }
+
+    var entry = { id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+                  company: c, role: r, link: link, ts: Date.now() };
+    state.logs.push(entry); save();
+    closeSheet(); render();
+    toast('Logged ✓', function(){
+      state.logs = state.logs.filter(function(l){ return l.id !== entry.id; });
+      save(); render();
+    });
+  });
+
+  /* ---------- backup ---------- */
+  $('exportBtn').onclick = function(){
+    var d = new Date();
+    var name = 'one-more-backup-' + d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + '.json';
+    download(name, JSON.stringify(state, null, 2), 'application/json');
+    toast('Backup downloaded');
+  };
+  $('importBtn').onclick = function(){ $('importFile').click(); };
+  $('importFile').addEventListener('change', function(){
+    var f = this.files && this.files[0]; this.value = '';
+    if(!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      try{
+        var s = JSON.parse(String(rd.result));
+        var p = s.profile;
+        if(!p || TRACKS.indexOf(p.track) < 0 || GOALS.indexOf(Number(p.goal)) < 0 || typeof p.start !== 'number' || !Array.isArray(s.logs)) throw 0;
+        var seen = {};
+        var logs = s.logs.filter(function(l){ return l && typeof l.company === 'string' && typeof l.role === 'string' && typeof l.ts === 'number'; })
+          .map(function(l, i){
+            var id = String(l.id || l.ts);
+            if(seen[id]) id = id + '-' + i;
+            seen[id] = 1;
+            return { id: id, company: l.company.slice(0,80), role: l.role.slice(0,80), link: normLink(l.link || ''), ts: l.ts };
+          });
+        if(state.logs.length && !confirm('Replace the ' + state.logs.length + ' applications on this device with the ' + logs.length + ' in this backup?')) return;
+        state = { profile: { track:p.track, goal:Number(p.goal), remDay: Number(p.remDay)||1,
+                             remTime: typeof p.remTime === 'string' ? p.remTime : '08:00', start:p.start }, logs: logs };
+        save(); render(); toast('Imported ' + logs.length + ' applications');
+      }catch(err){ toast('That file does not look like a One More backup.'); }
+    };
+    rd.readAsText(f);
+  });
+  $('icsBtn').onclick = downloadICS;
+  $('editBtn').onclick = function(){ openSetup(true); };
+
+  /* re-render if the tab sits open across a day or week change */
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden && state.profile && $('sheet').hidden && !$('home').hidden) render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
