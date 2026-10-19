@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FAF8F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1115" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Thinking Style">
+<meta name="description" content="A 3-minute, fully offline self-assessment of how you think at work. Get a shareable badge and a map of where your thinking fits.">
+<title>Thinking Style Profile</title>
+<link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315161A'/%3E%3Ccircle cx='16' cy='7' r='3' fill='%232F6FED'/%3E%3Ccircle cx='24.5' cy='13' r='3' fill='%23F2644F'/%3E%3Ccircle cx='21.5' cy='23' r='3' fill='%238B5CF6'/%3E%3Ccircle cx='10.5' cy='23' r='3' fill='%2314A36B'/%3E%3Ccircle cx='7.5' cy='13' r='3' fill='%23E8A317'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" id="touchIcon" href="">
+<style>
+:root{
+  --bg:#FAF8F4; --card:#FFFFFF; --ink:#15161A; --muted:#666A75; --line:#E6E2D8; --soft:#F1EEE6;
+  --process:#2F6FED; --people:#F2644F; --product:#8B5CF6; --profit:#14A36B; --project:#E8A317;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0F1115; --card:#171A20; --ink:#F3F1EC; --muted:#9AA0AC; --line:#262A33; --soft:#1D2027}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;min-height:100dvh;-webkit-font-smoothing:antialiased}
+#app{max-width:480px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) 20px max(28px,env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--process);outline-offset:2px}
+.screen{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pulse{0%,100%{transform:scale(.7);opacity:.5}50%{transform:scale(1.15);opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+.eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(2.7rem,13vw,3.7rem);line-height:1;letter-spacing:-.035em;font-weight:800;margin:.35em 0 .3em}
+h2{font-size:1.5rem;line-height:1.15;letter-spacing:-.02em;font-weight:800;margin:0 0 .5rem}
+h3{font-size:1.2rem;line-height:1.2;letter-spacing:-.015em;font-weight:800;margin:.2rem 0 1rem}
+p{margin:0 0 1rem}
+.muted{color:var(--muted)}
+.btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;min-height:56px;padding:0 20px;border-radius:18px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:700;font-size:1.05rem;letter-spacing:-.01em}
+.btn:active{transform:scale(.985)}
+.btn.sec{background:transparent;color:var(--ink);border-color:var(--line)}
+@media (hover:hover){.btn.sec:hover{border-color:var(--ink)}}
+.ghost{background:none;border:0;min-width:44px;min-height:44px;font-size:1.4rem;border-radius:12px;display:grid;place-items:center}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* welcome */
+.welcome{min-height:calc(100dvh - 50px);display:flex;flex-direction:column;justify-content:center;gap:0}
+.logo{display:block;margin-bottom:6px;animation:float 5s ease-in-out infinite}
+.pillars{display:flex;gap:8px;flex-wrap:wrap;margin:.2rem 0 1.6rem}
+.pillars span{font-size:.85rem;font-weight:600;padding:.4rem .75rem;border-radius:999px;background:var(--soft)}
+.fine{font-size:.85rem;color:var(--muted);text-align:center;margin-top:1rem}
+
+/* quiz */
+.quiz{min-height:calc(100dvh - 50px);display:flex;flex-direction:column}
+.topbar{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px;min-height:44px}
+.topbar .eyebrow{text-align:center}
+.prog{height:4px;border-radius:4px;background:var(--line);overflow:hidden;margin:6px 0 0}
+.prog i{display:block;height:100%;background:var(--ink);border-radius:4px;transition:width .35s ease}
+.qwrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px 2px}
+.qnum{font-size:.8rem;font-weight:700;color:var(--muted);letter-spacing:.1em;margin-bottom:12px}
+.stmt{font-size:clamp(1.55rem,7vw,2rem);line-height:1.2;letter-spacing:-.025em;font-weight:700;margin:0}
+.hint{font-size:.85rem;color:var(--muted);margin:14px 0 0}
+.opt{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:58px;padding:0 18px;margin-top:10px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);font-weight:650;font-size:1.05rem;text-align:left;transition:background .12s,border-color .12s,color .12s}
+@media (hover:hover){.opt:hover{border-color:var(--ink)}}
+.opt.sel,.opt:active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dots{display:flex;gap:5px}
+.dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;opacity:.45}
+.dots i.on{background:currentColor;opacity:1}
+
+/* reveal */
+.reveal{min-height:calc(100dvh - 50px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:22px}
+.pdots{display:flex;gap:12px}
+.pdots i{width:16px;height:16px;border-radius:50%;animation:pulse 1.1s ease-in-out infinite}
+
+/* result */
+.badgewrap{border-radius:22px;overflow:hidden;box-shadow:0 18px 50px -18px rgba(0,0,0,.35);animation:pop .7s cubic-bezier(.2,.8,.2,1) both;line-height:0}
+.badgewrap svg{width:100%;height:auto;display:block}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--soft);border-radius:14px;padding:4px;margin:16px 0 10px}
+.seg button{border:0;background:transparent;min-height:42px;border-radius:11px;font-weight:700;font-size:.95rem;color:var(--muted)}
+.seg button[aria-checked=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.14)}
+.field{display:block;margin:6px 0 0}
+.field span{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:6px}
+.field input,.post{width:100%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:12px 14px;font:inherit}
+.post{min-height:210px;resize:vertical;line-height:1.5;font-size:.97rem}
+section.blk{margin-top:34px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:.38rem .8rem;border-radius:999px;border:1.5px solid var(--line);background:transparent;font-weight:650;font-size:.9rem}
+button.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip b{width:10px;height:10px;border-radius:50%;display:inline-block}
+.lead{font-size:1.25rem;line-height:1.3;letter-spacing:-.02em;font-weight:700;margin:0 0 1.1rem}
+dl{margin:0 0 1rem}
+dt{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:12px}
+dd{margin:2px 0 0}
+.callout{border-radius:18px;padding:16px 18px;background:var(--soft);margin:1rem 0 0}
+.callout b{display:block;margin-bottom:2px}
+.move{margin-top:12px;padding:16px 18px;border-radius:18px;border:1.5px dashed var(--line)}
+.rail{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:2px 20px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.rail::-webkit-scrollbar{display:none}
+.rcard{flex:0 0 88%;scroll-snap-align:center;scroll-snap-stop:always;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px}
+.dotnav{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.dotnav i{width:8px;height:8px;border-radius:50%;background:var(--line);transition:all .2s}
+.dotnav i.on{background:var(--ink);width:22px;border-radius:6px}
+.brow{margin:0 0 14px}
+.rl{display:flex;align-items:baseline;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.rl small{color:var(--muted);font-size:.8rem}
+.rl em{font-style:normal;font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--ink);color:var(--bg);margin-left:auto}
+.bar{height:10px;border-radius:6px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;transform-origin:left;animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
+.note{font-size:.88rem;color:var(--muted);margin:4px 0 0}
+.ladder{position:relative;margin:4px 0 0 8px;padding-left:22px;border-left:2px solid var(--line)}
+.step{position:relative;padding-bottom:18px}
+.step:last-child{padding-bottom:0}
+.step::before{content:"";position:absolute;left:-30px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--card);border:3px solid var(--ink)}
+.step .eyebrow{margin-bottom:6px}
+.step .chips{margin:0}
+.chip.role{font-size:.88rem;font-weight:600;background:var(--soft);border-color:transparent}
+.actions{display:grid;gap:10px;margin-top:14px}
+footer{margin-top:36px;text-align:center}
+footer .links{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+footer .links button{background:none;border:0;padding:10px 12px;color:var(--muted);font-weight:600;font-size:.9rem;text-decoration:underline;text-underline-offset:3px}
+details{text-align:left;margin-top:14px;font-size:.9rem;color:var(--muted)}
+summary{cursor:pointer;font-weight:700;color:var(--ink);padding:8px 0}
+#toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;transition:all .25s;max-width:90vw;text-align:center;z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.rail{align-items:flex-start}
+.krow{padding:16px 0;border-top:1px solid var(--line)}
+.krow:first-child{border-top:0}
+.ktext{white-space:pre-wrap;margin:6px 0 12px;font-size:.97rem;line-height:1.55}
+mark{background:rgba(232,163,23,.28);color:inherit;border-radius:5px;padding:0 3px}
+[hidden]{display:none!important}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--soft);border-radius:16px;padding:4px;margin-top:34px}
+.tabs button{border:0;background:transparent;min-height:48px;border-radius:12px;font-weight:700;font-size:.92rem;color:var(--muted)}
+.tabs button[aria-selected=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.14)}
+section.blk.tabp{margin-top:24px}
+.sblk{margin-top:12px;padding:14px;border-radius:16px;background:var(--soft)}
+.sblk .chip.role{background:var(--card)}
+.plist{margin:4px 0 0;padding-left:1.1rem}
+.plist li{margin:2px 0}
+.pprog{margin:18px 0 12px}
+.pprog span{display:block;font-size:.85rem;font-weight:700;margin-bottom:6px}
+.dpills{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:0 0 14px}
+.dpill{min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-weight:800}
+.dpill.done{background:var(--soft);color:var(--muted)}
+.dpill[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.row2 .btn.sm{width:100%}
+.btn.sm{min-height:40px;width:auto;display:inline-flex;padding:0 18px;font-size:.9rem;border-radius:12px}
+.kbhint{display:none}
+@media (hover:hover) and (pointer:fine){.kbhint{display:inline}}
+@media (min-width:700px){
+  #app{max-width:560px}
+  .stmt{font-size:2.3rem}
+}
+@media (min-width:980px){
+  #app.wide{max-width:1180px;padding-left:40px;padding-right:40px}
+  .rgrid{display:grid;grid-template-columns:minmax(380px,440px) 1fr;gap:56px;align-items:start}
+  .rleft{position:sticky;top:20px}
+  .rright>section.blk:first-child{margin-top:0}
+  .rail{display:grid;grid-template-columns:1fr 1fr;overflow:visible;margin:0;padding:0;gap:16px;align-items:stretch}
+  .rail .rcard:nth-child(3){grid-column:1/-1}
+  .rcard{flex:none}
+  .dotnav{display:none}
+  .rail .ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;border-left:0;padding-left:0;margin-left:0}
+  .rail .step{padding-bottom:0}
+  .rail .step::before{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<noscript><p style="padding:24px">This app needs JavaScript to run. Nothing is sent anywhere; it all happens on your device.</p></noscript>
+<div id="app"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ================= DATA & LOGIC (no DOM) ================= */
+/* Set this to your quiz link once it is hosted, e.g. 'yourname.github.io/thinking-style'. When set, it appears on the badge and in the post drafts. */
+const SHARE_URL='';
+const ORDER=['process','people','product','profit','project'];
+const SIZES=[['Startup','1–10 people'],['Small business','11–50'],['Scale-up','51–250'],['Mid-size','251–1,000'],['Enterprise','1,000+']];
+const DOMS=['Technology & Software','Healthcare','Finance & Banking','Education & Non-profit','Manufacturing & Logistics','Retail & Consumer','Construction & Engineering','Creative & Media','Government & Public Sector','Consulting & Professional Services','Energy & Resources','Hospitality & Tourism'];
+/* Industry seats: one entry per DOMS index; five tuples in ORDER (process, people, product, profit, project): [roles, what you do there] */
+const SEATS=[
+ /* Technology & Software */[
+  [['DevOps / Platform Engineer','IT Operations Manager','Quality Assurance Lead'],'You make releases boring and reliable: pipelines, incident processes and the runbooks everyone else depends on.'],
+  [['Engineering Manager','Developer Relations','Customer Success Manager'],'You grow teams and keep customers: hiring, coaching, onboarding and the relationships that renew contracts.'],
+  [['Product Manager','UX Designer','Technical Product Owner'],'You decide what gets built and why: discovery, design and a roadmap that follows the real customer problem.'],
+  [['Pricing Analyst','Revenue Operations Manager','Sales Engineer'],'You connect software to revenue: pricing, packaging, unit economics and where the next dollar comes from.'],
+  [['Technical Programme Manager','Scrum Master','Delivery Manager'],'You get complex releases over the line: dependencies, risks and a plan that keeps many teams moving together.']],
+ /* Healthcare */[
+  [['Clinical Operations Manager','Quality and Safety Officer','Patient Flow Coordinator'],'You cut waiting and error: care pathways, safety checks and systems that keep treatment consistent.'],
+  [['Nurse Unit Manager','Patient Experience Lead','Allied Health Team Lead'],'You hold teams and patients steady: staffing, wellbeing and the conversations that build trust.'],
+  [['Digital Health Product Manager','Service Designer','Clinical Innovation Lead'],'You redesign care around the patient: services, apps and pathways people can use when they are unwell.'],
+  [['Health Economist','Hospital Business Manager','Funding and Contracts Analyst'],'You make care sustainable: funding models, cost per patient and the business case for a new service.'],
+  [['Clinical Project Manager','Change Manager','Health IT Implementation Lead'],'You land change in busy settings: system rollouts, new wards and programmes without disrupting care.']],
+ /* Finance & Banking */[
+  [['Payments Operations Manager','Risk and Controls Analyst','Regulatory Reporting Lead'],'You make money movement safe and accurate: controls, reconciliations and processes that stand up to audit.'],
+  [['Relationship Manager','Financial Planner','Talent and Culture Partner'],'You earn client trust: advice, long relationships and the conversations that matter when money is at stake.'],
+  [['Fintech Product Manager','Digital Banking Designer','Product Strategist'],'You build better ways to bank: simpler journeys, new products and fewer reasons for customers to call.'],
+  [['Financial Analyst','Credit or Investment Analyst','FP&A Lead'],'You price risk and find value: analysis, forecasting and the numbers behind lending and investment decisions.'],
+  [['Transformation Programme Manager','Compliance Project Lead','PMO Analyst'],'You deliver regulated change: big programmes with fixed deadlines, audits and many stakeholders.']],
+ /* Education & Non-profit */[
+  [['Operations Manager','Grants Administrator','Student Services Coordinator'],'You make a small budget go far: clean admin, compliant grants and routines volunteers can follow.'],
+  [['Teacher or Lecturer','Volunteer Manager','Programme Coordinator'],'You grow people: teaching, mentoring and the community that keeps the mission alive.'],
+  [['Curriculum Designer','Learning Experience Designer','Programme Designer'],'You design how people learn or get help: courses, programmes and services built around real needs.'],
+  [['Fundraising and Partnerships Manager','Grants Strategist','Finance Manager'],'You fund the mission: donors, grants and the case that shows impact per dollar.'],
+  [['Programme Project Manager','Events and Campaign Manager','Grant Delivery Lead'],'You turn funding into delivery: programmes on time, on scope and reported back to funders.']],
+ /* Manufacturing & Logistics */[
+  [['Continuous Improvement Engineer','Supply Chain Planner','Quality Manager'],'You remove waste: lean flow, planning and quality systems that cut defects and delays.'],
+  [['Production Supervisor','Safety and Culture Lead','Workforce Planner'],'You keep the floor safe and steady: supervision, training and a culture that prevents incidents.'],
+  [['Product Engineer','Design for Manufacture Specialist','New Product Introduction Lead'],'You design things that can be built well and cheaply: new products from concept to production.'],
+  [['Cost Analyst','Procurement Manager','Pricing Manager'],'You protect margin: sourcing, costing and pricing across the supply chain.'],
+  [['Project Engineer','Logistics Programme Manager','Plant Expansion Lead'],'You deliver big physical change: new lines, warehouses and systems installed with minimal downtime.']],
+ /* Retail & Consumer */[
+  [['Inventory Planner','Store Operations Manager','Merchandising Operations Lead'],'You keep the right thing on the shelf: stock flow, store routines and fulfilment that work every day.'],
+  [['Store Manager','Customer Experience Lead','Community Manager'],'You build loyalty: teams who care and customers who come back.'],
+  [['Category Manager','Brand and Packaging Designer','E-commerce Product Owner'],'You decide what people want next: range, design and the shopping experience online and in store.'],
+  [['Merchandise Planner','Pricing and Promotions Analyst','Retail Finance Analyst'],'You win on margin: pricing, promotions and range decisions backed by sales data.'],
+  [['Retail Programme Manager','Store Rollout Manager','Campaign Delivery Lead'],'You launch on time: store openings, seasonal campaigns and systems changes across many sites.']],
+ /* Construction & Engineering */[
+  [['Quality and Compliance Manager','Document Controller','Engineering Systems Lead'],'You keep sites safe and compliant: standards, documentation and sign-offs that prevent expensive rework.'],
+  [['Site Supervisor','Safety Leader','Community Liaison Officer'],'You lead crews and neighbours: safe sites, clear communication and trust with the community.'],
+  [['Design Engineer','Design Manager','Sustainability Designer'],'You shape what gets built: design that solves the client’s real problem within real constraints.'],
+  [['Quantity Surveyor','Estimator','Commercial Manager'],'You price the job and protect the margin: estimates, variations and cost control.'],
+  [['Project Manager','Construction Planner','Programme Director'],'You run the build: scope, schedule, subcontractors and the risks that threaten the handover date.']],
+ /* Creative & Media */[
+  [['Production Manager','Studio Traffic Manager','Content Operations Lead'],'You keep creative work flowing: briefs, approvals and schedules so good ideas ship on time.'],
+  [['Creative Team Lead','Account Manager','Community Manager'],'You protect the team and the client relationship: feedback that helps and audiences that feel heard.'],
+  [['Creative Strategist','Art Director','Editorial Lead'],'You make the work itself: concepts, design and storytelling people choose to spend time on.'],
+  [['Media Planner','Business Affairs Manager','Commercial Producer'],'You turn attention into revenue: budgets, rights, partnerships and what a campaign is worth.'],
+  [['Producer','Campaign Manager','Events Producer'],'You deliver the launch: shoots, campaigns and events brought in on budget and on the day.']],
+ /* Government & Public Sector */[
+  [['Policy Operations Officer','Service Delivery Manager','Compliance and Audit Officer'],'You make public services fair and consistent: procedures, records and compliance that withstand scrutiny.'],
+  [['Community Engagement Officer','Case Manager','Team Leader'],'You listen to citizens and staff: engagement, casework and teams that deliver under pressure.'],
+  [['Service Designer','Digital Product Manager','Policy Designer'],'You redesign how people deal with government: simpler services built around real citizen needs.'],
+  [['Budget Analyst','Procurement Officer','Evaluation Analyst'],'You make public money count: budgets, procurement and evidence of value for taxpayers.'],
+  [['Project Manager','Programme Delivery Lead','Transformation Manager'],'You deliver public programmes: policy turned into systems and services, on schedule and accountable.']],
+ /* Consulting & Professional Services */[
+  [['Operations Consultant','Process Improvement Consultant','Risk and Compliance Advisor'],'You fix how organisations run: process design, controls and operating models.'],
+  [['Change Management Consultant','Organisational Development Advisor','Client Partner'],'You help people adopt change: stakeholders, workshops and long client relationships.'],
+  [['Strategy Consultant','Service Design Consultant','Proposition Lead'],'You shape what clients offer next: research, concepts and the case for a new service.'],
+  [['Management Consultant','Financial Advisory Analyst','Due Diligence Analyst'],'You answer the money question: models, benchmarks and recommendations leaders act on.'],
+  [['Engagement Manager','PMO Consultant','Transformation Programme Lead'],'You run the engagement: scope, team, deliverables and a client who always knows where things stand.']],
+ /* Energy & Resources */[
+  [['Operations Excellence Engineer','Maintenance Planner','HSE Systems Lead'],'You keep critical assets running safely: maintenance planning, permits and systems where mistakes are costly.'],
+  [['Operations Team Lead','Stakeholder Relations Manager','Workforce Development Lead'],'You build trust on and around the site: crews, landowners and communities.'],
+  [['Energy Transition Product Manager','Process Design Engineer','New Energy Business Developer'],'You design what comes next: new energy products, services and technologies.'],
+  [['Commodity Analyst','Asset Economics Analyst','Commercial Manager'],'You judge which projects pay: price curves, capital allocation and the economics of an asset.'],
+  [['Capital Projects Manager','Turnaround Planner','Project Controls Lead'],'You deliver large, high-risk projects: turnarounds, builds and upgrades inside tight safety and schedule windows.']],
+ /* Hospitality & Tourism */[
+  [['Front Office Manager','Reservations Systems Lead','Food Safety and Quality Manager'],'You make the guest experience repeatable: standards and systems that hold on the busiest night.'],
+  [['Hotel or Venue Manager','Guest Experience Lead','Events Team Leader'],'You create warmth at scale: teams who care and guests who return.'],
+  [['Experience Designer','Food and Beverage Concept Developer','Tourism Product Developer'],'You design experiences people tell stories about: venues, menus and journeys.'],
+  [['Revenue Manager','Food and Beverage Cost Controller','Partnerships Manager'],'You fill rooms at the right price: yield, costs and the partnerships that bring guests in.'],
+  [['Events Manager','Refurbishment Project Manager','Tour Operations Manager'],'You deliver the big moment: events, openings and itineraries where everything must happen on schedule.']]
+].map(arr=>{const o={};ORDER.forEach((k,j)=>{o[k]={r:arr[j][0],t:arr[j][1]};});return o;});
+function seatBlocks(r,i){
+  const o=r.order,S=SEATS[i];
+  const pick=r.shape==='pure'?[o[0]]:r.shape==='duo'?[o[0],o[1]]:r.shape==='trio'?[o[0],o[1],o[2]]:o.slice();
+  return {blocks:pick.map(k=>({k,roles:S[k].r,t:S[k].t})),team:(r.shape==='rounded'||r.flat)?null:{k:r.blind,roles:S[r.blind].r}};
+}
+
+const STY={
+ process:{name:'Process',col:'#2F6FED',dark:'#2556C9',title:'Systems Builder',
+  line:'You see the system behind the symptom, and you fix it once, properly.',
+  super:'turn messy work into systems that run themselves',
+  watch:'can over-engineer, or resist change that breaks the rules',
+  action:'Write down one thing only you know how to do, as if you were leaving tomorrow.',
+  sizeW:[0,1,3,3,3],domW:[1,2,2,1,3,2,2,0,2,2,3,2],
+  roles:{now:['Operations Analyst','Process Improvement Officer','Quality Coordinator'],next:['Operations Manager','Business Excellence Lead','Systems Manager'],reach:['Head of Operations','Chief Operating Officer','Chief of Staff']}},
+ people:{name:'People',col:'#F2644F',dark:'#D9452F',title:'Culture Catalyst',
+  line:'You feel the temperature of a room, and you turn a group into a team.',
+  super:'read people and bring them along',
+  watch:'can avoid a hard call to keep the peace',
+  action:'Ask one person what they need that they haven’t said out loud.',
+  sizeW:[1,3,3,2,2],domW:[1,3,1,3,1,2,0,2,2,2,1,3],
+  roles:{now:['Team Lead','People & Culture Coordinator','Customer Success Representative'],next:['HR Business Partner','Customer Success Manager','Head of Community'],reach:['Chief People Officer','Executive Coach','Founder of a people-first company']}},
+ product:{name:'Product',col:'#8B5CF6',dark:'#6D3FE0',title:'Experience Maker',
+  line:'You ask why until you find the real problem, then you make the answer beautiful.',
+  super:'find the real problem and craft something people love',
+  watch:'can chase perfect and miss the ship date',
+  action:'Ask “why?” three times about your current project, then cut one thing.',
+  sizeW:[3,2,3,1,1],domW:[3,1,1,1,1,3,1,3,0,1,1,2],
+  roles:{now:['Product Designer','Associate Product Manager','UX / Content Strategist'],next:['Product Manager','Design Lead','Innovation Lead'],reach:['Head of Product','Chief Product Officer','Founder']}},
+ profit:{name:'Profit',col:'#14A36B',dark:'#0E8556',title:'Value Driver',
+  line:'You follow the numbers to the truth, and have the nerve to act on it.',
+  super:'see what makes money and have the nerve to act on it',
+  watch:'can undervalue what doesn’t show up in a spreadsheet yet',
+  action:'Put a number on your best idea in one line: cost, return, time.',
+  sizeW:[1,2,3,3,2],domW:[1,1,3,0,1,3,1,0,0,3,2,2],
+  roles:{now:['Financial Analyst','Business Analyst','Sales Executive'],next:['Commercial Manager','Strategy Consultant','FP&A Lead'],reach:['Chief Financial Officer','General Manager','Managing Director']}},
+ project:{name:'Project',col:'#E8A317',dark:'#B97A00',title:'Delivery Engine',
+  line:'You turn big, vague goals into finished work, on time and on scope.',
+  super:'break big goals into steps and see them through',
+  watch:'can protect the plan when the plan should change',
+  action:'Take your vaguest goal and write the next three steps. Just three.',
+  sizeW:[0,1,2,3,3],domW:[2,1,1,1,2,1,3,1,3,2,3,1],
+  roles:{now:['Project Coordinator','Delivery Analyst','Planner / Scheduler'],next:['Project Manager','Scrum Master','Programme Coordinator'],reach:['Programme Director','Head of PMO','Chief Operating Officer']}}
+};
+const DUO={
+ 'process+people':{name:'The Steward',line:'Systems that treat people well.',roles:['Employee Experience Lead','Service Delivery Manager','People Operations Manager']},
+ 'process+product':{name:'The Platform Builder',line:'Elegant systems that scale.',roles:['Product Operations Manager','Platform Product Manager','Design Systems Lead']},
+ 'process+profit':{name:'The Optimiser',line:'Efficiency you can see in the margin.',roles:['Business Process Consultant','Operations Finance Partner','Cost & Efficiency Lead']},
+ 'process+project':{name:'The Operator',line:'Reliable, repeatable delivery.',roles:['PMO Lead','Delivery Operations Manager','Programme Operations Manager']},
+ 'people+product':{name:'The Advocate',line:'Human-centred creation.',roles:['UX Researcher','Customer Experience Designer','Community Product Lead']},
+ 'people+profit':{name:'The Dealmaker',line:'Relationships that close.',roles:['Account Director','Partnerships Lead','Business Development Manager']},
+ 'people+project':{name:'The Captain',line:'Brings a team home on time.',roles:['Delivery Lead / Scrum Master','Programme Manager','Agile Coach']},
+ 'product+profit':{name:'The Entrepreneur',line:'Builds what sells.',roles:['Founder','Growth Product Manager','New Venture Lead']},
+ 'product+project':{name:'The Shipper',line:'Great ideas that actually launch.',roles:['Technical Programme Manager','Product Delivery Lead','Launch Manager']},
+ 'profit+project':{name:'The Closer',line:'Commercial discipline, delivered.',roles:['Portfolio Manager','Transformation Lead','Commercial Project Director']}
+};
+const ROUNDED={now:['Business Operations Associate','Programme Coordinator','Customer Success Representative'],next:['Business Manager','Strategy & Operations Lead','Chief of Staff (associate)'],reach:['General Manager','Chief of Staff','Generalist Founder']};
+const PAIR={
+ process:{who:'a Process thinker',why:'They’ll spot the workflow you walk past and make your best ideas repeatable.'},
+ people:{who:'a People thinker',why:'They’ll read the room before you walk into it.'},
+ product:{who:'a Product thinker',why:'They’ll ask “why?” before you build, and sweat how it feels to use.'},
+ profit:{who:'a Profit thinker',why:'They’ll ask how it pays for itself before you’ve spent it.'},
+ project:{who:'a Project thinker',why:'They’ll protect the deadline and break the goal into steps.'}
+};
+const TB={
+ process:'Fix the system so it can’t happen again.',
+ people:'Make sure everyone feels heard before we move.',
+ product:'Make it right, even if it takes longer.',
+ profit:'Make sure it pays for itself.',
+ project:'Get it done, on time, as planned.'
+};
+const SHAPE_LABEL={pure:'Focused profile',duo:'Duo profile',trio:'Trio profile',rounded:'Balanced profile'};
+const RAW_Q={
+ process:[
+  'When something goes wrong, I look for the flaw in the system before I look for who to blame.',
+  'It bothers me when people redo work that someone has already solved.',
+  'I like writing down how things are done so anyone can repeat them.',
+  'I feel calmer when there’s a clear standard to follow.',
+  'If I do something twice, I start thinking about how to automate it.'],
+ people:[
+  'I pick up on the mood of a room within minutes.',
+  'Before I decide, I ask how it will land with the people affected.',
+  'People often come to me to talk things through.',
+  'I’d rather take longer and bring the team with me than push a decision through.',
+  'I believe a team that enjoys working together will beat a team that doesn’t.'],
+ product:[
+  'I keep asking “why?” until I find the real problem behind the request.',
+  'I notice small details in everyday products and think about how to improve them.',
+  'I would delay a launch to get the quality right.',
+  'New ideas and market shifts give me energy.',
+  'I care how something feels to use, not only whether it works.'],
+ profit:[
+  'Before I back an idea, I want to see how it pays for itself.',
+  'I look at the numbers first and the story second.',
+  'I’m comfortable making a tough call when the numbers support it.',
+  'I naturally think about margins and return on effort.',
+  'I measure success by growth and value created.'],
+ project:[
+  'Crossing items off a list gives me real satisfaction.',
+  'I protect deadlines and scope.',
+  'I’m good at turning a vague goal into small, clear steps.',
+  'I spot risks and blockers before they happen.',
+  'I’d rather deliver steadily than chase the next shiny idea.']
+};
+const QS=[];
+ORDER.forEach(s=>RAW_Q[s].forEach((t,i)=>QS.push({id:s+i,s,t})));
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function makeDeck(){
+  let best=null;
+  for(let n=0;n<40;n++){
+    const d=makeDeckOnce();let adj=0;
+    for(let i=1;i<d.length;i++)if(d[i].s===d[i-1].s)adj++;
+    if(!best||adj<best.adj)best={d,adj};
+    if(adj===0)break;
+  }
+  return best.d;
+}
+function makeDeckOnce(){
+  const pools={};ORDER.forEach(s=>pools[s]=shuffle(QS.filter(q=>q.s===s)));
+  const out=[];let last=null;
+  while(out.length<QS.length){
+    let cands=ORDER.filter(s=>pools[s].length&&s!==last);
+    if(!cands.length)cands=ORDER.filter(s=>pools[s].length);
+    const tot=cands.reduce((n,s)=>n+pools[s].length,0);
+    let r=Math.random()*tot,pick=cands[0];
+    for(const s of cands){r-=pools[s].length;if(r<=0){pick=s;break;}}
+    out.push(pools[pick].pop());last=pick;
+  }
+  return out;
+}
+function tally(answers){
+  const raw={},peaks={},zeros={};ORDER.forEach(k=>{raw[k]=0;peaks[k]=0;zeros[k]=0;});
+  QS.forEach(q=>{const a=answers[q.id];if(a==null)return;raw[q.s]+=a;if(a===3)peaks[q.s]++;if(a===0)zeros[q.s]++;});
+  return {raw,peaks,zeros};
+}
+function ranked(t,bonus){
+  bonus=bonus||{};
+  return ORDER.slice().sort((a,b)=>
+    ((t.raw[b]+(bonus[b]||0))-(t.raw[a]+(bonus[a]||0)))||(t.peaks[b]-t.peaks[a])||(t.zeros[a]-t.zeros[b])||(ORDER.indexOf(a)-ORDER.indexOf(b)));
+}
+function findTie(answers){
+  const t=tally(answers),o=ranked(t),v=o.map(k=>t.raw[k]);
+  if(v[0]-v[4]<=3)return null;
+  const key=k=>t.raw[k]+'|'+t.peaks[k]+'|'+t.zeros[k];
+  for(let p=0;p<2;p++){
+    if(key(o[p])===key(o[p+1])){
+      const g=[];for(let j=p;j<5&&key(o[j])===key(o[p]);j++)g.push(o[j]);
+      return g.slice(0,3);
+    }
+  }
+  return null;
+}
+function duoKey(a,b){return ORDER.indexOf(a)<ORDER.indexOf(b)?a+'+'+b:b+'+'+a;}
+function hash4(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(36).toUpperCase().padStart(4,'0').slice(-4);}
+function compute(answers,bonus,dateISO){
+  const t=tally(answers),order=ranked(t,bonus),v=order.map(k=>t.raw[k]);
+  let shape;
+  if(v[0]-v[4]<=3)shape='rounded';
+  else if(v[0]-v[2]<=2)shape='trio';
+  else if(v[0]-v[1]<=2)shape='duo';
+  else shape='pure';
+  const A=STY[order[0]],B=STY[order[1]],C=STY[order[2]];
+  let title,sub,line,styles,dk=null;
+  if(shape==='pure'){title=A.title;sub='A focused '+A.name+' thinker';line=A.line;styles=[order[0]];}
+  else if(shape==='duo'){dk=duoKey(order[0],order[1]);title=DUO[dk].name;sub=A.name+' + '+B.name+' · '+A.name+'-led';line=DUO[dk].line;styles=[order[0],order[1]];}
+  else if(shape==='trio'){title='The Integrator';sub=A.name+' · '+B.name+' · '+C.name;line='Three strengths in play. You connect dots others keep apart.';styles=order.slice(0,3);}
+  else{title='The All-Rounder';sub='Balanced across all five';line='You can step into almost any seat and see the whole table.';styles=order.slice();}
+  const mn=v[4],mx=v[0],rel={};
+  ORDER.forEach(k=>rel[k]=mx>mn?0.28+0.72*(t.raw[k]-mn)/(mx-mn):0.7);
+  const day=(dateISO||'').slice(0,10);
+  const id='TSP-'+hash4(ORDER.map(k=>t.raw[k]).join('-')+day)+'-'+day.replace(/-/g,'').slice(2);
+  return {raw:t.raw,order,shape,title,sub,line,styles,blind:order[4],flat:v[0]===v[4],rel,id,date:dateISO,duoKey:dk};
+}
+function rolesFor(r,tier){
+  const o=r.order,d=STY[o[0]],s=STY[o[1]],c=STY[o[2]];let a;
+  if(r.shape==='pure')a=d.roles[tier];
+  else if(r.shape==='duo')a=tier==='next'?DUO[r.duoKey].roles:tier==='now'?[d.roles.now[0],d.roles.now[1],s.roles.now[0]]:[d.roles.reach[0],s.roles.reach[0],d.roles.reach[1]];
+  else if(r.shape==='trio')a=[d.roles[tier][0],s.roles[tier][0],c.roles[tier][0]];
+  else a=ROUNDED[tier];
+  return Array.from(new Set(a)).slice(0,3);
+}
+function fits(r,key){
+  const mn=Math.min(...ORDER.map(k=>r.raw[k])),w={};let tw=0;
+  ORDER.forEach(k=>{w[k]=r.raw[k]-mn+1;tw+=w[k];});
+  const n=STY.process[key].length;
+  return Array.from({length:n},(_,i)=>ORDER.reduce((s,k)=>s+w[k]*STY[k][key][i],0)/(tw*3));
+}
+function meaning(r){
+  const o=r.order,A=STY[o[0]],B=STY[o[1]],C=STY[o[2]];let sp,wo;
+  if(r.shape==='pure'){sp='You '+A.super+'.';wo='Your '+A.name+' side '+A.watch+'.';}
+  else if(r.shape==='duo'){sp='You '+A.super+', and '+B.super+'.';wo='Your '+A.name+' side '+A.watch+'. Your '+B.name+' side '+B.watch+'.';}
+  else if(r.shape==='trio'){sp='You '+A.super+', '+B.super+', and '+C.super+'.';wo='Your '+A.name+' side '+A.watch+'.';}
+  else{sp='You can switch lenses on demand (systems, people, product, profit or project), whichever the moment needs.';wo='With no strong default it’s easy to drift. Choose a lens on purpose.';}
+  const act=r.flat?'Pick the one lens your next project needs most, and lead with it on purpose.':r.shape==='rounded'?STY[r.blind].action:A.action;
+  return {sp,wo,act};
+}
+function postText(r,tone){
+  let t=postTextBase(r,tone);
+  if(SHARE_URL){const i=t.lastIndexOf('\n\n#');if(i>-1)t=t.slice(0,i)+'\n\nTake it yourself: '+SHARE_URL+t.slice(i);}
+  return t;
+}
+function postTextBase(r,tone){
+  const names=r.styles.length===5?'all five styles':r.styles.map(k=>STY[k].name).join(' + ');
+  const bl=STY[r.blind].name,pr=PAIR[r.blind].who,bw=r.shape==='rounded'?'quietest lens':'blind spot';
+  const t=r.title;
+  if(r.flat){
+    if(tone==='curious')return '25 statements. 3 minutes. One surprisingly useful badge.\n\nMine says '+t+': '+r.line+'\n\nApparently I switch lenses on demand. Now I want to know who is the opposite.\n\nWhat’s yours?\n\n#ThinkingStyle #Teamwork #CareerDevelopment';
+    if(tone==='bold')return t+'. '+r.line+'\n\nFind your style. Then find your complement.\n\n#ThinkingStyle #Leadership #CareerGrowth';
+    return 'I took a thinking-style self-assessment this week. My result: '+t+' ('+names+').\n\nThe lesson: with no default lens, I have to choose one on purpose.\n\nWhat’s yours?\n\n#ThinkingStyle #SelfAwareness #CareerGrowth';
+  }
+  if(tone==='curious')return '25 statements. 3 minutes. One surprisingly useful badge.\n\nMine says '+t+': '+r.line+'\n\nThe part I’m chewing on: my '+bw+' is '+bl+', so the person I need next to me is '+pr+'.\n\nWho’s your complement?\n\n#ThinkingStyle #Teamwork #CareerDevelopment';
+  if(tone==='bold')return t+'. '+r.line+'\n\nI lead with '+names+', and I know exactly who completes me: '+pr+'.\n\nFind your style. Then find your complement.\n\n#ThinkingStyle #Leadership #CareerGrowth';
+  return 'I took a thinking-style self-assessment this week. My result: '+t+' ('+names+').\n\nWhat stuck with me: my '+bw+' is '+bl+'. If you’ve worked with me, tell me where you’ve seen it.\n\nWhat’s yours?\n\n#ThinkingStyle #SelfAwareness #CareerGrowth';
+}
+const TAG={
+ process:'turning messy work into systems that run',
+ people:'building teams people want to work in',
+ product:'making things people love',
+ profit:'finding where the value is made',
+ project:'delivering complex work on time'
+};
+const KW={
+ process:['Process improvement','Workflow automation','Standard operating procedures','Quality management','Continuous improvement'],
+ people:['Stakeholder engagement','Coaching and mentoring','Conflict resolution','Team building','Culture and engagement'],
+ product:['Product thinking','User experience','Customer discovery','Innovation','Roadmapping'],
+ profit:['Financial analysis','Commercial acumen','Business cases','Return on investment','Margin management'],
+ project:['Project planning','Risk management','Stakeholder reporting','Delivery management','Scope management']
+};
+function lensOf(r){
+  const o=r.order,S0=STY[o[0]],S1=STY[o[1]],S2=STY[o[2]];
+  if(r.shape==='pure')return {tag:TAG[o[0]],sup:S0.super};
+  if(r.shape==='duo')return {tag:TAG[o[0]]+' and '+TAG[o[1]],sup:S0.super+', and '+S1.super};
+  if(r.shape==='trio')return {tag:TAG[o[0]]+', '+TAG[o[1]]+' and '+TAG[o[2]],sup:S0.super+', '+S1.super+', and '+S2.super};
+  return {tag:'moving between systems, people, product, numbers and delivery as the problem needs',sup:'switch lenses to fit the problem (systems, people, product, numbers or delivery)'};
+}
+function keywords(r){
+  const o=r.order,out=[],take=(k,n)=>KW[k].slice(0,n).forEach(x=>out.push(x));
+  if(r.shape==='pure')take(o[0],5);
+  else if(r.shape==='duo'){take(o[0],3);take(o[1],2);}
+  else if(r.shape==='trio'){take(o[0],2);take(o[1],2);take(o[2],1);}
+  else o.forEach(k=>take(k,1));
+  return out;
+}
+function kit(r,role){
+  const L=lensOf(r),K=keywords(r),A=STY[r.order[0]];
+  const headTag=r.shape==='rounded'?'moving between systems, people, product, numbers and delivery':TAG[r.order[0]];
+  const up=headTag.charAt(0).toUpperCase()+headTag.slice(1);
+  const dev=r.flat
+    ?'with no default lens, I can drift. I manage that by choosing the lens each project needs at kickoff and saying it out loud'
+    :'my '+A.name+' side '+A.watch+'. I manage that by [one habit you use], and by working closely with '+PAIR[r.blind].who;
+  return [
+    {t:'LinkedIn headline, option 1: your edge',x:role+' | '+up},
+    {t:'LinkedIn headline, option 2: searchable',x:role+' · '+K.slice(0,3).join(', ')},
+    {t:'LinkedIn About: opening',x:'I '+L.sup+'.\n\nThat is what I want to do more of as '+role+'. [Add one result with a number: what you changed, and by how much.]'},
+    {t:'CV summary',x:role+' focused on '+L.tag+'. [Add your years of experience and your most measurable result.]'},
+    {t:'Cover letter paragraph',x:'What I would bring to the '+role+' role is simple: I '+L.sup+'. In my last role that looked like [one specific example and its result]. I would like to do the same for [company], especially [one priority from the job ad].'},
+    {t:'Interview: strength and development area',x:'Strength: I '+L.sup+'. Example: [situation, what you did, and the result, in three sentences].\n\nDevelopment area: '+dev+'.'},
+    {t:'Skills to add to LinkedIn and your CV',x:K.join(', ')}
+  ];
+}
+const DAYH=['Announce it','Understand it','Make a rough first draft','Ask for feedback','Improve it','Finish and publish','Reflect and share the lesson'];
+const CASES={
+ process:{title:'Turn a messy process into a one-page system',
+  brief:'Pick a messy everyday process, such as onboarding a new hire, handling a customer complaint or monthly reporting. Map how it works today, find the three biggest delays or errors, and redesign it.',
+  deliverable:'A before and after flow, plus a one-page checklist someone else can follow.',
+  done:['A before and after flow on one page','A checklist someone could follow without asking you','One improvement with a number, clearly marked as an estimate if it is one'],
+  d2:'Map the current process step by step. Count the handoffs and the waiting time.',
+  d3:'Draw the redesigned flow. Cut every step you can.',
+  d5:'Test the checklist on one person who has not seen it. Fix every place they stumble.',
+  d6:'Publish the before and after flow and the checklist as a PDF or a short carousel.'},
+ people:{title:'Run a team conversation that clears a real blockage',
+  brief:'Take a common team tension, such as unclear ownership, meetings that go nowhere or feedback that never lands. Design a 30-minute conversation, run it with friends or colleagues who agree to take part, and write up what happened.',
+  deliverable:'A one-page facilitation guide and an anonymised write-up of what happened.',
+  done:['A 30-minute agenda anyone could reuse','Everyone’s consent, and names removed','Two things that surprised you about how people responded'],
+  d2:'Talk to two or three people about the tension, with their consent. Listen more than you talk.',
+  d3:'Draft the 30-minute agenda: an opening, one question for each person, and one commitment at the end.',
+  d5:'Run it with a real group, then ask what felt useful and what felt awkward. Revise the agenda.',
+  d6:'Publish the guide and the anonymised write-up.'},
+ product:{title:'Teardown and redesign of an everyday screen',
+  brief:'Pick one screen from an everyday app, such as a booking, checkout or settings screen. Ask why it exists, who it is for and where people get stuck, then redesign it. Sketch it yourself rather than republishing screenshots.',
+  deliverable:'An annotated teardown of the original and a hand-drawn redesign, with the reasoning.',
+  done:['Three problems you found, each with a reason','A redesign you drew yourself','One thing you removed on purpose'],
+  d2:'Use the screen as a customer and write down every point of friction. Ask three people to try the same task.',
+  d3:'Sketch two redesigns quickly, then pick one.',
+  d5:'Show it to the same three people and watch where they hesitate. Fix that.',
+  d6:'Publish the teardown and redesign as a short carousel with your reasoning.'},
+ profit:{title:'A one-page business case for a small idea',
+  brief:'Choose a small real-world idea, such as a local service, a product tweak or a pricing change. Work out who pays, how much, what it costs and when it pays back.',
+  deliverable:'A one-page business case with a simple model.',
+  done:['Every assumption labelled as a fact or a guess','Break-even or payback shown simply','The biggest risk to the numbers, named'],
+  d2:'List every assumption. Mark each as a sourced fact or a guess.',
+  d3:'Build a simple model: revenue, costs and break-even.',
+  d5:'Ask someone from that industry to challenge your top three assumptions. Update the model.',
+  d6:'Publish the one-pager with a summary of the model.'},
+ project:{title:'Plan and de-risk a two-week launch',
+  brief:'Pick a small launch, such as a community event, a product release or a campaign. Break it into tasks, find the five biggest risks and plan how you would handle each.',
+  deliverable:'A two-week plan with milestones and a risk register.',
+  done:['Milestones with dates and owners','The top five risks, each with a response','A list of what you would cut first'],
+  d2:'Write the end goal, then work backwards: milestones, owners and dependencies.',
+  d3:'Draft the plan and a risk list with likelihood and impact.',
+  d5:'Ask someone who has run a launch to find what you missed. Add it.',
+  d6:'Publish the plan and risk register as a one-page document.'}
+};
+const TWISTS=[
+ {short:'in a different industry',text:'Run the same brief in an industry you want to work in next.'},
+ {short:'with half the time and no budget',text:'Do the smallest version that still works.'},
+ {short:'as a lesson for beginners',text:'Explain it so a beginner could repeat it, with a worked example.'}
+];
+const PROOF_MODES=[['master','Master it'],['stretch','Stretch it'],['remix','Remix it'],['own','Your own']];
+function proofPlan(r,p){
+  const mode=p.mode;let sty=null,c,twist=null,label,why;
+  if(mode==='own'){
+    c={title:p.ownT||'[Your project name]',
+      brief:'You choose the project. Pick something small enough to finish in a week and visible enough that people can react to it. The outcome: '+(p.ownO||'[what will exist at the end, in one sentence]')+'.',
+      deliverable:p.ownO||'[the finished thing you will publish]',
+      done:['A finished thing someone else can look at or use','Your progress shown, with a before and after','What you learned, in one paragraph'],
+      d2:'Gather what you need: talk to two people or collect three examples.',
+      d3:'Make a rough first version. Ugly is fine.',
+      d5:'Apply the feedback and keep a before and after.',
+      d6:'Publish the finished piece where people can see it.'};
+    label='Your own project';
+    why='The goal: '+(p.ownO||'[what you want to have made by day 7]')+'.';
+  }else{
+    sty=mode==='master'?r.order[0]:mode==='stretch'?r.blind:(p.style||r.order[0]);
+    c=CASES[sty];
+    if(mode==='remix')twist=TWISTS[p.twist||0];
+    label=mode==='master'?'Master it · your strongest lens':mode==='stretch'?'Stretch it · your blind spot':'Remix it';
+    why=mode==='master'?'This is '+STY[sty].name+'-style work, my strongest lens, so I’m sharpening it in public.'
+      :mode==='stretch'?STY[sty].name+' is my quietest lens, so I’m practising it in public for a week.'
+      :'I’m remixing a practice brief '+twist.short+'.';
+  }
+  const title=c.title,brief=c.brief+(twist?' Twist: '+twist.text:''),d6=c.d6+(twist?' Remember the twist: '+twist.text:'');
+  const reviewer=mode==='stretch'?'I’d especially like a '+PAIR[sty].who.replace(/^a /,'')+' to look at this.':'Be blunt.';
+  const tasks=[
+    'Write down what you will make and why it matters to you. Post it today. The post is the commitment.',
+    c.d2,c.d3,
+    'Share the rough draft and ask three people three specific questions. Name the one thing you already know is wrong.',
+    c.d5,d6,
+    'Write what you learned: what worked, what did not, and what this showed you about your thinking style.'
+  ];
+  const dl=c.deliverable.charAt(0).toLowerCase()+c.deliverable.slice(1);
+  const tag='#BuildInPublic #ThinkingStyle';
+  const posts=[
+    'Starting a 7-day build in public: '+title+'.\n\n'+why+'\n\nBy day 7 I will publish: '+dl+'\n\nIf you have done something similar, what is one thing you wish you had known? [add your own line]\n\n'+tag,
+    'Day 2: understanding before building.\n\nToday I [what you mapped, read or asked]. The thing that surprised me: [one thing you did not expect].\n\n'+tag,
+    'Day 3: first draft, deliberately rough.\n\n[Add a photo, sketch or screenshot of your own work.]\n\nWhat I already know is wrong: [one thing]. Feedback tomorrow.\n\n'+tag,
+    'Day 4: asking for feedback.\n\nHere is the draft: [link or image].\n\nThree questions:\n1. [question]\n2. [question]\n3. [question]\n\n'+reviewer+'\n\n'+tag,
+    'Day 5: what changed after your feedback.\n\nBefore: [what it was]. After: [what it is now].\n\nThe comment that changed my mind: [paraphrase it, and credit the person with their permission].\n\n'+tag,
+    'Day 6: finished.\n\n'+title+': [link or document].\n\nWhat is in it: '+dl+'\n\nWhat I am proud of: [one thing]. What I would still improve: [one thing].\n\n'+tag,
+    'Day 7: what I learned.\n\nI did this to practise '+(sty?STY[sty].name+' thinking':'finishing something in public')+'. '+(mode==='stretch'?'My blind spot showed up when [moment].':mode==='master'?'My strength showed up when [moment].':'It was hardest when [moment].')+'\n\nNext I will [one next step]. Thank you to [names, with their permission].\n\nIf it is useful, here is the template: [link].\n\n'+tag
+  ];
+  return {label,title,brief,deliverable:c.deliverable,done:c.done,
+    days:DAYH.map((h,i)=>({h,task:tasks[i],post:posts[i]}))};
+}
+function proofText(pl){
+  return pl.title+'\n\n'+pl.brief+'\n\nYou will publish: '+pl.deliverable+'\n\nDone looks like:\n'+pl.done.map(x=>'- '+x).join('\n')+'\n\n'+
+    pl.days.map((d,i)=>'DAY '+(i+1)+': '+d.h+'\nTask: '+d.task+'\nPost draft:\n'+d.post).join('\n\n----\n\n');
+}
+/*__UI__*/
+/* ================= BADGE (SVG) ================= */
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function titleLines(t){
+  if(t.length<=16)return [t];
+  const w=t.split(' ');let best=null;
+  for(let i=1;i<w.length;i++){const a=w.slice(0,i).join(' '),b=w.slice(i).join(' '),m=Math.max(a.length,b.length);if(!best||m<best.m)best={m,l:[a,b]};}
+  return best.l;
+}
+function palette(r,theme){
+  const dom=r.order[0],sec=r.order[1];
+  if(theme==='bold'){
+    let c1,c2;
+    if(r.shape==='rounded'){c1='#23262F';c2='#3D4352';}
+    else{c1=STY[dom].dark;c2=r.shape==='pure'?STY[dom].dark:STY[sec].dark;}
+    return {defs:'<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+c1+'"/><stop offset="1" stop-color="'+c2+'"/></linearGradient><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>',
+      bg:'<rect width="1080" height="1080" fill="url(#bg)"/><rect width="1080" height="1080" fill="url(#shade)"/>',
+      ink:'#FFFFFF',mute:'rgba(255,255,255,.8)',grid:'rgba(255,255,255,.3)',fillC:'#FFFFFF',fillO:.2,stroke:'#FFFFFF',dot:()=>'#FFFFFF'};
+  }
+  if(theme==='dark'){
+    const g=r.shape==='rounded'?'#9AA0AC':STY[dom].col;
+    return {defs:'<radialGradient id="glow" cx=".5" cy=".62" r=".62"><stop offset="0" stop-color="'+g+'" stop-opacity=".30"/><stop offset="1" stop-color="'+g+'" stop-opacity="0"/></radialGradient>',
+      bg:'<rect width="1080" height="1080" fill="#0D0F14"/><rect width="1080" height="1080" fill="url(#glow)"/>',
+      ink:'#F3F1EC',mute:'#9AA0AC',grid:'#2A2F3A',fillC:g,fillO:.28,stroke:g,dot:k=>STY[k].col};
+  }
+  return {defs:'',
+    bg:'<rect width="1080" height="1080" fill="#F6F3EC"/><rect x="28" y="28" width="1024" height="1024" rx="40" fill="none" stroke="#16171B" stroke-opacity=".14" stroke-width="2"/>',
+    ink:'#16171B',mute:'#6E6A62',grid:'#D8D2C4',fillC:'#16171B',fillO:.1,stroke:'#16171B',dot:()=>'#16171B'};
+}
+function fmtDate(iso){try{return new Date(iso).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});}catch(e){return '';}}
+function badgeSVG(r,theme,name){
+  const P=palette(r,theme),lines=titleLines(r.title),two=lines.length===2;
+  const cx=540,cy=two?725:680,R=200,f1=n=>n.toFixed(1);
+  const ang=i=>(-90+72*i)*Math.PI/180;
+  const pt=(i,f)=>{const a=ang(i);return [cx+R*f*Math.cos(a),cy+R*f*Math.sin(a)];};
+  const poly=f=>ORDER.map((k,i)=>pt(i,f).map(f1).join(',')).join(' ');
+  const val=ORDER.map((k,i)=>pt(i,r.rel[k]).map(f1).join(',')).join(' ');
+  let rings='',axes='',dots='',labels='';
+  [1/3,2/3,1].forEach(f=>{rings+='<polygon points="'+poly(f)+'" fill="none" stroke="'+P.grid+'" stroke-width="2"/>';});
+  ORDER.forEach((k,i)=>{
+    const [x,y]=pt(i,1),[vx,vy]=pt(i,r.rel[k]);
+    axes+='<line x1="'+cx+'" y1="'+cy+'" x2="'+f1(x)+'" y2="'+f1(y)+'" stroke="'+P.grid+'" stroke-width="2"/>';
+    dots+='<circle cx="'+f1(vx)+'" cy="'+f1(vy)+'" r="10" fill="'+P.dot(k)+'"/>';
+    const a=ang(i),c=Math.cos(a),s=Math.sin(a),lx=cx+(R+34)*c,ly=cy+(R+34)*s;
+    const anchor=Math.abs(c)<.2?'middle':(c>0?'start':'end');
+    const ny=i===0?ly-30:(s>.5?ly+16:ly+6);
+    labels+='<text x="'+f1(lx)+'" y="'+f1(ny)+'" text-anchor="'+anchor+'" font-size="30" font-weight="700" fill="'+P.ink+'">'+STY[k].name+'</text><text x="'+f1(lx)+'" y="'+f1(ny+28)+'" text-anchor="'+anchor+'" font-size="23" fill="'+P.mute+'">'+r.raw[k]+'/15</text>';
+  });
+  const logo=ORDER.map((k,i)=>{const a=ang(i);return '<circle cx="'+f1(100+17*Math.cos(a))+'" cy="'+f1(92+17*Math.sin(a))+'" r="5.5" fill="'+(theme==='calm'||theme==='bold'?P.ink:STY[k].col)+'"/>';}).join('');
+  const sub=r.sub;
+  const topLine=name?name.toUpperCase():SHAPE_LABEL[r.shape].toUpperCase();
+  const fs=(lines.length===1&&r.title.length>13)?80:88;
+  const tl=lines.map((l,i)=>'<text x="80" y="'+(272+i*92)+'" font-size="'+fs+'" font-weight="800" letter-spacing="-2" fill="'+P.ink+'">'+esc(l)+'</text>').join('');
+  const subY=272+(lines.length-1)*92+56;
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080" role="img" aria-label="Thinking style badge: '+esc(r.title)+', '+esc(sub)+'" font-family="-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,\'Helvetica Neue\',Arial,sans-serif"><defs>'+P.defs+'</defs>'+P.bg+
+    logo+'<text x="132" y="101" font-size="25" font-weight="700" letter-spacing="5" fill="'+P.ink+'">THINKING STYLE PROFILE</text><text x="1000" y="101" text-anchor="end" font-size="24" fill="'+P.mute+'">'+esc(fmtDate(r.date))+'</text>'+
+    '<text x="80" y="178" font-size="28" font-weight="600" letter-spacing="4" fill="'+P.mute+'">'+esc(topLine)+'</text>'+tl+
+    '<text x="80" y="'+subY+'" font-size="34" fill="'+P.mute+'">'+esc(sub)+'</text>'+
+    rings+axes+'<polygon points="'+val+'" fill="'+P.fillC+'" fill-opacity="'+P.fillO+'" stroke="'+P.stroke+'" stroke-width="5" stroke-linejoin="round"/>'+dots+labels+
+    '<line x1="80" y1="990" x2="1000" y2="990" stroke="'+P.grid+'" stroke-width="2"/><text x="80" y="1032" font-size="23" letter-spacing="1" fill="'+P.mute+'">'+(SHARE_URL?esc(SHARE_URL):'ID '+esc(r.id))+'</text><text x="1000" y="1032" text-anchor="end" font-size="23" fill="'+P.mute+'">Self-assessment · not a certification</text></svg>';
+}
+function svgToPng(svg,size){
+  size=size||1080;
+  return new Promise((res,rej)=>{
+    const img=new Image();
+    img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=size;c.getContext('2d').drawImage(img,0,0,size,size);c.toBlob(b=>b?res(b):rej(new Error('png')),'image/png');};
+    img.onerror=()=>rej(new Error('img'));
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  });
+}
+function logoSVG(sz){
+  const c=sz/2,R=sz*.34,pts=ORDER.map((k,i)=>{const a=(-90+72*i)*Math.PI/180;return [c+R*Math.cos(a),c+R*Math.sin(a)];});
+  return '<svg class="logo" width="'+sz+'" height="'+sz+'" viewBox="0 0 '+sz+' '+sz+'" aria-hidden="true"><polygon points="'+pts.map(p=>p.join(',')).join(' ')+'" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="2"/>'+pts.map((p,i)=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(sz*.075).toFixed(1)+'" fill="'+STY[ORDER[i]].col+'"/>').join('')+'</svg>';
+}
+
+/* ================= STATE & STORAGE ================= */
+const $=s=>document.querySelector(s);
+const app=$('#app');
+const REDUCED=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MEM={v:null};
+const store={
+  get(){try{const x=localStorage.getItem('tsp.v1');return x?JSON.parse(x):MEM.v;}catch(e){return MEM.v;}},
+  set(o){MEM.v=o;try{localStorage.setItem('tsp.v1',JSON.stringify(o));}catch(e){}},
+  clear(){MEM.v=null;try{localStorage.removeItem('tsp.v1');}catch(e){}}
+};
+const S={screen:'welcome',deck:[],i:0,answers:{},bonus:{},tie:null,res:null,date:null,theme:'calm',tone:'humble',name:'',post:'',pngP:null,lock:false,role:null,roleFor:null,roleList:[],kit:[],pl:null,tab:'map',proof:{mode:'master',style:null,twist:0,ownT:'',ownO:'',day:1,done:[]}};
+(function init(){const s=store.get();if(s){S.name=s.name||'';S.theme=s.theme||'calm';S.tone=s.tone||'humble';if(s.proof)S.proof=Object.assign(S.proof,s.proof);}})();
+function persist(){store.set({answers:S.answers,bonus:S.bonus,date:S.date,name:S.name,theme:S.theme,tone:S.tone,proof:S.proof});}
+
+/* ================= SCREENS ================= */
+function rWelcome(){
+  const saved=store.get();
+  return '<div class="welcome">'+logoSVG(88)+
+   '<div class="eyebrow">Thinking Style Profile</div><h1>How do you think?</h1>'+
+   '<p class="muted" style="font-size:1.1rem">25 statements. About 3 minutes. A badge worth sharing, and a map of where your thinking fits best.</p>'+
+   '<div class="pillars"><span>Your style</span><span>Your blind spot</span><span>Your path</span></div>'+
+   '<button class="btn" data-act="start">Begin</button>'+
+   (saved&&saved.answers&&saved.date?'<button class="btn sec" style="margin-top:10px" data-act="last">See my last result</button>':'')+
+   '<p class="fine">Private by design. Works offline.<br>Nothing leaves your device.</p></div>';
+}
+const ANS=['Not me','A bit','Mostly','That’s me'];
+function rQuiz(){
+  const q=S.deck[S.i],cur=S.answers[q.id],pct=Math.round(S.i/QS.length*100);
+  return '<div class="quiz"><div class="topbar"><button class="ghost" data-act="back" aria-label="Previous statement"'+(S.i===0?' disabled style="opacity:.3"':'')+'>←</button><span class="eyebrow">'+(S.i+1)+' / '+QS.length+'</span><span></span></div>'+
+   '<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="25" aria-valuenow="'+S.i+'"><i style="width:'+pct+'%"></i></div>'+
+   '<div class="qwrap"><p class="stmt">'+esc(q.t)+'</p><p class="hint">Go with your first instinct.<span class="kbhint"> Keys 1–4 answer, ← goes back.</span></p></div>'+
+   ANS.map((l,v)=>'<button class="opt'+(cur===v?' sel':'')+'" data-act="ans" data-v="'+v+'"><span>'+l+'</span><span class="dots" aria-hidden="true">'+[0,1,2].map(n=>'<i'+(n<v?' class="on"':'')+'></i>').join('')+'</span></button>').join('')+
+   '</div>';
+}
+function rTie(){
+  const opts=shuffle(S.tie.slice());
+  return '<div class="quiz"><div class="qwrap"><div class="eyebrow">One last thing</div><h2 style="font-size:2rem;margin-top:.5rem">Neck and neck.</h2><p class="muted">Two or more of your styles are tied. Which of these sounds more like you right now?</p>'+
+   opts.map(k=>'<button class="opt" data-act="tie" data-k="'+k+'" style="min-height:64px">'+esc(TB[k])+'</button>').join('')+'</div></div>';
+}
+function rReveal(){
+  return '<div class="reveal"><div class="pdots" aria-hidden="true">'+ORDER.map((k,i)=>'<i style="background:'+STY[k].col+';animation-delay:'+(i*120)+'ms"></i>').join('')+'</div><h2>Reading your answers…</h2></div>';
+}
+function bars(labels,vals,col,subs){
+  const mx=Math.max(...vals),top=vals.indexOf(mx);
+  return labels.map((l,i)=>'<div class="brow"><div class="rl"><b>'+esc(l)+'</b>'+(subs?'<small>'+esc(subs[i])+'</small>':'')+(i===top?'<em>Sweet spot</em>':'')+'</div><div class="bar"><i style="width:'+Math.round(vals[i]/mx*100)+'%;background:'+col+';animation-delay:'+(i*70)+'ms"></i></div></div>').join('');
+}
+function flatNote(vals){const mx=Math.max(...vals),mn=Math.min(...vals);return (mx-mn)/mx<.2?'<p class="note">Your profile is adaptable. Culture and people will matter more than the label.</p>':'';}
+function hl(s){return esc(s).replace(/\[([^\]]+)\]/g,'<mark>[$1]</mark>');}
+function proofCtlHTML(){
+  const p=S.proof,r=S.res;
+  let h='<div class="chips" role="group" aria-label="Choose your path">'+PROOF_MODES.map(m=>'<button class="chip" data-act="pmode" data-m="'+m[0]+'" aria-pressed="'+(p.mode===m[0])+'">'+m[1]+'</button>').join('')+'</div>';
+  if(p.mode==='master')h+='<p class="note">Your strongest lens is '+STY[r.order[0]].name+'. Show it off where people can see it.</p>';
+  else if(p.mode==='stretch')h+='<p class="note">Your quietest lens is '+STY[r.blind].name+'. Practise it in public, and invite '+PAIR[r.blind].who+' to review your work. That is the fastest way to learn it.</p>';
+  else if(p.mode==='remix'){
+    const cur=p.style||r.order[0];
+    h+='<p class="note">Pick a practice brief, then add a twist.</p><div class="chips" role="group" aria-label="Practice brief">'+ORDER.map(k=>'<button class="chip" data-act="pstyle" data-k="'+k+'" aria-pressed="'+(cur===k)+'"><b style="background:'+STY[k].col+'"></b>'+STY[k].name+'</button>').join('')+'</div>'+
+      '<div class="chips" role="group" aria-label="Twist">'+TWISTS.map((t,i)=>'<button class="chip" data-act="ptwist" data-i="'+i+'" aria-pressed="'+((p.twist||0)===i)+'">'+esc(t.short)+'</button>').join('')+'</div>';
+  }else{
+    h+='<label class="field"><span>Project name</span><input id="ownT" type="text" maxlength="80" placeholder="e.g. A one-page guide to onboarding a new hire" value="'+esc(p.ownT)+'"></label>'+
+      '<label class="field" style="margin-top:10px"><span>What will exist on day 7?</span><input id="ownO" type="text" maxlength="140" placeholder="e.g. A checklist and a before and after flow" value="'+esc(p.ownO)+'"></label>';
+  }
+  return h;
+}
+function proofPlanHTML(){
+  const p=S.proof,pl=proofPlan(S.res,p);S.pl=pl;
+  const day=Math.min(7,Math.max(1,p.day)),d=pl.days[day-1],n=p.done.length,isDone=p.done.indexOf(day)>-1;
+  return '<div class="card" style="margin-top:14px"><div class="eyebrow">'+esc(pl.label)+'</div><h3 style="margin-top:6px">'+hl(pl.title)+'</h3><p>'+hl(pl.brief)+'</p>'+
+    '<dl><dt>You will publish</dt><dd>'+hl(pl.deliverable)+'</dd><dt>Done looks like</dt><dd><ul class="plist">'+pl.done.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></dd></dl></div>'+
+    '<div class="pprog"><span>'+n+' of 7 days done</span><div class="bar"><i style="width:'+Math.round(n/7*100)+'%;background:var(--ink)"></i></div></div>'+
+    '<div class="dpills" role="group" aria-label="Day">'+[1,2,3,4,5,6,7].map(i=>'<button class="dpill'+(p.done.indexOf(i)>-1?' done':'')+'" data-act="pday" data-d="'+i+'" aria-pressed="'+(i===day)+'" aria-label="Day '+i+(p.done.indexOf(i)>-1?', done':'')+'">'+i+'</button>').join('')+'</div>'+
+    '<div class="card"><div class="eyebrow">Day '+day+' · about 30 to 45 minutes</div><h3 style="margin-top:6px">'+esc(d.h)+'</h3><p>'+hl(d.task)+'</p>'+
+    '<div class="eyebrow" style="margin-top:6px">Your LinkedIn post draft</div><div class="ktext">'+hl(d.post)+'</div>'+
+    '<div class="row2"><button class="btn sec sm" data-act="pcopy">Copy post</button><button class="btn sm" data-act="pdone">'+(isDone?'Undo day '+day:'Mark day '+day+' done')+'</button></div></div>'+
+    (n===7?'<div class="callout" style="margin-top:14px"><b>A week of proof, shipped.</b>Pin your day 6 post or add the finished piece to your LinkedIn Featured section. That is what a recruiter will actually click.</div>':'')+
+    '<div class="move" style="margin-top:14px"><b>Keep it safe and honest</b><br>Use practice or public information only. Never post confidential employer or client material. Get permission before naming or quoting anyone, and say it is a practice project. Make the work yourself: sketch, don’t republish someone else’s screenshots.</div>'+
+    '<div class="actions"><button class="btn sec" data-act="pall">Copy the whole week</button></div>';
+}
+function kitHTML(){
+  const role=S.role||rolesFor(S.res,'next')[0];
+  S.kit=kit(S.res,role);
+  return S.kit.map((it,i)=>'<div class="krow"><div class="eyebrow">'+esc(it.t)+'</div><div class="ktext">'+esc(it.x).replace(/\[([^\]]+)\]/g,'<mark>[$1]</mark>')+'</div><button class="btn sec sm" data-act="kcopy" data-i="'+i+'">Copy</button></div>').join('');
+}
+function rResult(){
+  const r=S.res,m=meaning(r),dom=r.order[0],col=r.shape==='rounded'?'#4B5160':STY[dom].col;
+  const sf=fits(r,'sizeW'),df=fits(r,'domW');
+  const di=df.map((v,i)=>i).sort((a,b)=>df[b]-df[a]).slice(0,5);
+  const now=rolesFor(r,'now'),next=rolesFor(r,'next'),reach=rolesFor(r,'reach');
+  const roleChips=a=>'<div class="chips">'+a.map(x=>'<span class="chip role">'+esc(x)+'</span>').join('')+'</div>';
+  const blindName=STY[r.blind].name;
+  if(S.roleFor!==r.id){S.role=null;S.roleFor=r.id;}
+  S.roleList=Array.from(new Set([].concat(next,now,reach))).slice(0,8);
+  const curRole=S.role||next[0];
+  return '<div class="topbar"><button class="ghost" data-act="home" aria-label="Back to start">←</button><span class="eyebrow">Your result</span><span></span></div>'+
+  '<div class="rgrid"><div class="rleft"><div style="margin-top:10px"><div class="badgewrap" id="badge">'+badgeSVG(r,S.theme,S.name)+'</div>'+
+  '<div class="seg" role="radiogroup" aria-label="Badge style">'+['calm','bold','dark'].map(t=>'<button role="radio" aria-checked="'+(S.theme===t)+'" data-act="theme" data-t="'+t+'">'+cap(t)+'</button>').join('')+'</div>'+
+  '<label class="field"><span>Name on badge (optional)</span><input id="nameIn" type="text" maxlength="28" autocomplete="name" placeholder="Your name" value="'+esc(S.name)+'"></label></div></div><div class="rright">'+
+
+  '<section class="blk"><h2>Share it</h2><button class="btn" data-act="share">Share badge</button>'+
+  '<div class="actions"><div class="row2"><button class="btn sec" data-act="save">Save image</button><button class="btn sec" data-act="copy">Copy post</button></div></div>'+
+  '<div class="chips" style="margin:18px 0 10px" role="group" aria-label="Post tone">'+['humble','curious','bold'].map(t=>'<button class="chip" data-act="tone" data-t="'+t+'" aria-pressed="'+(S.tone===t)+'">'+cap(t)+'</button>').join('')+'</div>'+
+  '<textarea class="post" id="post" aria-label="LinkedIn post text">'+esc(S.post)+'</textarea>'+
+  '<div class="actions"><button class="btn sec" data-act="linkedin">Open LinkedIn (needs internet)</button></div>'+
+  '<p class="note" style="margin-top:10px">Tip: save the image first, then attach it to your post.</p></section>'+
+
+  '<section class="blk"><div class="eyebrow">What this says</div><div class="card" style="margin-top:10px">'+
+  '<div class="chips">'+r.styles.map(k=>'<span class="chip"><b style="background:'+STY[k].col+'"></b>'+STY[k].name+'</span>').join('')+'</div>'+
+  '<p class="lead">'+esc(r.line)+'</p>'+
+  '<dl><dt>Your superpower</dt><dd>'+esc(m.sp)+'</dd><dt>Watch out for</dt><dd>'+esc(m.wo)+'</dd></dl>'+
+  (r.flat?'<div class="callout"><b>Nothing stands out</b>All five lenses scored the same. That’s a real strength, and a nudge to choose one on purpose.</div>':'<div class="callout"><b>'+(r.shape==='rounded'?'Lean-in area':'Blind spot')+': '+blindName+'</b>Pair with '+PAIR[r.blind].who+'. '+esc(PAIR[r.blind].why)+'</div>')+
+  '<div class="move"><b>This week</b><br>'+esc(m.act)+'</div></div></section>'+
+
+  '<div class="tabs" role="tablist" aria-label="More about your result">'+[['map','Your map'],['kit','Career kit'],['proof','7-day proof']].map(t=>'<button role="tab" id="tabbtn-'+t[0]+'" data-act="tab" data-t="'+t[0]+'" aria-selected="'+(S.tab===t[0])+'" aria-controls="tab-'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'+
+  '<section class="blk tabp" id="tab-map" role="tabpanel" aria-labelledby="tabbtn-map"'+(S.tab==='map'?'':' hidden')+'><div class="eyebrow">Your map</div><h2 style="margin-top:6px">Where your thinking fits</h2>'+
+  '<div class="rail" id="rail">'+
+   '<div class="rcard"><div class="eyebrow">Company size</div><h3>Where you’ll thrive</h3>'+bars(SIZES.map(s=>s[0]),sf,col,SIZES.map(s=>s[1]))+flatNote(sf)+'</div>'+
+   '<div class="rcard"><div class="eyebrow">Natural fit</div><h3>Where your style is the default</h3>'+bars(di.map(i=>DOMS[i]),di.map(i=>df[i]),col)+'<p class="note">A natural fit, not a limit. Every industry needs all five styles.</p>'+
+     '<div class="eyebrow" style="margin-top:20px">Your seat in any industry</div><div class="chips" style="margin:10px 0 0" role="group" aria-label="Industries">'+DOMS.map((d,i)=>'<button class="chip" data-act="seat" data-i="'+i+'" aria-pressed="false">'+esc(d)+'</button>').join('')+'</div><div id="seat" aria-live="polite"><p class="note" style="margin-top:12px">Tap your industry to see the roles where your style fits.</p></div></div>'+
+   '<div class="rcard"><div class="eyebrow">Career pathways</div><h3>'+(r.shape==='rounded'?'Generalist routes':'Your likely climb')+'</h3><div class="ladder">'+
+     '<div class="step"><div class="eyebrow">Now</div>'+roleChips(now)+'</div>'+
+     '<div class="step"><div class="eyebrow">Next · 2–3 years</div>'+roleChips(next)+'</div>'+
+     '<div class="step"><div class="eyebrow">Reach</div>'+roleChips(reach)+'</div></div>'+
+     (r.shape==='duo'?'<p class="note" style="margin-top:14px">“Next” roles are the sweet spot where your two styles meet.</p>':'')+
+     (r.shape==='rounded'?'<p class="note" style="margin-top:14px">You can step into most roles. Choose by the problems you enjoy.</p>':'')+'</div>'+
+  '</div><div class="dotnav" id="dotnav"><i class="on"></i><i></i><i></i></div></section>'+
+
+  '<section class="blk tabp" id="tab-kit" role="tabpanel" aria-labelledby="tabbtn-kit"'+(S.tab==='kit'?'':' hidden')+'><div class="eyebrow">Put it to work</div><h2 style="margin-top:6px">Use it on LinkedIn, your CV and in interviews</h2>'+
+  '<p class="muted">Pick the role you’re aiming for. These are drafts, not finished text. Replace the highlighted gaps with a real result, because recruiters hire evidence, not labels. Describe your strengths in your own words, and don’t list “'+esc(r.title)+'” as a credential.</p>'+
+  '<div class="chips" role="group" aria-label="Target role">'+S.roleList.map((x,i)=>'<button class="chip" data-act="role" data-i="'+i+'" aria-pressed="'+(x===curRole)+'">'+esc(x)+'</button>').join('')+'</div>'+
+  '<div class="card" id="kitlist" style="padding-top:6px;padding-bottom:6px">'+kitHTML()+'</div></section>'+
+
+  '<section class="blk tabp" id="tab-proof" role="tabpanel" aria-labelledby="tabbtn-proof"'+(S.tab==='proof'?'':' hidden')+'><div class="eyebrow">Prove it in public</div><h2 style="margin-top:6px">Turn it into a week of visible work</h2>'+
+  '<p class="muted">Knowing your style is the start. Seven days of work in public is the proof. Pick a path: practise your strength, learn your blind spot, remix a practice brief, or build your own.</p>'+
+  '<div id="pctl">'+proofCtlHTML()+'</div><div id="pplan">'+proofPlanHTML()+'</div></section>'+
+
+  '<footer><div class="links"><button data-act="retake">Retake</button><button data-act="wipe">Delete my data</button></div>'+
+  '<details><summary>How this works</summary><p>Each statement scores 0 to 3. Your result comes from the gaps between your five style scores, not the totals, so it still works if you tend to agree with everything. One close call may trigger a tie-break question.</p><p>This is a reflective tool, not a validated psychological test and not a certification. The size, domain and role suggestions are starting points for thinking, not predictions.</p><p>Everything runs on your device. Your answers are stored only in this browser, and “Delete my data” removes them.</p></details></footer></div></div>';
+}
+
+/* ================= RENDER & ACTIONS ================= */
+function render(){
+  const f={welcome:rWelcome,quiz:rQuiz,tie:rTie,reveal:rReveal,result:rResult}[S.screen];
+  const el=document.createElement('main');el.className='screen';el.innerHTML=f();
+  app.className=S.screen==='result'?'wide':'';
+  app.innerHTML='';app.appendChild(el);
+  window.scrollTo(0,0);
+  if(S.screen==='result'){bindRail();prepPNG();}
+}
+function bindRail(){
+  const rail=$('#rail'),nav=$('#dotnav');if(!rail)return;
+  rail.addEventListener('scroll',()=>{
+    const cards=rail.children,mid=rail.scrollLeft+rail.clientWidth/2;let idx=0,best=1e9;
+    for(let i=0;i<cards.length;i++){const c=cards[i].offsetLeft+cards[i].offsetWidth/2,d=Math.abs(c-mid);if(d<best){best=d;idx=i;}}
+    [...nav.children].forEach((d,i)=>d.classList.toggle('on',i===idx));
+  },{passive:true});
+}
+let tT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),2600);}
+async function copyText(s){
+  try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(s);return true;}}catch(e){}
+  try{const ta=document.createElement('textarea');ta.value=s;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,s.length);const ok=document.execCommand('copy');ta.remove();return ok;}catch(e){return false;}
+}
+let pngTimer;
+function prepPNG(){
+  clearTimeout(pngTimer);
+  pngTimer=setTimeout(()=>{S.pngP=svgToPng(badgeSVG(S.res,S.theme,S.name)).catch(()=>null);},S.pngP?350:0);
+  if(!S.pngP)S.pngP=svgToPng(badgeSVG(S.res,S.theme,S.name)).catch(()=>null);
+}
+function download(blob){
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='thinking-style-badge.png';document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);
+}
+async function getBlob(){
+  let b=S.pngP?await S.pngP:null;
+  if(!b){b=await svgToPng(badgeSVG(S.res,S.theme,S.name));}
+  return b;
+}
+function currentPost(){const t=$('#post');return t?t.value:S.post;}
+async function doShare(){
+  const text=currentPost();
+  try{
+    const blob=await getBlob(),file=new File([blob],'thinking-style-badge.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text});return;}
+    if(navigator.share){await copyText(text);await navigator.share({text});return;}
+    download(blob);const ok=await copyText(text);toast(ok?'Badge saved · post copied':'Badge saved');
+  }catch(e){if(e&&e.name==='AbortError')return;toast('Couldn’t open share. Try Save image.');}
+}
+async function doSave(){try{download(await getBlob());toast('Badge saved');}catch(e){toast('Couldn’t save the image on this browser.');}}
+async function doCopy(){const ok=await copyText(currentPost());toast(ok?'Post copied':'Select the text and copy it');}
+async function doLinkedIn(){
+  const text=currentPost();await copyText(text);
+  toast('Post copied. Paste it in LinkedIn and attach your badge.');
+  setTimeout(()=>{window.open('https://www.linkedin.com/feed/?shareActive=true&text='+encodeURIComponent(text),'_blank','noopener');},600);
+}
+function goReveal(){
+  S.screen='reveal';render();
+  setTimeout(()=>{
+    S.date=new Date().toISOString();S.res=compute(S.answers,S.bonus,S.date);
+    S.post=postText(S.res,S.tone);S.pngP=null;persist();S.screen='result';render();
+  },REDUCED?500:1700);
+}
+function finish(){
+  const tie=findTie(S.answers);
+  if(tie){S.tie=tie;S.screen='tie';render();}else goReveal();
+}
+function answer(v){
+  if(S.lock)return;S.lock=true;
+  const q=S.deck[S.i];S.answers[q.id]=v;
+  const b=app.querySelector('.opt[data-v="'+v+'"]');if(b)b.classList.add('sel');
+  setTimeout(()=>{S.lock=false;S.i++;if(S.i>=QS.length)finish();else render();},REDUCED?0:190);
+}
+function act(a,d){
+  if(a==='start'){S.deck=makeDeck();S.i=0;S.answers={};S.bonus={};S.screen='quiz';render();}
+  else if(a==='ans')answer(+d.v);
+  else if(a==='back'){if(S.i>0&&!S.lock){S.i--;render();}}
+  else if(a==='tie'){S.bonus={};S.bonus[d.k]=.5;goReveal();}
+  else if(a==='last'){const s=store.get();if(!s||!s.answers)return;S.answers=s.answers;S.bonus=s.bonus||{};S.date=s.date;S.res=compute(S.answers,S.bonus,S.date);S.post=postText(S.res,S.tone);S.pngP=null;S.tab=(S.proof.done.length>0&&S.proof.done.length<7)?'proof':'map';S.screen='result';render();}
+  else if(a==='home'){S.screen='welcome';render();}
+  else if(a==='theme'){
+    S.theme=d.t;persist();
+    $('#badge').innerHTML=badgeSVG(S.res,S.theme,S.name);
+    app.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.t===S.theme)));
+    S.pngP=null;prepPNG();
+  }
+  else if(a==='tone'){
+    S.tone=d.t;persist();S.post=postText(S.res,S.tone);$('#post').value=S.post;
+    app.querySelectorAll('[data-act=tone]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===S.tone)));
+  }
+  else if(a==='seat'){
+    const i=+d.i,r=S.res,ind=DOMS[i],sb=seatBlocks(r,i);
+    app.querySelectorAll('[data-act=seat]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.i===i)));
+    let h='<div class="eyebrow" style="margin-top:16px">In '+esc(ind)+'</div>';
+    if(r.shape==='rounded')h+='<p class="note" style="margin-top:6px">Every seat is open to you here. Choose by the problems you enjoy.</p>';
+    sb.blocks.forEach(b=>{
+      h+='<div class="sblk"><span class="chip"><b style="background:'+STY[b.k].col+'"></b>'+STY[b.k].name+' lens</span><p style="margin:8px 0">'+esc(b.t)+'</p><div class="chips" style="margin:0">'+b.roles.map(x=>'<span class="chip role">'+esc(x)+'</span>').join('')+'</div></div>';
+    });
+    if(sb.team)h+='<p class="note" style="margin-top:12px"><b>Team up with</b> '+STY[sb.team.k].name+' thinkers here, such as '+esc(sb.team.roles.slice(0,2).join(' or '))+'.</p>';
+    h+='<p class="note">Typical roles. Titles vary by employer and country.</p>';
+    const el=document.getElementById('seat');if(el)el.innerHTML=h;
+  }
+  else if(a==='role'){
+    S.role=S.roleList[+d.i];
+    app.querySelectorAll('[data-act=role]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.i===+d.i)));
+    $('#kitlist').innerHTML=kitHTML();
+  }
+  else if(a==='kcopy'){
+    const it=S.kit[+d.i];if(!it)return;
+    copyText(it.x).then(ok=>toast(ok?'Copied. Replace the highlighted gaps before you use it.':'Select the text and copy it'));
+  }
+  else if(a==='pmode'){S.proof.mode=d.m;S.proof.day=1;persist();$('#pctl').innerHTML=proofCtlHTML();$('#pplan').innerHTML=proofPlanHTML();}
+  else if(a==='pstyle'){S.proof.style=d.k;persist();$('#pctl').innerHTML=proofCtlHTML();$('#pplan').innerHTML=proofPlanHTML();}
+  else if(a==='ptwist'){S.proof.twist=+d.i;persist();$('#pctl').innerHTML=proofCtlHTML();$('#pplan').innerHTML=proofPlanHTML();}
+  else if(a==='pday'){S.proof.day=+d.d;persist();$('#pplan').innerHTML=proofPlanHTML();}
+  else if(a==='pdone'){
+    const day=S.proof.day,i=S.proof.done.indexOf(day);
+    if(i>-1)S.proof.done.splice(i,1);else{S.proof.done.push(day);if(day<7)S.proof.day=day+1;}
+    persist();$('#pplan').innerHTML=proofPlanHTML();
+  }
+  else if(a==='pcopy'){
+    const dd=S.pl&&S.pl.days[S.proof.day-1];if(!dd)return;
+    copyText(dd.post).then(ok=>toast(ok?'Copied. Fill the highlighted gaps with your own details.':'Select the text and copy it'));
+  }
+  else if(a==='pall'){
+    if(!S.pl)return;
+    copyText(proofText(S.pl)).then(ok=>toast(ok?'The whole week is copied.':'Select the text and copy it'));
+  }
+  else if(a==='tab'){
+    S.tab=d.t;
+    app.querySelectorAll('[data-act=tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.t===S.tab)));
+    ['map','kit','proof'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.hidden=(t!==S.tab);});
+  }
+  else if(a==='share')doShare();
+  else if(a==='save')doSave();
+  else if(a==='copy')doCopy();
+  else if(a==='linkedin')doLinkedIn();
+  else if(a==='retake'){S.screen='welcome';render();}
+  else if(a==='wipe'){
+    if(confirm('Delete your saved result and name from this device?')){store.clear();S.name='';S.proof={mode:'master',style:null,twist:0,ownT:'',ownO:'',day:1,done:[]};S.res=null;S.answers={};S.bonus={};S.screen='welcome';render();toast('Your data has been deleted');}
+  }
+}
+app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;act(b.dataset.act,b.dataset);});
+app.addEventListener('input',e=>{
+  if(e.target.id==='ownT'||e.target.id==='ownO'){
+    if(e.target.id==='ownT')S.proof.ownT=e.target.value.slice(0,80);else S.proof.ownO=e.target.value.slice(0,140);
+    persist();const pp=$('#pplan');if(pp)pp.innerHTML=proofPlanHTML();return;
+  }
+  if(e.target.id==='nameIn'){
+    S.name=e.target.value.trim().slice(0,28);persist();
+    $('#badge').innerHTML=badgeSVG(S.res,S.theme,S.name);S.pngP=null;prepPNG();
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(S.screen!=='quiz'||e.target.closest('input,textarea'))return;
+  if(e.key>='1'&&e.key<='4')answer(+e.key-1);
+  else if(e.key==='ArrowLeft'||e.key==='Backspace'){if(S.i>0&&!S.lock){S.i--;render();}}
+});
+/* icon for home-screen installs */
+try{
+  const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d');
+  x.fillStyle='#15161A';x.fillRect(0,0,180,180);
+  ORDER.forEach((k,i)=>{const a=(-90+72*i)*Math.PI/180;x.fillStyle=STY[k].col;x.beginPath();x.arc(90+52*Math.cos(a),90+52*Math.sin(a),17,0,7);x.fill();});
+  const u=c.toDataURL('image/png');$('#touchIcon').href=u;$('#favicon').href=u;
+}catch(e){}
+render();
+</script>
+</body>
+</html>
