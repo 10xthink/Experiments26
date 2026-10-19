@@ -98,10 +98,10 @@ dd{margin:2px 0 0}
 .callout{border-radius:18px;padding:16px 18px;background:var(--soft);margin:1rem 0 0}
 .callout b{display:block;margin-bottom:2px}
 .move{margin-top:12px;padding:16px 18px;border-radius:18px;border:1.5px dashed var(--line)}
-.rail{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:2px 20px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.rail{display:flex;flex-direction:column;gap:12px}
 .rail::-webkit-scrollbar{display:none}
-.rcard{flex:0 0 88%;scroll-snap-align:center;scroll-snap-stop:always;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px}
-.dotnav{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.rcard{flex:none;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px}
+.dotnav{display:none;justify-content:center;gap:8px;margin-top:12px}
 .dotnav i{width:8px;height:8px;border-radius:50%;background:var(--line);transition:all .2s}
 .dotnav i.on{background:var(--ink);width:22px;border-radius:6px}
 .brow{margin:0 0 14px}
@@ -126,9 +126,15 @@ details{text-align:left;margin-top:14px;font-size:.9rem;color:var(--muted)}
 summary{cursor:pointer;font-weight:700;color:var(--ink);padding:8px 0}
 #toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;transition:all .25s;max-width:90vw;text-align:center;z-index:9}
 #toast.on{opacity:1;transform:translate(-50%,0)}
-.rail{align-items:flex-start}
+.rail{align-items:stretch}
 .krow{padding:16px 0;border-top:1px solid var(--line)}
 .krow:first-child{border-top:0}
+details.more{border-top:1px solid var(--line);margin-top:4px}
+details.more>summary{list-style:none;cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:.95rem}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::after{content:'+';font-size:1.3rem;color:var(--muted)}
+details.more[open]>summary::after{content:'\2212'}
+details.more .plist{margin:0 0 12px}
 .ktext{white-space:pre-wrap;margin:6px 0 12px;font-size:.97rem;line-height:1.55}
 mark{background:rgba(232,163,23,.28);color:inherit;border-radius:5px;padding:0 3px}
 [hidden]{display:none!important}
@@ -160,7 +166,7 @@ section.blk.tabp{margin-top:24px}
   .rleft{position:sticky;top:20px}
   .rright>section.blk:first-child{margin-top:0}
   .rail{display:grid;grid-template-columns:1fr 1fr;overflow:visible;margin:0;padding:0;gap:16px;align-items:stretch}
-  .rail .rcard:nth-child(3){grid-column:1/-1}
+  .rail .rcard:nth-child(n+3){grid-column:1/-1}
   .rcard{flex:none}
   .dotnav{display:none}
   .rail .ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;border-left:0;padding-left:0;margin-left:0}
@@ -514,9 +520,19 @@ function kit(r,role){
     {t:'CV summary',x:role+' focused on '+L.tag+'. [Add your years of experience and your most measurable result.]'},
     {t:'Cover letter paragraph',x:'What I would bring to the '+role+' role is simple: I '+L.sup+'. In my last role that looked like [one specific example and its result]. I would like to do the same for [company], especially [one priority from the job ad].'},
     {t:'Interview: strength and development area',x:'Strength: I '+L.sup+'. Example: [situation, what you did, and the result, in three sentences].\n\nDevelopment area: '+dev+'.'},
-    {t:'Skills to add to LinkedIn and your CV',x:K.join(', ')}
+    {t:'Skills to add to LinkedIn and your CV',x:K.join(', ')},
+    {t:'How I use AI at work (About or interview)',x:'I use AI for [one task, such as first drafts or analysis], and I check its output by [one habit]. What stays mine is '+aiLens(r).stays+'.\n\nExample: [one time AI saved you time, and what you changed in its output].'}
   ];
 }
+const AIS={
+ process:{hands:'drafting checklists, documenting steps and spotting repeat work',stays:'deciding which process is worth fixing, and noticing when the standard itself is wrong',habit:'Automate one repeat task this week, then check the output yourself before you trust it.'},
+ people:{hands:'summarising meetings, drafting messages and preparing talking points',stays:'reading the room, building trust and having the hard conversation',habit:'Use AI to prepare a tough conversation, then have it face to face without it.'},
+ product:{hands:'producing options, mock-ups and first drafts in minutes',stays:'taste: knowing which of fifty options is right, and why',habit:'Ask AI for ten versions, then write one line on why you chose one.'},
+ profit:{hands:'crunching numbers, building models and scanning markets',stays:'judging which numbers matter, the risk call and the deal itself',habit:'Ask AI to challenge your next business case, and check every figure it uses.'},
+ project:{hands:'status updates, plans, reminders and task breakdowns',stays:'owning the outcome, clearing blockers and making the call when plans collide',habit:'Let AI draft your next plan and status update, then spend the time you saved unblocking people.'}
+};
+const AI_GEN={hands:'drafting, summarising and number-crunching in any lens',stays:'choosing which lens the moment needs, and owning the call',habit:'Pick the lens first, then use AI to speed up the work inside it.'};
+function aiLens(r){return (r.shape==='rounded'||r.flat)?AI_GEN:AIS[r.order[0]];}
 const DAYH=['Announce it','Understand it','Make a rough first draft','Ask for feedback','Improve it','Finish and publish','Reflect and share the lesson'];
 const CASES={
  process:{title:'Turn a messy process into a one-page system',
@@ -563,7 +579,8 @@ const CASES={
 const TWISTS=[
  {short:'in a different industry',text:'Run the same brief in an industry you want to work in next.'},
  {short:'with half the time and no budget',text:'Do the smallest version that still works.'},
- {short:'as a lesson for beginners',text:'Explain it so a beginner could repeat it, with a worked example.'}
+ {short:'as a lesson for beginners',text:'Explain it so a beginner could repeat it, with a worked example.'},
+ {short:'with AI, in the open',text:'Use AI openly for the first draft, then publish what you changed and what it got wrong.'}
 ];
 const PROOF_MODES=[['master','Master it'],['stretch','Stretch it'],['remix','Remix it'],['own','Your own']];
 function proofPlan(r,p){
@@ -758,20 +775,22 @@ function proofPlanHTML(){
   const p=S.proof,pl=proofPlan(S.res,p);S.pl=pl;
   const day=Math.min(7,Math.max(1,p.day)),d=pl.days[day-1],n=p.done.length,isDone=p.done.indexOf(day)>-1;
   return '<div class="card" style="margin-top:14px"><div class="eyebrow">'+esc(pl.label)+'</div><h3 style="margin-top:6px">'+hl(pl.title)+'</h3><p>'+hl(pl.brief)+'</p>'+
-    '<dl><dt>You will publish</dt><dd>'+hl(pl.deliverable)+'</dd><dt>Done looks like</dt><dd><ul class="plist">'+pl.done.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></dd></dl></div>'+
+    '<dl><dt>You will publish</dt><dd>'+hl(pl.deliverable)+'</dd></dl><details class="more"><summary>Done looks like</summary><ul class="plist">'+pl.done.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></details></div>'+
     '<div class="pprog"><span>'+n+' of 7 days done</span><div class="bar"><i style="width:'+Math.round(n/7*100)+'%;background:var(--ink)"></i></div></div>'+
     '<div class="dpills" role="group" aria-label="Day">'+[1,2,3,4,5,6,7].map(i=>'<button class="dpill'+(p.done.indexOf(i)>-1?' done':'')+'" data-act="pday" data-d="'+i+'" aria-pressed="'+(i===day)+'" aria-label="Day '+i+(p.done.indexOf(i)>-1?', done':'')+'">'+i+'</button>').join('')+'</div>'+
     '<div class="card"><div class="eyebrow">Day '+day+' · about 30 to 45 minutes</div><h3 style="margin-top:6px">'+esc(d.h)+'</h3><p>'+hl(d.task)+'</p>'+
     '<div class="eyebrow" style="margin-top:6px">Your LinkedIn post draft</div><div class="ktext">'+hl(d.post)+'</div>'+
     '<div class="row2"><button class="btn sec sm" data-act="pcopy">Copy post</button><button class="btn sm" data-act="pdone">'+(isDone?'Undo day '+day:'Mark day '+day+' done')+'</button></div></div>'+
     (n===7?'<div class="callout" style="margin-top:14px"><b>A week of proof, shipped.</b>Pin your day 6 post or add the finished piece to your LinkedIn Featured section. That is what a recruiter will actually click.</div>':'')+
-    '<div class="move" style="margin-top:14px"><b>Keep it safe and honest</b><br>Use practice or public information only. Never post confidential employer or client material. Get permission before naming or quoting anyone, and say it is a practice project. Make the work yourself: sketch, don’t republish someone else’s screenshots.</div>'+
+    '<div class="move" style="margin-top:14px"><b>Keep it safe and honest</b><br>Use practice or public information only. Never post confidential employer or client material. Get permission before naming or quoting anyone, and say it is a practice project. If you use AI, say so and show what you changed. Make the work yourself: sketch, don’t republish someone else’s screenshots.</div>'+
     '<div class="actions"><button class="btn sec" data-act="pall">Copy the whole week</button></div>';
 }
 function kitHTML(){
   const role=S.role||rolesFor(S.res,'next')[0];
   S.kit=kit(S.res,role);
-  return S.kit.map((it,i)=>'<div class="krow"><div class="eyebrow">'+esc(it.t)+'</div><div class="ktext">'+esc(it.x).replace(/\[([^\]]+)\]/g,'<mark>[$1]</mark>')+'</div><button class="btn sec sm" data-act="kcopy" data-i="'+i+'">Copy</button></div>').join('');
+  const row=(it,i)=>'<div class="krow"><div class="eyebrow">'+esc(it.t)+'</div><div class="ktext">'+esc(it.x).replace(/\[([^\]]+)\]/g,'<mark>[$1]</mark>')+'</div><button class="btn sec sm" data-act="kcopy" data-i="'+i+'">Copy</button></div>';
+  const rows=S.kit.map(row);
+  return rows.slice(0,3).join('')+'<details class="more"><summary>More: cover letter, interview answer, skills</summary>'+rows.slice(3).join('')+'</details>';
 }
 function rResult(){
   const r=S.res,m=meaning(r),dom=r.order[0],col=r.shape==='rounded'?'#4B5160':STY[dom].col;
@@ -814,6 +833,7 @@ function rResult(){
      '<div class="step"><div class="eyebrow">Reach</div>'+roleChips(reach)+'</div></div>'+
      (r.shape==='duo'?'<p class="note" style="margin-top:14px">“Next” roles are the sweet spot where your two styles meet.</p>':'')+
      (r.shape==='rounded'?'<p class="note" style="margin-top:14px">You can step into most roles. Choose by the problems you enjoy.</p>':'')+'</div>'+
+   '<div class="rcard"><div class="eyebrow">Working with AI</div><h3>What changes, what stays yours</h3><dl><dt>AI can take on</dt><dd>'+esc(cap(aiLens(r).hands))+'</dd><dt>What stays yours</dt><dd>'+esc(cap(aiLens(r).stays))+'</dd><dt>Try this week</dt><dd>'+esc(aiLens(r).habit)+'</dd></dl><p class="note" style="margin-top:14px">Role titles here are a 2026 snapshot and shift quickly as AI changes work. Check current job ads for the role you want.</p></div>'+
   '</div><div class="dotnav" id="dotnav"><i class="on"></i><i></i><i></i></div></section>'+
 
   '<section class="blk tabp" id="tab-kit" role="tabpanel" aria-labelledby="tabbtn-kit"'+(S.tab==='kit'?'':' hidden')+'><div class="eyebrow">Put it to work</div><h2 style="margin-top:6px">Use it on LinkedIn, your CV and in interviews</h2>'+
