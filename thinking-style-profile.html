@@ -410,7 +410,8 @@ function findTie(answers){
 }
 function duoKey(a,b){return ORDER.indexOf(a)<ORDER.indexOf(b)?a+'+'+b:b+'+'+a;}
 function hash4(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(36).toUpperCase().padStart(4,'0').slice(-4);}
-function compute(answers,bonus,dateISO){
+function newUid(){const A='23456789ABCDEFGHJKMNPQRSTUVWXYZ';let o='';try{const b=new Uint8Array(6);crypto.getRandomValues(b);for(let i=0;i<6;i++)o+=A[b[i]%A.length];}catch(e){for(let i=0;i<6;i++)o+=A[Math.floor(Math.random()*A.length)];}return o;}
+function compute(answers,bonus,dateISO,uid){
   const t=tally(answers),order=ranked(t,bonus),v=order.map(k=>t.raw[k]);
   let shape;
   if(v[0]-v[4]<=3)shape='rounded';
@@ -426,7 +427,7 @@ function compute(answers,bonus,dateISO){
   const mn=v[4],mx=v[0],rel={};
   ORDER.forEach(k=>rel[k]=mx>mn?0.28+0.72*(t.raw[k]-mn)/(mx-mn):0.7);
   const day=(dateISO||'').slice(0,10);
-  const id='TSP-'+hash4(ORDER.map(k=>t.raw[k]).join('-')+day)+'-'+day.replace(/-/g,'').slice(2);
+  const id='TSP-'+(uid||hash4(ORDER.map(k=>t.raw[k]).join('-')+day))+'-'+day.replace(/-/g,'').slice(2);
   return {raw:t.raw,order,shape,title,sub,line,styles,blind:order[4],flat:v[0]===v[4],rel,id,date:dateISO,duoKey:dk};
 }
 function rolesFor(r,tier){
@@ -700,9 +701,9 @@ const store={
   set(o){MEM.v=o;try{localStorage.setItem('tsp.v1',JSON.stringify(o));}catch(e){}},
   clear(){MEM.v=null;try{localStorage.removeItem('tsp.v1');}catch(e){}}
 };
-const S={screen:'welcome',deck:[],i:0,answers:{},bonus:{},tie:null,res:null,date:null,theme:'calm',tone:'humble',name:'',post:'',pngP:null,lock:false,role:null,roleFor:null,roleList:[],kit:[],pl:null,tab:'map',proof:{mode:'master',style:null,twist:0,ownT:'',ownO:'',day:1,done:[]}};
+const S={screen:'welcome',deck:[],i:0,answers:{},bonus:{},tie:null,res:null,date:null,uid:null,theme:'calm',tone:'humble',name:'',post:'',pngP:null,lock:false,role:null,roleFor:null,roleList:[],kit:[],pl:null,tab:'map',proof:{mode:'master',style:null,twist:0,ownT:'',ownO:'',day:1,done:[]}};
 (function init(){const s=store.get();if(s){S.name=s.name||'';S.theme=s.theme||'calm';S.tone=s.tone||'humble';if(s.proof)S.proof=Object.assign(S.proof,s.proof);}})();
-function persist(){store.set({answers:S.answers,bonus:S.bonus,date:S.date,name:S.name,theme:S.theme,tone:S.tone,proof:S.proof});}
+function persist(){store.set({answers:S.answers,bonus:S.bonus,date:S.date,uid:S.uid,name:S.name,theme:S.theme,tone:S.tone,proof:S.proof});}
 
 /* ================= SCREENS ================= */
 function rWelcome(){
@@ -885,7 +886,7 @@ async function doLinkedIn(){
 function goReveal(){
   S.screen='reveal';render();
   setTimeout(()=>{
-    S.date=new Date().toISOString();S.res=compute(S.answers,S.bonus,S.date);
+    S.date=new Date().toISOString();S.uid=newUid();S.res=compute(S.answers,S.bonus,S.date,S.uid);
     S.post=postText(S.res,S.tone);S.pngP=null;persist();S.screen='result';render();
   },REDUCED?500:1700);
 }
@@ -904,7 +905,7 @@ function act(a,d){
   else if(a==='ans')answer(+d.v);
   else if(a==='back'){if(S.i>0&&!S.lock){S.i--;render();}}
   else if(a==='tie'){S.bonus={};S.bonus[d.k]=.5;goReveal();}
-  else if(a==='last'){const s=store.get();if(!s||!s.answers)return;S.answers=s.answers;S.bonus=s.bonus||{};S.date=s.date;S.res=compute(S.answers,S.bonus,S.date);S.post=postText(S.res,S.tone);S.pngP=null;S.tab=(S.proof.done.length>0&&S.proof.done.length<7)?'proof':'map';S.screen='result';render();}
+  else if(a==='last'){const s=store.get();if(!s||!s.answers)return;S.answers=s.answers;S.bonus=s.bonus||{};S.date=s.date;if(!s.uid){S.uid=newUid();store.set(Object.assign({},s,{uid:S.uid}));}else S.uid=s.uid;S.res=compute(S.answers,S.bonus,S.date,S.uid);S.post=postText(S.res,S.tone);S.pngP=null;S.tab=(S.proof.done.length>0&&S.proof.done.length<7)?'proof':'map';S.screen='result';render();}
   else if(a==='home'){S.screen='welcome';render();}
   else if(a==='theme'){
     S.theme=d.t;persist();
@@ -965,7 +966,7 @@ function act(a,d){
   else if(a==='linkedin')doLinkedIn();
   else if(a==='retake'){S.screen='welcome';render();}
   else if(a==='wipe'){
-    if(confirm('Delete your saved result and name from this device?')){store.clear();S.name='';S.proof={mode:'master',style:null,twist:0,ownT:'',ownO:'',day:1,done:[]};S.res=null;S.answers={};S.bonus={};S.screen='welcome';render();toast('Your data has been deleted');}
+    if(confirm('Delete your saved result and name from this device?')){store.clear();S.name='';S.proof={mode:'master',style:null,twist:0,ownT:'',ownO:'',day:1,done:[]};S.res=null;S.uid=null;S.answers={};S.bonus={};S.screen='welcome';render();toast('Your data has been deleted');}
   }
 }
 app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;act(b.dataset.act,b.dataset);});
