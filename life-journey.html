@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Know Your Star: Journey</title>
+<style>
+:root{--bg:#faf6ee;--card:#fff;--ink:#2b2a33;--mute:#77748a;--line:#e8e2d4;--acc:#4b3f9e;--acc2:#efeaff;--g:#2e8b57;--gbg:#e6f5ec;--n:#b8860b;--nbg:#fbf3dc;--r:#c0392b;--rbg:#fbe9e6}
+@media(prefers-color-scheme:dark){:root{--bg:#17161d;--card:#22212b;--ink:#eceaf5;--mute:#9a97ad;--line:#33313f;--acc:#a99cff;--acc2:#2c2945;--g:#5fd08d;--gbg:#1d3326;--n:#e5b94a;--nbg:#3a3220;--r:#ff8a7a;--rbg:#3d2420}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:84px}
+.wrap{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:0 0 2px}h2{font-size:17px;margin:18px 0 8px}h3{font-size:15px;margin:0 0 4px}
+.sub{color:var(--mute);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+select,input,textarea,button{font:inherit;color:inherit}
+select,input[type=text],input[type=date],textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+input[type=date]{-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:0;max-width:100%;min-height:44px;text-align:left;line-height:1.2}
+input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0;min-height:1.2em}
+input[type=date]::-webkit-datetime-edit{padding:0;text-align:left}
+input[type=date]::-webkit-datetime-edit-fields-wrapper{padding:0}
+label.f{display:block;font-size:13px;color:var(--mute);margin:10px 0 3px}
+button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 12px;cursor:pointer}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc)}
+button.sm{padding:4px 9px;font-size:13px}
+button.on{background:var(--acc2);border-color:var(--acc);color:var(--acc);font-weight:600}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:5}
+nav button{flex:1;max-width:112px;border:0;border-radius:0;background:none;padding:10px 2px;font-size:12px;color:var(--mute)}
+nav button b{display:block;font-weight:400}
+nav button.on{color:var(--acc);background:none}
+.chip{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.g{background:var(--gbg);color:var(--g)}.n{background:var(--nbg);color:var(--n)}.r{background:var(--rbg);color:var(--r)}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--acc2);color:var(--acc)}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
+.note{font-size:13px;color:var(--mute);font-style:italic}
+.hide{display:none}
+.ic{width:1.15em;height:1.15em;vertical-align:-0.2em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button .ic{width:23px;height:23px;vertical-align:0}
+button.sm .ic{width:1.05em;height:1.05em;vertical-align:-0.15em}
+h2 .ic,h3 .ic{color:var(--acc);margin-right:2px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:0.05em}
+.dots i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--line);margin-right:3px}.dots i.on{background:var(--acc)}
+.sec{padding:10px 0;border-bottom:1px solid var(--line)}.sec:last-child{border:0}
+.habit{display:flex;gap:10px;align-items:flex-start;padding:7px 0}
+.habit input{width:22px;height:22px;margin-top:1px}
+.warn{background:var(--nbg);color:var(--n);border-radius:10px;padding:8px 10px;font-size:13px;margin:8px 0}
+.ok{background:var(--gbg);color:var(--g);border-radius:10px;padding:8px 10px;font-size:13px;margin:8px 0}
+.skill{padding:12px 0;border-bottom:1px solid var(--line)}.skill:last-child{border:0}
+.seg{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.cnt{font-variant-numeric:tabular-nums}
+summary{cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav id="nav"></nav>
+
+<script>
+/* ---------- DATA ---------- */
+const STARS=[["Ashwini"],["Bharani"],["Krittika"],["Rohini"],["Mrigashira"],["Ardra"],["Punarvasu"],["Pushya"],["Ashlesha"],["Magha"],["Purva Phalguni"],["Uttara Phalguni"],["Hasta"],["Chitra"],["Swati"],["Vishakha"],["Anuradha"],["Jyeshtha"],["Mula"],["Purva Ashadha"],["Uttara Ashadha"],["Shravana"],["Dhanishta"],["Shatabhisha"],["Purva Bhadrapada"],["Uttara Bhadrapada"],["Revati"]];
+// three skills per star: [name, tiny practice]. Written from each star's traditional shadows and growth edge.
+const SK=[
+[["Patience","Two minutes of slow breathing before reacting"],["Pausing before acting","Wait 10 seconds before saying yes or sending"],["Finishing","Finish one open task before starting a new one"]],
+[["Steadiness in emotion","Name the feeling in one word before acting"],["Letting change in","Make one small change to a routine"],["Trusting yourself","Write one thing you did well today"]],
+[["Kind honesty","Say one honest thing kindly"],["Holding back criticism","Pause 10 seconds before giving criticism"],["Riding out the lows","Do one small task on a low day"]],
+[["Letting go and sharing","Give away or share one thing"],["Flexibility","Let someone else choose once today"],["Choosing effort over comfort","Skip one comfort habit (snooze, snack, scroll)"]],
+[["Depth over novelty","Stay with one topic for 20 minutes"],["Deciding","Decide between two options within 5 minutes"],["Contentment","Name three things that are enough as they are"]],
+[["Waiting out the storm","Wait one hour before sending a heated message"],["Expressing feelings safely","Write your feelings in 3 lines"],["Staying warm under pressure","Walk outside for 10 minutes before a hard talk"]],
+[["Concrete steps","Take one concrete step on a plan"],["Spotting problems early","Ask what could go wrong, once today"],["Having hard conversations","Have one honest talk you have been avoiding"]],
+[["Receiving","Ask for help once"],["Looking after yourself","Do one thing purely for yourself"],["Staying open","Ask what am I missing before insisting"]],
+[["Openness","Share one real feeling with someone safe"],["Direct asking","Say what you want plainly, no hints"],["Benefit of the doubt","Assume good intent once today"]],
+[["Serving","Help someone without being noticed"],["Humility","Let someone else take the credit"],["Treating people as equals","Ask a more junior person for their view"]],
+[["Doing the dull thing first","Do the least fun task first"],["Self-restraint","Say no to one indulgence"],["Following through","Do one thing you owe someone"]],
+[["Good enough","Let one thing be good enough"],["Flexibility","Change one plan gracefully"],["Standing alone","Spend one hour on something just for you"]],
+[["Quieting the mind","Write one worry down, then put it away"],["Plain speaking","Say the kind version instead of the sarcastic one"],["Letting go","Let one thing go unfixed"]],
+[["Shipping","Ship something at 80% done"],["Substance over image","Spend 10 minutes without thinking of your image"],["Accepting imperfection","Leave one flaw unfixed"]],
+[["Committing","Make one decision and keep it for a week"],["Staying with it","Stay in one conversation or task for 20 minutes"],["Reaching out","Message someone you have been drifting from"]],
+[["Celebrating others","Sincerely celebrate someone else's win"],["Balance","Enjoy one thing with no goal attached"],["Easing off","Stop work at a set time today"]],
+[["Asking for what you need","Say one need out loud"],["Saying no","Decline one request kindly"],["Clearing resentment","Name one small resentment to a friend or on paper"]],
+[["Delegating","Delegate one task"],["Asking for help","Ask for help once"],["Letting people in","Reach out to someone close"]],
+[["Rebuilding","Build something after clearing something"],["Easing intensity","Take one deliberate easy break"],["Finding meaning","Name one thing that matters today"]],
+[["Listening","Listen without interrupting in one conversation"],["Admitting mistakes","Admit one thing you were wrong about"],["Changing your mind","Change your mind once on something small"]],
+[["Flexibility","Break one rigid routine"],["Saying no to overload","Remove one item from today's list"],["Resting","Do nothing useful for 15 minutes"]],
+[["Keeping confidences","Skip gossip once"],["Staying in your lane","Offer help only when asked, once today"],["Listening inward","Sit in silence for 5 minutes"]],
+[["Presence","Pause 5 minutes with no goals"],["Generosity","Give something generously"],["Closeness","Ask someone how they really are and listen"]],
+[["Letting people in","Share something private with someone trusted"],["Staying connected","Spend time with another person today"],["Steadying mood","Name your mood, then do one small thing anyway"]],
+[["Routine","Eat and sleep on schedule today"],["Moderation","Pick the middle option once"],["Staying grounded","Do one grounding activity (walk, stretch)"]],
+[["Acting","Do one thing you have delayed"],["Facing things","Face one thing you have been avoiding"],["Sharing wisdom","Share one insight with someone"]],
+[["Boundaries","Take 5 quiet minutes after a heavy conversation"],["Emotional separation","Ask is this mine or theirs"],["Finishing","Finish one small thing"]]
+];
+const STAGES=["Learner","Practicing","Skilled","Natural"];
+const STAGE_HELP=["You notice it only afterward","You catch it in the moment","You choose a different response","You do it without effort"];
+const ORDER=["Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury"];
+const YEARS={Ketu:7,Venus:20,Sun:6,Moon:10,Mars:7,Rahu:18,Jupiter:16,Saturn:19,Mercury:17};
+const P={
+Sun:{pic:"a spotlight",short:"identity and purpose",ask:"Step forward and be seen.",press:"ego and craving recognition"},
+Moon:{pic:"the tide",short:"emotions and home",ask:"Look after your inner life and your home base.",press:"mood swings and over-sensitivity"},
+Mars:{pic:"a starting gun",short:"drive and action",ask:"Act, start things and defend what matters.",press:"impatience and conflict"},
+Mercury:{pic:"a busy market",short:"learning and communication",ask:"Learn, talk things through and sort out details.",press:"scattered thinking and over-talking"},
+Jupiter:{pic:"a generous teacher",short:"growth and guidance",ask:"Grow, teach and trust the bigger picture.",press:"overdoing it or over-promising"},
+Venus:{pic:"a good host",short:"relationships and comfort",ask:"Build relationships and enjoy things in balance.",press:"comfort-seeking and over-attachment"},
+Saturn:{pic:"a strict coach",short:"discipline and responsibility",ask:"Do the steady work and accept limits.",press:"heaviness and self-criticism"},
+Rahu:{pic:"an escalator that never stops",short:"ambition and restlessness",ask:"Chase what pulls you, but keep your feet on the ground.",press:"restlessness and chasing"},
+Ketu:{pic:"clearing out the attic",short:"letting go and simplifying",ask:"Let go of what no longer fits.",press:"withdrawal and detachment"}
+};
+// the nine relationship moods: [name, kind, everyday picture]
+const T={
+1:["Janma","n","meeting someone who talks and moves just like you"],
+2:["Sampat","g","a friend who always has a spare ticket"],
+3:["Vipat","r","two people reading different maps in the same car"],
+4:["Kshema","g","a warm kitchen on a cold day"],
+5:["Pratyak","r","a sticky door"],
+6:["Sadhana","g","a gym or study buddy"],
+7:["Naidhana","r","a very loud party"],
+8:["Mitra","g","an old friend"],
+9:["Parama Mitra","g","the friend who would pick you up at 3 a.m."]
+};
+const KIND={g:["Easy conditions","Supportive types"],r:["Hard conditions","Testing types"],n:["Mirror conditions","Janma"]};
+const DROVE={missed:["Missed it","r"],late:["Caught it late","n"],chose:["Chose well","g"]};
+const FELT={easy:["smile","Easy","g"],okay:["neutral","Okay","n"],hard:["frown","Hard","r"]};
+
+const ICONS={
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/>',
+flag:'<path d="M5 21V4"/><path d="M5 5c4-2 6 2 10 0v8c-4 2-6-2-10 0"/>',
+road:'<path d="M9 3L5 21M15 3l4 18"/><path d="M12 5v2M12 11v2M12 17v2"/>',
+chart:'<path d="M4 20h16"/><path d="M7 20v-7M12 20V8M17 20v-10"/>',
+sliders:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+flame:'<path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.2 2-4.2.3 1.6 1.2 2.4 2 2.7C11.5 9.5 11 6.5 12 3z"/>',
+check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+smile:'<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.2 2.1 1.8 3.5 1.8s2.5-.6 3.5-1.8"/><path d="M9 9.5v.01M15 9.5v.01"/>',
+neutral:'<circle cx="12" cy="12" r="9"/><path d="M9 15.5h6"/><path d="M9 9.5v.01M15 9.5v.01"/>',
+frown:'<circle cx="12" cy="12" r="9"/><path d="M8.5 16.5c1-1.2 2.1-1.8 3.5-1.8s2.5.6 3.5 1.8"/><path d="M9 9.5v.01M15 9.5v.01"/>',
+arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+plus:'<path d="M12 5v14M5 12h14"/>'
+};
+const ic=n=>'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+ICONS[n]+'</svg>';
+const badge=(cls,txt)=>`<span class="chip ${cls}"><i class="dot"></i>${txt}</span>`;
+
+/* ---------- STATE ---------- */
+const KEY="knowYourStar.journey.v1";
+const EMPTY=()=>({star:null,md:"",start:"",end:"",skills:[],people:[],reps:[],ticks:{}});
+let S=EMPTY();
+try{const x=JSON.parse(localStorage.getItem(KEY));if(x)S=Object.assign(EMPTY(),x)}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let tab=S.star!==null?"skills":"setup";
+let draft={},pend={drove:null,felt:null},flash="";
+
+/* ---------- HELPERS ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const DAY=864e5,YR=365.25*DAY,MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const nowDate=()=>(typeof window!=="undefined"&&window.__NOW)?new Date(window.__NOW):new Date();
+const todayISO=()=>{const d=nowDate();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const parse=s=>new Date(s+"T00:00:00Z");
+const fmt=d=>d.getUTCDate()+" "+MON[d.getUTCMonth()]+" "+d.getUTCFullYear();
+const validDate=s=>/^\d{4}-\d{2}-\d{2}$/.test(s)&&!isNaN(parse(s));
+const dayShift=(iso,n)=>{const d=parse(iso);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+function left(a,b){const days=(b-a)/DAY;if(days<=0)return "ended";const y=Math.floor(days/365.25),m=Math.floor((days-y*365.25)/30.44);if(y>=1)return y+" yr"+(y>1?"s":"")+(m?" "+m+" mo":"");if(m>=1)return m+" mo";return Math.max(1,Math.round(days))+" days"}
+function tara(a,b){const d=((b-a+27)%27)+1;return ((d-1)%9)+1}
+const starLord=i=>ORDER[i%9];
+const skillName=id=>{const s=S.skills.find(x=>x.id===id);return s?s.name:"(removed skill)"};
+const personById=id=>S.people.find(p=>p.id===id);
+const seed=i=>SK[i].map(([name,practice])=>({id:uid(),name,practice,stage:1}));
+
+function chapter(){
+  if(!S.md||!S.start||!validDate(S.start))return null;
+  const yrs=YEARS[S.md],start=parse(S.start),hasEnd=S.end&&validDate(S.end);
+  const end=hasEnd?parse(S.end):new Date(start.getTime()+yrs*YR),full=hasEnd?new Date(end.getTime()-yrs*YR):start;
+  const idx=ORDER.indexOf(S.md);let t=full.getTime(),subs=[];
+  for(let k=0;k<9;k++){const L=ORDER[(idx+k)%9],len=yrs*YEARS[L]/120*YR;subs.push({L,s:new Date(t),e:new Date(t+len)});t+=len}
+  const shown=subs.filter(x=>x.e>start).map(x=>x.s<start?Object.assign({},x,{s:start}):x);
+  return {md:S.md,yrs,start,end,subs:shown};
+}
+function nextChapter(c){const idx=ORDER.indexOf(c.md),L=ORDER[(idx+1)%9];return {L,s:c.end,e:new Date(c.end.getTime()+YEARS[L]*YR)}}
+
+/* activity: days with any practice tick or logged rep */
+function activeDays(){const s=new Set();for(const d in S.ticks)if(S.ticks[d]&&S.ticks[d].length)s.add(d);S.reps.forEach(r=>s.add(r.date));return s}
+function streak(){const a=activeDays();let d=todayISO(),n=0;if(!a.has(d))d=dayShift(d,-1);while(a.has(d)){n++;d=dayShift(d,-1)}return n}
+
+/* stats */
+function group(reps,keyFn){
+  const m={};
+  reps.forEach(r=>{const k=keyFn(r);if(k===null)return;(m[k.key]||(m[k.key]={label:k.label,sub:k.sub||"",n:0,chose:0}));m[k.key].n++;if(r.drove==="chose")m[k.key].chose++});
+  return Object.values(m).sort((a,b)=>b.n-a.n);
+}
+function personKind(r){
+  const p=personById(r.who);if(!p||S.star===null)return null;
+  const t=tara(S.star,p.star);return T[t][1];
+}
+function skillStats(id){
+  const reps=S.reps.filter(r=>r.skill===id);
+  const people=group(reps,r=>{if(!r.who)return null;const p=personById(r.who);const t=p?T[tara(S.star,p.star)]:null;return {key:"p"+r.who,label:p?p.name:"(removed)",sub:t?t[0]:""}});
+  const places=group(reps,r=>r.place?{key:"l"+r.place.toLowerCase(),label:r.place}:null);
+  const cond=group(reps,r=>{const k=r.who?personKind(r):"none";if(k===null)return null;if(k==="none")return {key:"none",label:"Nobody else involved"};return {key:k,label:KIND[k][0],sub:KIND[k][1]}});
+  const slips=[...people,...places].filter(x=>x.n>=2&&x.chose/x.n<=0.5).sort((a,b)=>a.chose/a.n-b.chose/b.n||b.n-a.n);
+  const focus=slips.length?slips[0]:null;
+  return {reps,people,places,cond,focus,n:reps.length,chose:reps.filter(r=>r.drove==="chose").length};
+}
+
+/* ---------- VIEWS ---------- */
+function needSetup(){
+  return `<div class="card"><h2 style="margin-top:0">Start here</h2><p class="sub">Choose your birth nakshatra on the Setup tab. That gives you your three skills to master. The road ahead is optional.</p><button class="p" data-act="tab" data-k="setup">Go to Setup</button></div>`;
+}
+function terrainLine(){
+  const c=chapter();if(!c)return `<span class="sub">Add your chapter in Setup to see the road ahead.</span>`;
+  const now=nowDate();const cur=c.subs.find(x=>now>=x.s&&now<x.e);
+  return `Terrain: <b>${c.md}</b> chapter${cur?` · Weather: <b>${cur.L}</b>`:""}`;
+}
+function vSkills(){
+  if(S.star===null)return needSetup();
+  const st=streak(),today=todayISO(),done=S.ticks[today]||[];
+  const wk=S.reps.filter(r=>r.date>dayShift(today,-7));
+  const wkChose=wk.filter(r=>r.drove==="chose").length;
+  let h=`<div class="card"><div class="row"><div class="grow"><h1>Your skills</h1><div class="sub">${terrainLine()}</div></div><div style="text-align:right"><div style="font-size:22px;color:var(--acc)">${ic("flame")} ${st}</div><div class="sub">day streak</div></div></div>
+  <div class="row" style="margin-top:8px"><span class="pill">${esc(STARS[S.star][0])} · ${starLord(S.star)}</span><span class="sub">This week: ${wk.length} rep${wk.length===1?"":"s"}${wk.length?`, chose well ${wkChose}`:""}</span></div></div>`;
+  if(!S.skills.length)h+=`<div class="card"><p class="sub">You have no skills yet. Add some in Setup.</p></div>`;
+  S.skills.forEach(s=>{
+    const n=S.reps.filter(r=>r.skill===s.id).length;
+    h+=`<div class="card"><div class="skill" style="padding-top:0">
+    <div class="row"><div class="grow"><h3>${esc(s.name)}</h3><div class="dots">${[1,2,3,4].map(i=>`<i class="${i<=s.stage?"on":""}"></i>`).join("")}</div></div><div class="sub cnt">${n} rep${n===1?"":"s"}</div></div>
+    <label class="habit"><input type="checkbox" data-act="tick" data-id="${s.id}" ${done.includes(s.id)?"checked":""}><div class="grow"><div>${esc(s.practice)}</div><div class="sub">Today's practice</div></div></label>
+    <div class="sub" style="margin-top:2px">Where are you with it? <span class="note">${STAGE_HELP[s.stage-1]}.</span></div>
+    <div class="seg">${STAGES.map((nm,i)=>`<button class="sm ${s.stage===i+1?"on":""}" data-act="stage" data-id="${s.id}" data-v="${i+1}">${nm}</button>`).join("")}</div></div></div>`;
+  });
+  h+=`<div class="card"><div class="row"><div class="grow"><b>Practiced something just now?</b><div class="sub">A rep takes 30 seconds.</div></div><button class="p sm" data-act="tab" data-k="log">${ic("plus")} Log a rep</button></div></div>`;
+  return h;
+}
+
+function vLog(){
+  if(S.star===null)return needSetup();
+  if(!S.skills.length)return `<div class="card"><p class="sub">Add at least one skill in Setup first.</p></div>`;
+  const d=draft;
+  const skillOpts=S.skills.map(s=>`<option value="${s.id}" ${d.skill===s.id?"selected":""}>${esc(s.name)}</option>`).join("");
+  const whoOpts=`<option value="">Nobody else involved</option>`+S.people.map(p=>{const t=T[tara(S.star,p.star)];return `<option value="${p.id}" ${d.who===p.id?"selected":""}>${esc(p.name)} (${t[0]})</option>`}).join("");
+  const places=[...new Set(S.reps.map(r=>r.place).filter(Boolean))];
+  let h=flash?`<div class="ok">${esc(flash)}</div>`:"";flash="";
+  h+=`<div class="card"><h1>Log a rep</h1><p class="sub">One moment where you practiced, or missed the chance to.</p>
+  <label class="f">Skill</label><select id="lSkill" data-draft="skill">${skillOpts}</select>
+  <label class="f">What happened? (optional)</label><input type="text" id="lSit" data-draft="sit" value="${esc(d.sit||"")}" placeholder="e.g. Argued about plans">
+  <label class="f">Who was involved?</label><select id="lWho" data-draft="who">${whoOpts}</select>
+  <label class="f">Where?</label><input type="text" id="lPlace" data-draft="place" list="placeList" value="${esc(d.place||"")}" placeholder="e.g. Office"><datalist id="placeList">${places.map(p=>`<option value="${esc(p)}">`).join("")}</datalist>
+  <label class="f">How did you drive?</label>
+  <div class="row">${Object.entries(DROVE).map(([k,v])=>`<button class="sm ${pend.drove===k?"on":""}" data-act="drove" data-v="${k}" id="d_${k}">${v[0]}</button>`).join("")}</div>
+  <label class="f">How did it feel?</label>
+  <div class="row">${Object.entries(FELT).map(([k,v])=>`<button class="sm ${pend.felt===k?"on":""}" data-act="felt" data-v="${k}" id="f_${k}">${ic(v[0])} ${v[1]}</button>`).join("")}</div>
+  <div style="margin-top:14px"><button class="p" data-act="saveRep">Save rep</button></div></div>`;
+  h+=`<div class="card"><h2 style="margin-top:0">Add a person</h2><p class="sub">Their star shows how they tend to feel to you, which helps the patterns later.</p>
+  <input type="text" id="pName" data-draft="pname" value="${esc(d.pname||"")}" placeholder="Name">
+  <div class="row" style="margin-top:8px"><select id="pStar" class="grow" data-draft="pstar"><option value="">Their nakshatra…</option>${STARS.map((s,i)=>`<option value="${i}" ${d.pstar===String(i)?"selected":""}>${i+1}. ${s[0]}</option>`).join("")}</select><button class="p" data-act="addPerson">Add</button></div></div>`;
+  const recent=S.reps.slice().reverse().slice(0,8);
+  if(recent.length)h+=`<h2>Recent reps</h2>`+recent.map(r=>{const p=personById(r.who);return `<div class="card"><div class="row"><div class="grow"><b>${esc(skillName(r.skill))}</b> <span class="sub">${r.date}</span></div>${badge(DROVE[r.drove][1],DROVE[r.drove][0])}<span title="Felt ${FELT[r.felt][1]}">${ic(FELT[r.felt][0])}</span><button class="sm" data-act="delRep" data-id="${r.id}" title="Remove" aria-label="Remove">${ic("x")}</button></div>${r.sit?`<div class="note">${esc(r.sit)}</div>`:""}<div class="sub">${p?esc(p.name):"No one else"}${r.place?" · "+esc(r.place):""}</div></div>`}).join("");
+  return h;
+}
+
+function vAhead(){
+  if(S.star===null)return needSetup();
+  const c=chapter();
+  if(!c)return `<div class="card"><h2 style="margin-top:0">The road ahead</h2><p class="sub">Add your current chapter (Mahadasha planet and start date) in Setup, and this page will show the terrain and weather coming up so you can practice for it.</p><button class="p" data-act="tab" data-k="setup">Go to Setup</button></div>`;
+  const now=nowDate(),cur=c.subs.find(x=>now>=x.s&&now<x.e);
+  const pm=P[c.md];
+  let h=`<div class="card"><h1>The road ahead</h1><p class="sub" style="margin:0">Like driving lessons before a mountain road: see what is coming, then sharpen the skills it will test.</p></div>
+  <div class="card"><h3>Terrain: ${c.md} chapter</h3><div class="sub">${fmt(c.start)} to ${fmt(c.end)}${now>=c.start&&now<c.end?" · "+left(now,c.end)+" left":""}</div>
+  <p style="margin:6px 0 0">Like <b>${pm.pic}</b>: ${pm.short}. <span class="sub">${pm.ask}</span></p></div>`;
+  if(cur){
+    const pw=P[cur.L];
+    h+=`<div class="card"><h3>Weather now: ${cur.L} sub-chapter</h3><div class="sub">${fmt(cur.s)} to ${fmt(cur.e)} · ${left(now,cur.e)} left</div>
+    <p style="margin:6px 0 0">Like <b>${pw.pic}</b>: ${pw.short}. <span class="sub">${pw.ask}</span></p>
+    <p class="sub" style="margin:6px 0 0">Watch for ${pw.press}. Keep practicing your skills; this weather will test them in its own way.</p></div>`;
+    const i=c.subs.findIndex(x=>x.L===cur.L),nxt=c.subs.slice(i+1,i+3);
+    if(nxt.length)h+=`<div class="card"><h3>Weather coming</h3>${nxt.map(x=>`<div class="sec"><b>${x.L}</b> <span class="sub">from ${fmt(x.s)}</span><div class="sub">${P[x.L].short}. ${P[x.L].ask}</div></div>`).join("")}</div>`;
+  }else h+=`<div class="warn">Today is outside the chapter dates you entered. Check them in Setup.</div>`;
+  const nc=nextChapter(c);
+  h+=`<div class="card"><h3>Next terrain: ${nc.L} chapter</h3><div class="sub">from ${fmt(nc.s)}</div><p style="margin:6px 0 0"><b>${P[nc.L].short}</b>. <span class="sub">${P[nc.L].ask}</span></p></div>
+  <p class="note">These are traditional themes written as conditions to work with, not predictions. The skills are the same whatever the road; mastering them is what makes any road enjoyable.</p>`;
+  return h;
+}
+
+function vPatterns(){
+  if(S.star===null)return needSetup();
+  if(!S.reps.length)return `<div class="card"><h2 style="margin-top:0">Patterns</h2><p class="sub">Log a few reps and this page will show where each skill holds and where it slips.</p><button class="p" data-act="tab" data-k="log">Log a rep</button></div>`;
+  const total=S.reps.length,chose=S.reps.filter(r=>r.drove==="chose").length;
+  let h=`<div class="card"><h2 style="margin-top:0">Where each skill holds</h2><p style="margin:4px 0">${total} rep${total===1?"":"s"} so far, chose well in ${chose}.</p>
+  ${total<10?`<p class="note">Small sample: look for patterns over weeks, not days.</p>`:""}</div>`;
+  const rate=x=>`${x.chose} of ${x.n}`;
+  S.skills.forEach(s=>{
+    const st=skillStats(s.id);if(!st.n)return;
+    const row=(x,withSub)=>`<div class="row" style="padding:3px 0"><div class="grow">${esc(x.label)}${withSub&&x.sub?` <span class="sub">${esc(x.sub)}</span>`:""}</div><div class="cnt">${rate(x)}</div><div style="width:60px"><div class="bar"><i style="width:${Math.round(x.chose/x.n*100)}%"></i></div></div></div>`;
+    h+=`<div class="card"><div class="row"><h3 class="grow">${esc(s.name)}</h3><span class="pill">${STAGES[s.stage-1]}</span></div>
+    <div class="sub">Chose well in ${st.chose} of ${st.n}</div>`;
+    if(st.cond.length)h+=`<div class="sec"><div class="sub">By conditions</div>${st.cond.map(x=>row(x,true)).join("")}</div>`;
+    if(st.people.length)h+=`<div class="sec"><div class="sub">By person</div>${st.people.map(x=>row(x,true)).join("")}</div>`;
+    if(st.places.length)h+=`<div class="sec"><div class="sub">By place</div>${st.places.map(x=>row(x,false)).join("")}</div>`;
+    if(st.focus)h+=`<div class="warn"><b>Focus:</b> ${esc(s.name.toLowerCase())} slips most with ${esc(st.focus.label)} (${rate(st.focus)}). Try this before the next time: ${esc(s.practice.toLowerCase())}.</div>`;
+    h+=`</div>`;
+  });
+  h+=`<p class="note">Conditions come from the traditional mood between your star and theirs: Sampat, Kshema, Sadhana, Mitra and Parama Mitra count as easy, Vipat, Pratyak and Naidhana as hard, Janma as a mirror. Your own results are the real test of whether that fits.</p>`;
+  return h;
+}
+
+function vSetup(){
+  const planets=ORDER.map(p=>`<option value="${p}" ${S.md===p?"selected":""}>${p} (${YEARS[p]} years)</option>`).join("");
+  let h=`<div class="card"><h1>Setup</h1><p class="sub">Nothing leaves this device.</p>
+  <label class="f">Your birth nakshatra</label>
+  <select id="fStar"><option value="">Choose…</option>${STARS.map((s,i)=>`<option value="${i}" ${S.star===i?"selected":""}>${i+1}. ${s[0]}</option>`).join("")}</select>
+  <details style="margin-top:10px" ${S.md?"open":""}><summary class="sub">Add my current chapter (optional, for the road ahead)</summary>
+    <label class="f">Mahadasha planet</label><select id="fMd"><option value="">Not set</option>${planets}</select>
+    <label class="f">When did this chapter start?</label><input type="date" id="fStart" value="${esc(S.start)}">
+    <label class="f">When does it end? (optional)</label><input type="date" id="fEnd" value="${esc(S.end)}">
+  </details>
+  <div class="row" style="margin-top:14px"><button class="p" data-act="saveSetup">Save</button></div></div>`;
+  if(S.star!==null){
+    h+=`<div class="card"><h2 style="margin-top:0">Your skills</h2><p class="sub">Starting skills come from your star's growth edge and shadows. Rename them, change the practice, or add your own.</p>
+    ${S.skills.map(s=>`<div class="skill"><label class="f" style="margin-top:0">Skill</label><input type="text" data-act="skName" data-id="${s.id}" value="${esc(s.name)}">
+    <label class="f">Tiny daily practice</label><input type="text" data-act="skPractice" data-id="${s.id}" value="${esc(s.practice)}">
+    <div style="margin-top:6px"><button class="sm" data-act="delSkill" data-id="${s.id}">${ic("x")} Remove skill</button></div></div>`).join("")}
+    <h3 style="margin-top:12px">Add a skill</h3>
+    <input type="text" id="nsName" data-draft="nsname" value="${esc(draft.nsname||"")}" placeholder="Skill, e.g. Speaking up">
+    <input type="text" id="nsPractice" data-draft="nspractice" value="${esc(draft.nspractice||"")}" placeholder="Tiny practice, e.g. Share one opinion in a meeting" style="margin-top:6px">
+    <div style="margin-top:8px"><button class="p sm" data-act="addSkill">Add skill</button> <button class="sm" data-act="resetSkills">Restore my star's skills</button></div></div>`;
+    h+=`<div class="card"><h2 style="margin-top:0">People</h2>${S.people.length?S.people.map(p=>{const t=T[tara(S.star,p.star)];return `<div class="row" style="padding:6px 0"><div class="grow"><b>${esc(p.name)}</b> <span class="sub">${esc(STARS[p.star][0])}</span><div class="sub">${esc(p.name)} feels like ${t[2]} to you (${t[0]})</div></div>${badge(t[1],t[0])}<button class="sm" data-act="delPerson" data-id="${p.id}" aria-label="Remove">${ic("x")}</button></div>`}).join(""):`<p class="sub">No one yet. Add people on the Log tab.</p>`}</div>`;
+  }
+  const size=Math.round(JSON.stringify(S).length/1024*10)/10;
+  h+=`<div class="card"><h2 style="margin-top:0">Your data</h2><p class="sub">Stored only in this browser on this device. Back it up so your reps are never lost (${size} KB now).</p>
+  <div class="row"><button class="p" data-act="export">Download backup</button><button data-act="importBtn">Restore from file</button></div>
+  <input type="file" id="impFile" accept=".json,application/json" class="hide"></div>
+  <div class="card"><h2 style="margin-top:0">About</h2><p class="sub">Know Your Star: Journey is a reflection tool built around mastering your own skills. Nakshatra, Tara and Vimshottari readings are traditional Vedic ideas, and there is no scientific evidence that they predict personality or events. The part that works regardless is practice: noticing what drives you, and choosing differently. Treat the traditional readings as a lens to test against your own results.</p>
+  <p class="sub"><b>What comes from where:</b> the skills are written from each star's traditional strengths, shadows and growth edge, cross-checked against published summaries. The nine relationship moods follow standard Tara Bala (count from your star to theirs, divide by 9). The chapter and weather use the standard Vimshottari order, years and the chapter years × weather years ÷ 120 rule. Places have no traditional rating, so they are only a log of your own experience. The everyday pictures, practices and focus suggestions are mine.</p>
+  <p class="sub"><b>Sources:</b> Dekho Panchang (Tara Bala), Outlook India (nine Taras), Hindutone (Vimshottari), Wikipedia (Dasha; List of Nakshatras), TemplePurohit and Astro Sanjivani (nakshatra traits).</p></div>
+  <div class="card"><button data-act="wipe" style="color:var(--r)">Erase everything</button></div>`;
+  return h;
+}
+
+const TABS=[["skills","flag","Skills"],["log","plus","Log"],["ahead","road","Ahead"],["patterns","chart","Patterns"],["setup","sliders","Setup"]];
+const VIEWS={skills:vSkills,log:vLog,ahead:vAhead,patterns:vPatterns,setup:vSetup};
+function render(keep){
+  const y=window.scrollY;
+  $("#app").innerHTML=VIEWS[tab]();
+  $("#nav").innerHTML=TABS.map(([k,icn,l])=>`<button class="${tab===k?"on":""}" data-act="tab" data-k="${k}"><b>${ic(icn)}</b>${l}</button>`).join("");
+  if(keep)window.scrollTo(0,y);
+}
+
+/* ---------- EVENTS ---------- */
+document.addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.draft;if(k)draft[k]=e.target.value});
+document.addEventListener("change",e=>{
+  const t=e.target,ds=t.dataset||{};
+  if(ds.draft)draft[ds.draft]=t.value;
+  if(ds.act==="tick"){
+    const d=todayISO(),l=S.ticks[d]||(S.ticks[d]=[]),ix=l.indexOf(ds.id);
+    if(t.checked&&ix<0)l.push(ds.id);if(!t.checked&&ix>=0)l.splice(ix,1);
+    save();render(true);
+  }
+  if(ds.act==="skName"||ds.act==="skPractice"){
+    const s=S.skills.find(x=>x.id===ds.id);if(s){const v=t.value.trim();if(ds.act==="skName"){if(v)s.name=v;else t.value=s.name}else{if(v)s.practice=v;else t.value=s.practice}save()}
+  }
+  if(t.id==="impFile"){
+    const f=t.files[0];if(!f)return;
+    const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(typeof x!=="object"||!x)throw 0;
+      if(confirm("Replace current data with this backup?")){S=Object.assign(EMPTY(),x);save();alert("Restored.");tab=S.star!==null?"skills":"setup";render()}}catch(err){alert("That file is not a valid backup.")}};
+    r.readAsText(f);
+  }
+});
+document.addEventListener("click",e=>{
+  const el=e.target.closest("[data-act]");if(!el||el.tagName==="INPUT")return;
+  const a=el.dataset.act,d=el.dataset;
+  if(a==="tab"){tab=d.k;window.scrollTo(0,0);render()}
+  else if(a==="stage"){const s=S.skills.find(x=>x.id===d.id);if(s){s.stage=+d.v;save();render(true)}}
+  else if(a==="drove"){pend.drove=d.v;Object.keys(DROVE).forEach(k=>$("#d_"+k).classList.toggle("on",k===d.v))}
+  else if(a==="felt"){pend.felt=d.v;Object.keys(FELT).forEach(k=>$("#f_"+k).classList.toggle("on",k===d.v))}
+  else if(a==="saveRep"){
+    const skill=draft.skill||(S.skills[0]&&S.skills[0].id);
+    if(!skill){alert("Add a skill first.");return}
+    if(!pend.drove||!pend.felt){alert("Choose how you drove and how it felt.");return}
+    S.reps.push({id:uid(),date:todayISO(),skill,sit:(draft.sit||"").trim(),who:draft.who||"",place:(draft.place||"").trim(),drove:pend.drove,felt:pend.felt});
+    save();draft={};pend={drove:null,felt:null};flash="Rep saved.";render();window.scrollTo(0,0);
+  }
+  else if(a==="delRep"){if(confirm("Remove this rep?")){S.reps=S.reps.filter(r=>r.id!==d.id);save();render(true)}}
+  else if(a==="addPerson"){
+    const n=(draft.pname||"").trim(),s=draft.pstar;
+    if(!n||s===undefined||s===""){alert("Enter a name and choose their nakshatra.");return}
+    const p={id:uid(),name:n,star:+s};S.people.push(p);draft.pname="";draft.pstar="";draft.who=p.id;save();render(true);
+  }
+  else if(a==="delPerson"){if(confirm("Remove this person? Past reps keep their notes.")){S.people=S.people.filter(p=>p.id!==d.id);save();render(true)}}
+  else if(a==="saveSetup"){
+    const star=$("#fStar").value,md=$("#fMd").value,start=$("#fStart").value,end=$("#fEnd").value;
+    if(star===""){alert("Please choose your nakshatra.");return}
+    if(md&&!start){alert("Please add the chapter start date, or clear the planet.");return}
+    if((start&&!validDate(start))||(end&&!validDate(end))||(end&&start&&parse(end)<=parse(start))){alert("Please check the dates.");return}
+    const ns=+star;
+    if(S.star!==ns){
+      if(S.skills.length&&S.star!==null){if(confirm("Switching nakshatra replaces your skills with the new star's skills. Your reps are kept. Continue?")){S.skills=seed(ns)}else return}
+      else S.skills=seed(ns);
+    }
+    S.star=ns;S.md=md;S.start=md?start:"";S.end=md?end:"";save();tab="skills";window.scrollTo(0,0);render();
+  }
+  else if(a==="addSkill"){const n=(draft.nsname||"").trim(),p=(draft.nspractice||"").trim();if(!n||!p){alert("Enter a skill and a tiny practice.");return}S.skills.push({id:uid(),name:n,practice:p,stage:1});draft.nsname="";draft.nspractice="";save();render(true)}
+  else if(a==="delSkill"){if(confirm("Remove this skill? Your logged reps stay.")){S.skills=S.skills.filter(s=>s.id!==d.id);save();render(true)}}
+  else if(a==="resetSkills"){if(S.star!==null&&confirm("Replace your skills with the three that come with your star? Your reps are kept.")){S.skills=seed(S.star);save();render(true)}}
+  else if(a==="export"){
+    const b=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+    const u=URL.createObjectURL(b),l=document.createElement("a");l.href=u;l.download="know-your-star-journey-backup-"+todayISO()+".json";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),500);
+  }
+  else if(a==="importBtn"){$("#impFile").click()}
+  else if(a==="wipe"){if(confirm("Erase all data on this device? This cannot be undone.")&&confirm("Really erase everything?")){S=EMPTY();draft={};pend={drove:null,felt:null};save();tab="setup";render()}}
+});
+render();
+</script>
+</body>
+</html>
