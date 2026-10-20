@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The shortest path</title>
+<style>
+:root{--bg:#fff;--ink:#111;--mute:#8a8a8f;--line:#d6d6da;--go:#0a9d78;--soft:rgba(127,127,127,.13)}
+@media (prefers-color-scheme:dark){:root{--bg:#000;--ink:#f5f5f7;--mute:#86868b;--line:#3a3a3c;--go:#30d5a8}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+main{max-width:460px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;padding:20px 20px calc(24px + env(safe-area-inset-bottom))}
+h1{font-size:28px;line-height:1.15;font-weight:600;letter-spacing:-.02em;margin:8px 0 4px}
+h2{font-size:26px;line-height:1.2;font-weight:600;letter-spacing:-.02em;margin:12px 0 16px}
+.sub{color:var(--mute);margin:0 0 12px;font-size:16px}
+.hide{display:none!important}
+.pick{display:flex;flex-direction:column;gap:12px;margin-top:auto;margin-bottom:auto}
+.pick p{margin:0 0 4px;font-size:20px;font-weight:600}
+.stats{display:flex;gap:26px;margin-bottom:4px;align-items:flex-end}
+.stat b{display:block;font-size:34px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat span{color:var(--mute);font-size:13px}
+.chg{margin-left:auto;background:none!important;color:var(--mute)!important;font-size:14px!important;font-weight:400!important;padding:6px 0!important;flex:none!important}
+.cap{font-size:22px;font-weight:600;line-height:1.25;letter-spacing:-.01em;min-height:56px;margin:6px 0 4px}
+#stage{display:flex;flex-direction:column;flex:1;min-height:0;cursor:pointer}
+.hint{color:var(--mute);font-size:13px;text-align:center;min-height:18px}
+svg{width:100%;flex:1;min-height:0;max-height:50dvh}
+.stop circle{fill:var(--bg);stroke:var(--line);stroke-width:2}
+.stop text{fill:var(--mute);font-size:12px;paint-order:stroke;stroke:var(--bg);stroke-width:4px}
+.stop.on circle{fill:var(--ink);stroke:var(--ink)}
+.stop.on text{fill:var(--ink)}
+.man{stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;fill:none}
+.per{stroke:var(--go);stroke-width:2.5;stroke-linecap:round;fill:none}
+.bubble{opacity:0;transition:opacity .4s}
+.bubble.show{opacity:1}
+.bubble rect{fill:var(--bg);stroke:var(--go);stroke-width:1.5}
+.bubble text{fill:var(--ink);font-size:13px}
+.btns{display:flex;gap:10px;margin-top:10px}
+button{flex:1;font:inherit;font-size:17px;font-weight:600;padding:16px 10px;border-radius:14px;border:0;cursor:pointer;background:var(--ink);color:var(--bg)}
+button.go{background:var(--go);color:#fff}
+button.sec{background:var(--soft);color:var(--ink)}
+button.sel{background:var(--ink);color:var(--bg)}
+button:disabled{opacity:.35}
+.card{display:none;margin-top:10px;gap:10px;flex-direction:column}
+.card.show{display:flex}
+input{font:inherit;font-size:17px;padding:14px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+input:focus{outline:none;border-color:var(--go)}
+.p{border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.p .h{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer}
+.nm{font-size:17px;font-weight:600}
+.via{color:var(--mute);font-size:13px;display:block;font-weight:400}
+.chip{font-size:12px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);color:var(--mute);white-space:nowrap}
+.chip.sent{color:var(--ink);border-color:var(--ink)}
+.chip.replied{background:var(--go);border-color:var(--go);color:#fff}
+.msg{font-size:15px;line-height:1.45;margin:12px 0 8px;background:var(--soft);padding:10px 12px;border-radius:10px}
+.row{display:flex;gap:8px;margin-top:8px}
+.row button{padding:11px 4px;font-size:15px}
+.row button.sm{font-size:14px}
+.ask{margin-top:12px}
+.ask b{display:block;font-size:15px;margin-bottom:6px}
+.note{color:var(--mute);font-size:13px;min-height:18px;margin-top:6px}
+.addbox{margin-top:8px}
+.addbox .pr{font-weight:600;font-size:17px;margin:10px 0 8px}
+.tiny{background:none!important;color:var(--mute)!important;font-size:13px!important;font-weight:400!important;padding:12px 0 0!important;flex:none!important;align-self:center}
+</style>
+</head>
+<body>
+<main>
+  <div id="head">
+    <h1>One person is the shortest path.</h1>
+    <p class="sub">Who is Sam?</p>
+  </div>
+
+  <div class="pick" id="pick">
+    <p>Sam is a...</p>
+    <button data-a="startup">Startup founder</button>
+    <button data-a="business">Small business owner</button>
+    <button data-a="job">Job seeker</button>
+  </div>
+
+  <div id="scene" class="hide" style="flex-direction:column;flex:1;min-height:0">
+    <div class="stats">
+      <div class="stat"><b id="days">0</b><span>days</span></div>
+      <div class="stat"><b id="met">0</b><span>people met</span></div>
+      <button class="chg" id="skip">Skip</button>
+    </div>
+    <div class="cap" id="cap"></div>
+    <div id="stage">
+      <svg viewBox="0 0 360 510" role="img" aria-label="Sam walks a long winding road, then a short straight line to one person">
+        <path d="M180 60V420" fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="2 6" stroke-linecap="round"/>
+        <path id="long" d="M180 60C40 100 40 140 180 175S320 250 180 290S40 370 180 420" fill="none" stroke="var(--line)" stroke-width="2" stroke-linecap="round"/>
+        <g id="stops"></g>
+        <g class="per" transform="translate(180 472)">
+          <circle cy="-22" r="7"/><path d="M0-15V5M-11-8H11M0 5L-8 20M0 5L8 20"/>
+        </g>
+        <g class="bubble" id="bubble">
+          <rect x="194" y="440" width="160" height="34" rx="10"/>
+          <text id="btxt" x="274" y="461" text-anchor="middle"></text>
+        </g>
+        <g class="man" id="sam" transform="translate(180 60)">
+          <circle cy="-22" r="7"/><path d="M0-15V5M-11-8H11M0 5L-8 20M0 5L8 20"/>
+        </g>
+      </svg>
+      <div class="hint" id="hint">Tap to pause</div>
+    </div>
+    <div class="card" id="card">
+      <button class="go" id="toFirst">Your turn</button>
+    </div>
+  </div>
+
+  <div id="first" class="hide">
+    <div id="f1">
+      <h2 id="fq"></h2>
+      <input id="fname" placeholder="A name" autocomplete="off" maxlength="40">
+      <div class="btns"><button class="go" id="fnext">Next</button></div>
+      <div class="note">Rough is fine. One real person.</div>
+    </div>
+    <div id="f2" class="hide">
+      <h2 id="fh"></h2>
+      <div class="msg" id="fmsg"></div>
+      <div class="row">
+        <button class="go sm" data-f="wa">WhatsApp</button>
+        <button class="go sm" data-f="sms">SMS</button>
+        <button class="go sm" data-f="mail">Email</button>
+        <button class="sec sm" data-f="copy">Copy</button>
+      </div>
+      <div class="note" id="fnote"></div>
+      <div class="btns"><button id="fdone">I've sent it</button></div>
+    </div>
+  </div>
+
+  <div id="tool" class="hide">
+    <div class="stats">
+      <div class="stat"><b id="talked">0</b><span>people talked to</span></div>
+      <div class="stat"><b id="sent">0</b><span>messages sent</span></div>
+      <button class="chg" id="story">Story</button>
+    </div>
+    <p class="sub" id="tsub" style="margin-top:8px"></p>
+    <div id="list"></div>
+    <div class="addbox">
+      <div class="pr" id="prompt"></div>
+      <input id="newName" placeholder="A name" autocomplete="off" maxlength="40">
+      <div class="btns"><button class="go" id="addBtn">Add</button></div>
+    </div>
+    <button class="tiny" id="reset">Start over</button>
+  </div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const KEY='sp.v1';
+const A={
+  startup:{goal:'customers',days:[14,45,90,130,170],
+    stops:['Logo','Website','Pitch deck','Brand','Posts'],
+    lost:'Six months. Beautiful logo. No customers.',
+    bubble:'Talk to Maya next.',
+    open:'I\'m building something and I\'d value your view.',
+    close:'Could I have 15 minutes this week? I\'m trying to understand the problem, not sell anything.',
+    ask:'Who else has this problem?',
+    prompts:['Who has this problem today?','Who knows someone who does?','Who would pay to get it fixed?','Who tried to solve it and gave up?','Who would tell you the honest truth?']},
+  business:{goal:'customers',days:[14,45,90,130,170],
+    stops:['Logo','Website','Cards','Flyers','Posts'],
+    lost:'Six months. Beautiful cards. No customers.',
+    bubble:'Maya needs this.',
+    open:'I\'m starting a business and I\'d value your view.',
+    close:'Could I have 15 minutes this week to hear what you would want from it?',
+    ask:'Who else would want this?',
+    prompts:['Who would buy this from you?','Who runs a similar business nearby?','Who lives or works close and needs this?','Who could introduce you to ten customers?','Who would tell you the honest truth?']},
+  job:{goal:'a job',days:[14,45,90,130,170],
+    stops:['Resume','LinkedIn','Job boards','Cover letter','Courses'],
+    lost:'Six months. Perfect resume. No interviews.',
+    bubble:'Ask Maya. She\'s hiring.',
+    open:'I\'m exploring my next role and I\'d value your advice.',
+    close:'Could I have 15 minutes this week to hear how you got into your role?',
+    ask:'Who else should I talk to?',
+    prompts:['Who works in the role you want?','Who has hired for it?','Who left a job like it, and knows why?','Who knows someone at a company you like?','Who has helped your career before?']}
+};
+const F=[.14,.32,.5,.68,.86];
+let S={a:null,people:[],open:null};
+try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&typeof r==='object')S=Object.assign(S,r)}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const long=$('long'), sam=$('sam');
+let L=0, stops=[], cur=S.a||'startup', token=0, paused=false, curLen=0, pending=null;
+
+function show(which){
+  ['pick','scene','first','tool'].forEach(id=>$(id).classList.toggle('hide',id!==which));
+  $('scene').style.display=which==='scene'?'flex':'';
+  $('head').classList.toggle('hide',which!=='pick');
+}
+
+function build(){
+  const box=$('stops'); box.innerHTML=''; stops=[];
+  A[cur].stops.forEach((n,i)=>{
+    const p=long.getPointAtLength(L*F[i]), g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','stop');
+    const right=p.x<200;
+    g.innerHTML='<circle cx="'+p.x+'" cy="'+p.y+'" r="6"/><text x="'+(p.x+(right?12:-12))+'" y="'+(p.y+4)+'" text-anchor="'+(right?'start':'end')+'"></text>';
+    g.querySelector('text').textContent=n;
+    box.appendChild(g); stops.push({g,f:F[i]});
+  });
+  $('btxt').textContent=A[cur].bubble;
+}
+function resetScene(){
+  stops.forEach(s=>s.g.classList.remove('on'));
+  $('bubble').classList.remove('show');
+  $('card').classList.remove('show');
+  $('days').textContent='0'; $('met').textContent='0';
+  sam.setAttribute('transform','translate(180 60)');
+  curLen=0;
+}
+
+function wait(ms,cb){
+  const tk=token;
+  return new Promise(res=>{
+    let t=0,last=performance.now();
+    (function f(now){
+      if(tk!==token)return res(false);
+      if(!paused)t+=now-last;
+      last=now;
+      const k=Math.min(1,t/ms);
+      if(cb)cb(k);
+      if(k>=1)return res(true);
+      requestAnimationFrame(f);
+    })(last);
+  });
+}
+const ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+function walkTo(target,ms,d0,d1){
+  const from=curLen;
+  return wait(ms,k=>{
+    const e=ease(k); curLen=from+(target-from)*e;
+    const p=long.getPointAtLength(curLen);
+    sam.setAttribute('transform','translate('+p.x+' '+p.y+')');
+    $('days').textContent=Math.round(d0+(d1-d0)*e);
+  });
+}
+
+async function playStory(){
+  token++; paused=false; $('hint').textContent='Tap to pause';
+  show('scene'); L=long.getTotalLength(); build(); resetScene();
+  const a=A[cur], cap=t=>{$('cap').textContent=t};
+  cap('Meet Sam. He wants '+a.goal+'.'); if(!await wait(2400))return;
+  cap('So he gets ready.'); if(!await wait(1400))return;
+  let d0=0;
+  for(let i=0;i<5;i++){
+    if(!await walkTo(L*F[i],1000,d0,a.days[i]))return;
+    stops[i].g.classList.add('on'); d0=a.days[i];
+    cap('Day '+d0+': '+a.stops[i]+'.');
+    if(!await wait(1300))return;
+  }
+  if(!await walkTo(L,1000,d0,180))return;
+  cap(a.lost); if(!await wait(3200))return;
+  resetScene();
+  cap('Same Sam. One different move.'); if(!await wait(2000))return;
+  if(!await wait(1100,k=>{
+    const e=ease(k);
+    sam.setAttribute('transform','translate(180 '+(60+360*e)+')');
+  }))return;
+  $('days').textContent='1'; $('met').textContent='1';
+  $('bubble').classList.add('show');
+  cap('Day 1. One person. The next one named.');
+  if(!await wait(2600))return;
+  $('card').classList.add('show');
+}
+$('stage').onclick=()=>{
+  paused=!paused;
+  $('hint').textContent=paused?'Paused. Tap to resume':'Tap to pause';
+};
+
+function choose(a){ cur=S.a=a; save(); playStory(); }
+function goFirst(){
+  token++; cur=S.a||cur;
+  show('first');
+  $('f1').classList.remove('hide'); $('f2').classList.add('hide');
+  $('fq').textContent=A[cur].prompts[0];
+  $('fname').value=''; pending=null;
+}
+
+function msg(p){
+  const a=A[S.a||'startup'];
+  const lead=p.via?'Hi '+p.name+', '+p.via+' suggested I reach out. ':'Hi '+p.name+', ';
+  return lead+a.open+' '+a.close;
+}
+function copyText(text,done){
+  const fb=()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(x){}ta.remove();done()};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fb)}else fb();
+}
+function sendVia(kind,p,note){
+  const m=msg(p), q=encodeURIComponent(m);
+  if(kind==='wa'){window.open('https://wa.me/?text='+q,'_blank');note.textContent='Pick the person in WhatsApp, send it, then tap Sent.';}
+  else if(kind==='sms'){location.href='sms:?&body='+q;note.textContent='Pick the person, send it, then tap Sent.';}
+  else if(kind==='mail'){location.href='mailto:?subject='+encodeURIComponent('15 minutes?')+'&body='+q;note.textContent='Add their address, send it, then tap Sent.';}
+  else copyText(m,()=>{note.textContent='Copied. Paste it, send it, then tap Sent.'});
+}
+
+function addPerson(name,via){
+  name=name.trim(); if(!name)return null;
+  const p={id:Date.now()+Math.random(),name,status:'new',via:via||null};
+  S.people.push(p); save(); return p;
+}
+$('fnext').onclick=()=>{
+  const p=addPerson($('fname').value);
+  if(!p){$('fname').focus();return}
+  pending=p;
+  $('fh').textContent='Send this to '+p.name+'.';
+  $('fmsg').textContent=msg(p);
+  $('fnote').textContent='';
+  $('f1').classList.add('hide'); $('f2').classList.remove('hide');
+};
+$('fname').addEventListener('keydown',e=>{if(e.key==='Enter')$('fnext').click()});
+document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{if(pending)sendVia(b.dataset.f,pending,$('fnote'))});
+$('fdone').onclick=()=>{
+  if(pending){pending.status='sent';S.open=null;save();}
+  showTool();
+};
+
+function render(){
+  const P=S.people, n=P.length;
+  const sent=P.filter(p=>p.status!=='new').length;
+  const talked=P.filter(p=>p.status==='replied'||p.status==='no').length;
+  $('talked').textContent=talked; $('sent').textContent=sent;
+  $('tsub').textContent=
+    n<5?'Name '+(5-n)+' more '+(5-n===1?'person':'people')+'. Rough is fine.':
+    sent<5?'Now send. Five messages before any more polishing.':
+    talked<1?'Sent. Now name more people while you wait.':
+    talked+' real conversation'+(talked===1?'':'s')+'. Every reply names the next person.';
+  const cfg=A[S.a||'startup'];
+  $('prompt').textContent=cfg.prompts[n%cfg.prompts.length];
+  $('list').innerHTML=P.map(p=>{
+    const open=S.open===p.id;
+    const label={new:'new',sent:'sent',replied:'replied',no:'said no'}[p.status];
+    let body='';
+    if(open){
+      body='<div class="msg">'+esc(msg(p))+'</div>'+
+      '<div class="row">'+
+        '<button class="go sm" data-act="send" data-k="wa">WhatsApp</button>'+
+        '<button class="go sm" data-act="send" data-k="sms">SMS</button>'+
+        '<button class="go sm" data-act="send" data-k="mail">Email</button>'+
+        '<button class="sec sm" data-act="send" data-k="copy">Copy</button>'+
+      '</div>'+
+      '<div class="note"></div>'+
+      '<div class="row">'+
+        ['sent','replied','no'].map(s=>'<button class="sec'+(p.status===s?' sel':'')+'" data-act="status" data-s="'+s+'">'+({sent:'Sent',replied:'Replied',no:'Said no'}[s])+'</button>').join('')+
+      '</div>'+
+      ((p.status==='replied'||p.status==='no')&&!p.asked?
+        '<div class="ask"><b>'+esc(cfg.ask)+'</b><input placeholder="A name" maxlength="40" autocomplete="off"><div class="row"><button class="go" data-act="ask">Add them</button></div></div>':'')+
+      '<div class="row"><button class="sec" data-act="del" style="font-weight:400;font-size:13px;flex:none;padding:8px 12px">Remove</button></div>';
+    }
+    return '<div class="p" data-id="'+p.id+'"><div class="h" data-act="toggle"><div class="nm">'+esc(p.name)+(p.via?'<span class="via">via '+esc(p.via)+'</span>':'')+'</div><span class="chip '+p.status+'">'+label+'</span></div>'+body+'</div>';
+  }).join('');
+}
+function showTool(){ token++; show('tool'); render(); }
+
+$('list').addEventListener('click',e=>{
+  const t=e.target.closest('[data-act]'); if(!t)return;
+  const card=t.closest('.p'); const p=S.people.find(x=>String(x.id)===card.dataset.id); if(!p)return;
+  const act=t.dataset.act;
+  if(act==='toggle'){S.open=S.open===p.id?null:p.id;save();render();}
+  else if(act==='status'){p.status=p.status===t.dataset.s?'new':t.dataset.s;save();render();}
+  else if(act==='del'){S.people=S.people.filter(x=>x!==p);S.open=null;save();render();}
+  else if(act==='ask'){
+    const inp=card.querySelector('.ask input');
+    if(addPerson(inp.value,p.name)){p.asked=true;save();render();}
+    else inp.focus();
+  }
+  else if(act==='send'){sendVia(t.dataset.k,p,card.querySelector('.note'));}
+});
+function doAdd(){
+  const inp=$('newName');
+  if(addPerson(inp.value)){inp.value='';render();}
+  else inp.focus();
+}
+document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>choose(b.dataset.a));
+$('skip').onclick=goFirst;
+$('toFirst').onclick=goFirst;
+$('story').onclick=()=>{cur=S.a||'startup';playStory();};
+$('addBtn').onclick=doAdd;
+$('newName').addEventListener('keydown',e=>{if(e.key==='Enter')doAdd()});
+$('reset').onclick=()=>{if(confirm('Clear everyone and start over?')){token++;S={a:null,people:[],open:null};save();show('pick');}};
+
+if(S.a&&S.people.length)showTool();
+else if(S.a)goFirst();
+else show('pick');
+</script>
+</body>
+</html>
