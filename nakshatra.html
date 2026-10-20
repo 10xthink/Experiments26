@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Know Your Star</title>
+<style>
+:root{--bg:#faf6ee;--card:#fff;--ink:#2b2a33;--mute:#77748a;--line:#e8e2d4;--acc:#4b3f9e;--acc2:#efeaff;--g:#2e8b57;--gbg:#e6f5ec;--n:#b8860b;--nbg:#fbf3dc;--r:#c0392b;--rbg:#fbe9e6}
+@media(prefers-color-scheme:dark){:root{--bg:#17161d;--card:#22212b;--ink:#eceaf5;--mute:#9a97ad;--line:#33313f;--acc:#a99cff;--acc2:#2c2945;--g:#5fd08d;--gbg:#1d3326;--n:#e5b94a;--nbg:#3a3220;--r:#ff8a7a;--rbg:#3d2420}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:84px}
+.wrap{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:0 0 2px}h2{font-size:17px;margin:18px 0 8px}
+.sub{color:var(--mute);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+select,input,textarea,button{font:inherit;color:inherit}
+select,input[type=text],textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+textarea{min-height:90px}
+button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 12px;cursor:pointer}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc)}
+button.sm{padding:4px 9px;font-size:13px}
+button.on{background:var(--acc2);border-color:var(--acc);color:var(--acc);font-weight:600}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:5}
+nav button{flex:1;max-width:112px;border:0;border-radius:0;background:none;padding:10px 2px;font-size:12px;color:var(--mute)}
+nav button b{display:block;font-size:19px;font-weight:400}
+nav button.on{color:var(--acc);background:none}
+.trait{padding:8px 0;border-bottom:1px solid var(--line)}.trait:last-child{border:0}
+.chip{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.g{background:var(--gbg);color:var(--g)}.n{background:var(--nbg);color:var(--n)}.r{background:var(--rbg);color:var(--r)}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
+.habit{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line)}.habit:last-child{border:0}
+.habit input{width:22px;height:22px;margin-top:2px}
+.tag{font-size:11px;color:var(--mute)}
+.days{display:flex;gap:5px;margin-top:8px}.days span{flex:1;text-align:center;font-size:11px;color:var(--mute)}.days u{display:block;height:22px;border-radius:6px;background:var(--line);margin-bottom:2px}.days u.d{background:var(--acc)}
+.note{font-size:13px;color:var(--mute);font-style:italic}
+.hide{display:none}
+.big{font-size:34px}
+.ic{width:1.15em;height:1.15em;vertical-align:-0.2em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button .ic{width:23px;height:23px;vertical-align:0}
+button.sm .ic{width:1.05em;height:1.05em;vertical-align:-0.15em}
+h2 .ic{color:var(--acc);margin-right:2px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:0.05em}
+.tag .ic{width:1.1em;height:1.1em}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav id="nav"></nav>
+
+<script>
+/* ---------- DATA ---------- */
+// [name, symbol, strengths[3], shadows[3], growth edge, habits[strength, weakness, ritual]]
+const N=[
+["Ashwini","🐎",["Quick starter","Energetic and healing","Courageous"],["Impatient","Impulsive","Leaves things unfinished"],"Finish one thing before starting the next",["Start one small thing the moment you think of it","Finish one open task before starting a new one","Two minutes of slow breathing before reacting"]],
+["Bharani","🔺",["Creative and passionate","Disciplined and honest","Resilient and transformative"],["Emotional extremes","Attached, resists change","Jealousy or self-doubt"],"Loosen your grip and let change in",["Do one hard thing you have been avoiding","Make one small change to a routine","Write down one thing you are letting go of"]],
+["Krittika","🔥",["Sharp, honest and decisive","Ambitious and determined","Protective"],["Blunt, sometimes harsh","Critical of others","Big ups and downs"],"Pair truth with warmth",["Say one clear honest thing kindly","Pause 10 seconds before giving criticism","Give one genuine compliment"]],
+["Rohini","🌳",["Creative and artistic","Magnetic and caring","Charming, high standards"],["Possessive and jealous","Hard to move on","Materialistic or critical"],"Let go and share freely",["5 minutes of creative work","Give away or share one thing","Skip one comfort habit (snooze, snack, scroll)"]],
+["Mrigashira","🦌",["Curious","Gentle","Intelligent communicator"],["Restless","Indecisive","Hard to satisfy"],"Go deep on one question",["Learn one new thing for 10 minutes","Decide between two options within 5 minutes","Stay with one topic for 20 minutes"]],
+["Ardra","💧",["Deep, sharp thinker","Grows through adversity","Emotionally powerful"],["Volatile moods","Emotional extremes","Can turn destructive or cold"],"Let the storm pass before acting",["Write your feelings in 3 lines","Wait one hour before sending a heated message","Walk outside for 10 minutes"]],
+["Punarvasu","🏹",["Optimistic","Generous and forgiving","Recovers well"],["Naive at times","Overlooks problems","Complacent"],"Turn ideals into concrete steps",["Name one thing that went right today","Take one concrete step on a plan","Have one honest talk you have been avoiding"]],
+["Pushya","🌼",["Nurturing","Responsible and disciplined","Generous and helpful"],["Over-responsible","Neglects own needs","Sure they are right"],"Receive as well as give",["Do one caring act for someone","Ask for help once","Do one thing purely for yourself"]],
+["Ashlesha","🐍",["Perceptive","Strategic","Intuitive, reads people"],["Guarded and secretive","Manipulative when threatened","Suspicious"],"Trust openly",["Notice one detail others missed","Share one real feeling with someone safe","Say what you want plainly, no hints"]],
+["Magha","👑",["Dignified","Natural leader","Honors tradition and lineage"],["Pride","Needs recognition","Struggles with equality"],"Lead by serving",["Call or think of an elder or ancestor with gratitude","Help someone without being noticed","Let someone else lead or take credit"]],
+["Purva Phalguni","🛋️",["Creative and artistic","Sociable and warm","Good communicator"],["Self-indulgent","Lazy streak","Avoids responsibility"],"Rest and play with purpose",["Do something joyful and creative","Do the least fun task first","Reach out warmly to one person"]],
+["Uttara Phalguni","🛏️",["Reliable and principled","Kind and helpful","Builds for the long term"],["Perfectionist","Rigid","Leans heavily on relationships"],"Stay steady alone and flexible with others",["Keep one promise to the letter","Let one thing be good enough","Do a favor expecting nothing back"]],
+["Hasta","✋",["Skilled with hands","Quick, clever learner","Practical and adaptable"],["Anxious, overthinks","Sarcastic","Hard to let go"],"Loosen your grip and quiet the overthinking",["Make or fix something with your hands","Write one worry down, then put it away","Do a slow 5-minute hand practice (writing, sketching)"]],
+["Chitra","💎",["Creative, visual eye","Charming and imaginative","Detail-oriented"],["Vain","Perfectionist","Preoccupied with how things look"],"Substance over polish",["Create or beautify one small thing","Ship something at 80% done","Spend 10 minutes without thinking of your image"]],
+["Swati","🌬️",["Independent","Adaptable","Diplomatic"],["Indecisive","Struggles to commit","Restless, unsettled"],"Commit and put down roots",["Do one thing entirely on your own terms","Make one decision and keep it for a week","Message someone you have been drifting from"]],
+["Vishakha","🏛️",["Determined","Focused and goal-driven","Persuasive"],["Jealous","Obsessive","Overly competitive"],"Enjoy the path, not only the goal",["25 focused minutes on your main goal","Sincerely celebrate someone else's win","Enjoy one thing with no goal attached"]],
+["Anuradha","🪷",["Loyal and devoted","Organized and cooperative","Friendly leader"],["Self-sacrificing","Suppressed resentment","Struggles to voice needs"],"Voice your needs",["Reach out to a friend","Say one need out loud","Organize one small space for calm"]],
+["Jyeshtha","☂️",["Protective","Responsible and intelligent","Wise, experienced"],["Controlling","Isolated, few close friends","Hard to ask for help"],"Share the load",["Take responsibility for one task","Delegate or ask for help once","Assume good intent in one irritating moment"]],
+["Mula","🌱",["Fearless and probing","Gets to root causes","Persistent"],["Excessive intensity","Can slide into 'nothing matters'","Tears down more than needed"],"Rebuild after you clear",["Ask why, deeply, about one thing","Build something after clearing something","Declutter one small space"]],
+["Purva Ashadha","🌊",["Persuasive communicator","Resilient, bounces back","Confident and independent"],["Proud","Stubborn","Slow to admit mistakes"],"Listen first",["Encourage someone","Listen without interrupting in one conversation","Admit one thing you were wrong about"]],
+["Uttara Ashadha","🐘",["Principled and ethical","Patient and persistent","Responsible and sincere"],["Rigid","Overloads self","Struggles to relax"],"Allow joy and flexibility",["Do one task toward a long-term goal","Break one rigid routine","Spend time with someone for no purpose"]],
+["Shravana","👂",["Good listener","Eager learner and teacher","Observant, thoughtful"],["Gossip","Over-involved in others' affairs","Weak with confidences"],"Listen to yourself too",["Listen fully to one person","Skip gossip once","Sit in silence for 5 minutes"]],
+["Dhanishta","🥁",["Rhythmic and lively","Ambitious and energetic","Socially capable"],["Materialistic or greedy","Emotionally distant","Inner emptiness behind the drive"],"Be present",["Move to music for 5 minutes","Pause 5 minutes with no goals","Give something generously"]],
+["Shatabhisha","🌌",["Independent","Analytical researcher","Drawn to healing"],["Isolates","Secretive","Moody or emotionally distant"],"Let people in",["Research something you are curious about","Share something private with someone trusted","Spend time with another person today"]],
+["Purva Bhadrapada","⚔️",["Intense and passionate","Philosophical, spiritually driven","Independent"],["Extremes","Rigid","Detached from everyday life"],"Ground the vision in routine",["Write down one big idea","Eat and sleep on schedule today","Do one grounding activity (walk, stretch)"]],
+["Uttara Bhadrapada","🐉",["Wise","Calm, emotionally controlled","Compassionate and patient"],["Withdrawn","Avoidant","Escapist or lazy at times"],"Act on your wisdom",["Sit quietly for 5 minutes","Do one thing you have delayed","Share one insight with someone"]],
+["Revati","🐟",["Empathetic","Creative and intuitive","Kind and helpful"],["Highly sensitive","Overwhelmed by others' emotions","Hard to hold boundaries"],"Hold boundaries so others' feelings do not flood you",["Do a small kind thing for someone","Take 5 quiet minutes after a heavy conversation","Finish one small thing"]]
+];
+// 9-Tara cycle
+const T={
+1:["Janma","n","Same energy as you","Like a mirror. Great understanding, but both your strengths and shadows get amplified. Be honest, not competitive."],
+2:["Sampat","g","Wealth","Mutual gain. Share resources, plan together, build things."],
+3:["Vipat","r","Danger","Misread each other easily. Slow down, clarify intent, avoid big joint risks."],
+4:["Kshema","g","Wellbeing","Comforting and healthy. Good for rest, family and steady support."],
+5:["Pratyak","r","Obstacle","Friction and blocks. Keep expectations modest and communication direct."],
+6:["Sadhana","g","Achievement","Helps you get things done. Good for work and shared goals."],
+7:["Naidhana","r","Destruction","Draining or intense. Keep boundaries and do not take it personally."],
+8:["Mitra","g","Friend","Natural ease and goodwill. Easy to be yourself."],
+9:["Parama Mitra","g","Best friend","Deep support and trust. Value and nurture it."]
+};
+const LBL={g:"Supportive",n:"Neutral",r:"Challenging"};
+const FELT={g:["smile","Good"],n:["neutral","Okay"],r:["frown","Hard"]};
+// UI icons: simple line SVGs (inherit text colour, work in light and dark)
+const ICONS={
+sparkle:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
+flame:'<path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.2 2-4.2.3 1.6 1.2 2.4 2 2.7C11.5 9.5 11 6.5 12 3z"/>',
+users:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M17.5 14.2c2.3.3 4 2.2 4 4.8"/>',
+search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/>',
+sliders:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/>',
+moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+sprout:'<path d="M12 21v-9"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 15c0-3-2-5-6-5 0 3 2 5 6 5z"/>',
+check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+pencil:'<path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/><path d="M14.5 6.5l3 3"/>',
+smile:'<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.2 2.1 1.8 3.5 1.8s2.5-.6 3.5-1.8"/><path d="M9 9.5v.01M15 9.5v.01"/>',
+neutral:'<circle cx="12" cy="12" r="9"/><path d="M9 15.5h6"/><path d="M9 9.5v.01M15 9.5v.01"/>',
+frown:'<circle cx="12" cy="12" r="9"/><path d="M8.5 16.5c1-1.2 2.1-1.8 3.5-1.8s2.5.6 3.5 1.8"/><path d="M9 9.5v.01M15 9.5v.01"/>'
+};
+const ic=n=>'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+ICONS[n]+'</svg>';
+const badge=r=>`<span class="chip ${r}"><i class="dot"></i>${LBL[r]}</span>`;
+
+/* ---------- STATE ---------- */
+const KEY="knowYourStar.v1";
+let S={star:null,edits:{},habits:{},log:{},people:[],marks:{},ints:[]};
+try{const x=JSON.parse(localStorage.getItem(KEY));if(x)S=Object.assign(S,x)}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let tab="me",editing=false,openPerson=null;
+
+/* ---------- HELPERS ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const ds=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const today=()=>ds(new Date());
+const dayAgo=n=>{const d=new Date();d.setDate(d.getDate()-n);return ds(d)};
+function tara(a,b){const d=((b-a+27)%27)+1;return ((d-1)%9)+1}
+function relation(a,b){
+  const t1=tara(a,b),t2=tara(b,a),sc={g:1,n:0,r:-1};
+  const sum=sc[T[t1][1]]+sc[T[t2][1]];
+  return {t1,t2,res:sum>=1?"g":sum<=-1?"r":"n"};
+}
+function profile(i){
+  const b=N[i],e=S.edits[i]||{};
+  return {str:e.str||b[2],sha:e.sha||b[3],grow:e.grow||b[4]};
+}
+function habitsFor(i){
+  if(!S.habits[i]){const h=N[i][5];S.habits[i]=[{id:uid(),text:h[0],type:"s"},{id:uid(),text:h[1],type:"w"},{id:uid(),text:h[2],type:"r"}];save()}
+  return S.habits[i];
+}
+const TYPES={s:"builds strength",w:"heals weakness",r:"ritual"};
+function streak(i){
+  const ids=new Set(habitsFor(i).map(h=>h.id));
+  const done=d=>(S.log[d]||[]).some(x=>ids.has(x));
+  let n=0,k=done(today())?0:1;
+  while(done(dayAgo(k))){n++;k++}
+  return n+(k===1&&n===0?0:0);
+}
+function todayCount(i){const hs=habitsFor(i),l=S.log[today()]||[];return hs.filter(h=>l.includes(h.id)).length}
+
+/* ---------- VIEWS ---------- */
+function starPicker(){
+  return `<select id="starSel"><option value="">Choose your nakshatra…</option>${N.map((n,i)=>`<option value="${i}" ${S.star===i?"selected":""}>${i+1}. ${n[0]}</option>`).join("")}</select>`;
+}
+function needStar(){
+  return `<div class="card"><h2 style="margin-top:0">Start here</h2><p class="sub">Pick your birth nakshatra. Everything in this app is a set of tendencies to observe and test, not a verdict.</p>${starPicker()}</div>`;
+}
+
+function vMe(){
+  if(S.star===null)return needStar();
+  const i=S.star,p=profile(i);
+  const trait=(txt,kind)=>{
+    const k=i+"|"+txt,m=S.marks[k]||{};
+    return `<div class="trait"><div>${esc(txt)}</div>
+    <div class="row" style="margin-top:5px">
+      ${[["y","Yes, me"],["p","Partly"],["n","Not me"]].map(([v,l])=>`<button class="sm ${m.v===v?"on":""}" data-act="mark" data-k="${esc(k)}" data-v="${v}">${l}</button>`).join("")}
+      <button class="sm" data-act="tnote" data-k="${esc(k)}" title="Add a note" aria-label="Add a note">${ic("pencil")}</button>
+    </div>${m.note?`<div class="note">“${esc(m.note)}”</div>`:""}</div>`;
+  };
+  if(editing){
+    return `<div class="card"><div class="big">${N[i][1]}</div><h1>Edit ${N[i][0]}</h1><p class="sub">One item per line. Make it match your life or your tradition.</p>
+    <h2>Strengths</h2><textarea id="e_str">${esc(p.str.join("\n"))}</textarea>
+    <h2>Shadows</h2><textarea id="e_sha">${esc(p.sha.join("\n"))}</textarea>
+    <h2>Growth edge</h2><input type="text" id="e_grow" value="${esc(p.grow)}">
+    <div class="row" style="margin-top:12px"><button class="p" data-act="saveEdit">Save</button><button data-act="cancelEdit">Cancel</button><button data-act="resetEdit">Restore original</button></div></div>`;
+  }
+  return `<div class="card"><div class="row"><div class="big">${N[i][1]}</div><div class="grow"><h1>${N[i][0]}</h1><div class="sub">Nakshatra ${i+1} of 27</div></div><button class="sm" data-act="edit">Edit</button></div></div>
+  <div class="card"><h2 style="margin-top:0">${ic("sun")} Strengths</h2>${p.str.map(t=>trait(t)).join("")}</div>
+  <div class="card"><h2 style="margin-top:0">${ic("moon")} Shadows</h2>${p.sha.map(t=>trait(t)).join("")}</div>
+  <div class="card"><h2 style="margin-top:0">${ic("sprout")} Growth edge</h2><p style="margin:0">${esc(p.grow)}</p><p class="sub">Habits tab turns this into small daily actions.</p></div>
+  <div class="card"><div class="sub">Change nakshatra</div>${starPicker()}</div>`;
+}
+
+function vHabits(){
+  if(S.star===null)return needStar();
+  const i=S.star,hs=habitsFor(i),l=S.log[today()]||[],c=todayCount(i),st=streak(i);
+  const ids=new Set(hs.map(h=>h.id));
+  const week=[6,5,4,3,2,1,0].map(n=>{const d=dayAgo(n);const dn=(S.log[d]||[]).some(x=>ids.has(x));const wd=["S","M","T","W","T","F","S"][new Date(d+"T00:00:00").getDay()];return `<span><u class="${dn?"d":""}"></u>${wd}</span>`}).join("");
+  const order={s:0,w:1,r:2};
+  return `<div class="card"><div class="row"><div class="grow"><h1>Today</h1><div class="sub">${c} of ${hs.length} done</div></div><div style="text-align:right"><div style="font-size:22px;color:var(--acc)">${ic("flame")} ${st}</div><div class="sub">day streak</div></div></div>
+  <div class="bar" style="margin-top:10px"><i style="width:${hs.length?Math.round(c/hs.length*100):0}%"></i></div><div class="days">${week}</div></div>
+  <div class="card">${hs.length?hs.slice().sort((a,b)=>order[a.type]-order[b.type]).map(h=>`<label class="habit"><input type="checkbox" data-act="tick" data-id="${h.id}" ${l.includes(h.id)?"checked":""}><div class="grow"><div>${esc(h.text)}</div><div class="tag">${TYPES[h.type]}</div></div><button class="sm" data-act="delHabit" data-id="${h.id}" title="Remove" aria-label="Remove">${ic("x")}</button></label>`).join(""):`<p class="sub">No habits yet. Add one below.</p>`}</div>
+  <div class="card"><h2 style="margin-top:0">Add a habit</h2><p class="sub">Make it so small you cannot say no (under 2 minutes).</p>
+  <input type="text" id="hText" placeholder="e.g. Write one line before bed">
+  <div class="row" style="margin-top:8px"><select id="hType" class="grow"><option value="s">builds strength</option><option value="w">heals weakness</option><option value="r">ritual</option></select><button class="p" data-act="addHabit">Add</button></div></div>
+  <p class="note">Small actions repeated daily compound. Showing up matters more than doing it perfectly.</p>`;
+}
+
+function personCard(p){
+  const r=relation(S.star,p.star);
+  const open=openPerson===p.id;
+  let det="";
+  if(open){
+    const a=T[r.t1],b=T[r.t2];
+    det=`<div style="margin-top:8px;font-size:14px">
+    <p style="margin:4px 0"><b>You → ${esc(p.name)}:</b> ${a[0]} (${a[2]}). ${a[3]}</p>
+    <p style="margin:4px 0"><b>${esc(p.name)} → you:</b> ${b[0]} (${b[2]}). ${b[3]}</p>
+    <p style="margin:4px 0" class="sub">${esc(p.name)}'s star: ${N[p.star][1]} ${N[p.star][0]}. Strengths: ${esc(profile(p.star).str.join(", "))}. Shadows: ${esc(profile(p.star).sha.join(", "))}.</p>
+    <button class="sm" data-act="delPerson" data-id="${p.id}">Remove person</button></div>`;
+  }
+  return `<div class="card"><div class="row" data-act="togglePerson" data-id="${p.id}" style="cursor:pointer"><div class="grow"><b>${esc(p.name)}</b><div class="sub">${N[p.star][1]} ${N[p.star][0]}</div></div>${badge(r.res)}</div>${det}</div>`;
+}
+function vOthers(){
+  if(S.star===null)return needStar();
+  return `<div class="card"><h2 style="margin-top:0">Add a person</h2>
+  <input type="text" id="pName" placeholder="Name">
+  <div class="row" style="margin-top:8px"><select id="pStar" class="grow"><option value="">Their nakshatra…</option>${N.map((n,i)=>`<option value="${i}">${i+1}. ${n[0]}</option>`).join("")}</select><button class="p" data-act="addPerson">Add</button></div></div>
+  ${S.people.length?S.people.map(personCard).join(""):`<p class="sub">No one yet. Add someone and tap them to see how your stars relate.</p>`}
+  <p class="note">Uses the 9-Tara cycle, counted both ways between the two stars. A challenging label means "needs more care", not "avoid".</p>`;
+}
+
+function acc(){
+  let tot=0,fit=0;
+  for(const k in S.marks){const v=S.marks[k].v;if(!v)continue;tot++;fit+=v==="y"?1:v==="p"?.5:0}
+  let it=0,hit=0;
+  S.ints.forEach(x=>{it++;if(x.pred===x.felt)hit++});
+  return {tot,fit,it,hit};
+}
+function vReality(){
+  if(S.star===null)return needStar();
+  const a=acc();
+  const ppl=S.people.filter(p=>true);
+  return `<div class="card"><h2 style="margin-top:0">Your evidence so far</h2>
+  <p style="margin:4px 0"><b>Self descriptions:</b> ${a.tot?`${a.fit%1?a.fit.toFixed(1):a.fit} of ${a.tot} fit you (${Math.round(a.fit/a.tot*100)}%)`:"mark traits on the Me tab"}</p>
+  <p style="margin:4px 0"><b>Relationship predictions:</b> ${a.it?`${a.hit} of ${a.it} matched how it felt (${Math.round(a.hit/a.it*100)}%)`:"log an interaction below"}</p>
+  <p class="note">Tiny samples prove nothing yet. Keep logging and look for patterns over weeks, not days.</p></div>
+  <div class="card"><h2 style="margin-top:0">Log an interaction</h2>
+  ${ppl.length?`<select id="iPerson">${ppl.map(p=>`<option value="${p.id}">${esc(p.name)} (${LBL[relation(S.star,p.star).res]})</option>`).join("")}</select>
+  <div class="row" style="margin:8px 0">How did it feel? ${["g","n","r"].map(f=>`<button class="sm" data-act="felt" data-f="${f}" id="f_${f}">${ic(FELT[f][0])} ${FELT[f][1]}</button>`).join("")}</div>
+  <input type="text" id="iNote" placeholder="What happened? (optional)"><div style="margin-top:8px"><button class="p" data-act="logInt">Save</button></div>`:`<p class="sub">Add people on the Others tab first.</p>`}</div>
+  ${S.ints.length?`<h2>Recent</h2>`+S.ints.slice().reverse().slice(0,15).map(x=>{const p=S.people.find(q=>q.id===x.pid);return `<div class="card"><div class="row"><div class="grow"><b>${p?esc(p.name):"(removed)"}</b> <span class="sub">${x.date}</span></div><span class="chip ${x.pred}"><i class="dot"></i>${LBL[x.pred]} predicted</span><span title="Felt ${FELT[x.felt][1]}">${ic(FELT[x.felt][0])}</span></div>${x.note?`<div class="note">${esc(x.note)}</div>`:""}<div class="tag">${x.pred===x.felt?ic("check")+" matched":ic("x")+" differed"}</div></div>`}).join(""):""}`;
+}
+
+function vOwn(){
+  const size=Math.round(JSON.stringify(S).length/1024*10)/10;
+  return `<div class="card"><h2 style="margin-top:0">Your data</h2><p class="sub">Everything is stored only in this browser on this device. Back it up so your growth record is never lost (${size} KB now).</p>
+  <div class="row"><button class="p" data-act="export">Download backup</button><button data-act="importBtn">Restore from file</button></div>
+  <input type="file" id="impFile" accept=".json,application/json" class="hide"></div>
+  <div class="card"><h2 style="margin-top:0">Make it yours</h2><p class="sub">On the Me tab, tap Edit to rewrite strengths, shadows and growth edge in your own words. On Habits, add or remove any habit. Anything that does not fit you, change it.</p></div>
+  <div class="card"><h2 style="margin-top:0">About</h2><p class="sub">Know Your Star is a reflection tool. Nakshatra descriptions are traditional Vedic tendencies, paraphrased and simplified, and traditions vary. There is no scientific evidence that a birth star determines personality, so treat each description as a hypothesis and test it against real life on the Check tab.</p>
+  <p class="sub"><b>Where the text comes from:</b> strengths and shadows were cross-checked against published summaries of traditional descriptions (TemplePurohit, Astro Sanjivani, R-Astro), with symbols, deities and rulers per Wikipedia's List of Nakshatras. The Tara cycle follows standard Tara Bala (count from your star to theirs inclusive, divide by 9; Janma is treated as neutral because sources differ). Some names vary by region, such as Pratyari for Pratyak, Sadhaka for Sadhana and Vadha for Naidhana.</p></div>
+  <div class="card"><button data-act="wipe" style="color:var(--r)">Erase everything</button></div>`;
+}
+
+const TABS=[["me","sparkle","Me"],["habits","flame","Habits"],["others","users","Others"],["reality","search","Check"],["own","sliders","Own"]];
+const VIEWS={me:vMe,habits:vHabits,others:vOthers,reality:vReality,own:vOwn};
+let pendingFelt=null;
+function render(keepScroll){
+  const y=window.scrollY;
+  $("#app").innerHTML=VIEWS[tab]();
+  $("#nav").innerHTML=TABS.map(([k,icn,l])=>`<button class="${tab===k?"on":""}" data-act="tab" data-k="${k}"><b>${ic(icn)}</b>${l}</button>`).join("");
+  if(keepScroll)window.scrollTo(0,y);
+  if(pendingFelt&&$("#f_"+pendingFelt))$("#f_"+pendingFelt).classList.add("on");
+}
+
+/* ---------- EVENTS ---------- */
+document.addEventListener("change",e=>{
+  if(e.target.id==="starSel"){S.star=e.target.value===""?null:+e.target.value;save();render()}
+  if(e.target.dataset.act==="tick"){
+    const d=today(),l=S.log[d]||(S.log[d]=[]),id=e.target.dataset.id,ix=l.indexOf(id);
+    if(e.target.checked&&ix<0)l.push(id);if(!e.target.checked&&ix>=0)l.splice(ix,1);
+    save();render(true);
+  }
+  if(e.target.id==="impFile"){
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(typeof x!=="object"||!x)throw 0;
+      if(confirm("Replace current data with this backup?")){S=Object.assign({star:null,edits:{},habits:{},log:{},people:[],marks:{},ints:[]},x);save();alert("Restored.");render()}}catch(err){alert("That file is not a valid backup.")}};
+    r.readAsText(f);
+  }
+});
+document.addEventListener("click",e=>{
+  const el=e.target.closest("[data-act]");if(!el||el.tagName==="INPUT")return;
+  const a=el.dataset.act,d=el.dataset;
+  if(a==="tab"){tab=d.k;editing=false;window.scrollTo(0,0);render()}
+  else if(a==="mark"){const m=S.marks[d.k]||(S.marks[d.k]={});m.v=m.v===d.v?null:d.v;save();render(true)}
+  else if(a==="tnote"){const m=S.marks[d.k]||(S.marks[d.k]={});const n=prompt("Real-life example or note:",m.note||"");if(n!==null){m.note=n.trim();save();render(true)}}
+  else if(a==="edit"){editing=true;render()}
+  else if(a==="cancelEdit"){editing=false;render()}
+  else if(a==="saveEdit"){
+    const lines=id=>$(id).value.split("\n").map(s=>s.trim()).filter(Boolean);
+    S.edits[S.star]={str:lines("#e_str"),sha:lines("#e_sha"),grow:$("#e_grow").value.trim()||N[S.star][4]};
+    save();editing=false;render();
+  }
+  else if(a==="resetEdit"){if(confirm("Restore the original text for this star?")){delete S.edits[S.star];save();editing=false;render()}}
+  else if(a==="addHabit"){const t=$("#hText").value.trim();if(!t)return;habitsFor(S.star).push({id:uid(),text:t,type:$("#hType").value});save();render()}
+  else if(a==="delHabit"){e.preventDefault();if(confirm("Remove this habit?")){S.habits[S.star]=habitsFor(S.star).filter(h=>h.id!==d.id);save();render(true)}}
+  else if(a==="addPerson"){const n=$("#pName").value.trim(),s=$("#pStar").value;if(!n||s===""){alert("Enter a name and choose their nakshatra.");return}S.people.push({id:uid(),name:n,star:+s});save();render()}
+  else if(a==="togglePerson"){openPerson=openPerson===d.id?null:d.id;render(true)}
+  else if(a==="delPerson"){if(confirm("Remove this person?")){S.people=S.people.filter(p=>p.id!==d.id);openPerson=null;save();render(true)}}
+  else if(a==="felt"){pendingFelt=d.f;["g","n","r"].forEach(f=>$("#f_"+f).classList.toggle("on",f===d.f))}
+  else if(a==="logInt"){
+    if(!pendingFelt){alert("Pick how it felt first.");return}
+    const p=S.people.find(q=>q.id===$("#iPerson").value);if(!p)return;
+    S.ints.push({id:uid(),pid:p.id,date:today(),pred:relation(S.star,p.star).res,felt:pendingFelt,note:$("#iNote").value.trim()});
+    pendingFelt=null;save();render(true);
+  }
+  else if(a==="export"){
+    const b=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+    const u=URL.createObjectURL(b),l=document.createElement("a");l.href=u;l.download="know-your-star-backup-"+today()+".json";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),500);
+  }
+  else if(a==="importBtn"){$("#impFile").click()}
+  else if(a==="wipe"){if(confirm("Erase all data on this device? This cannot be undone.")&&confirm("Really erase everything?")){S={star:null,edits:{},habits:{},log:{},people:[],marks:{},ints:[]};save();tab="me";render()}}
+});
+render();
+</script>
+</body>
+</html>
