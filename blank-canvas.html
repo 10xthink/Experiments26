@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Blank</title>
+<style>
+:root{--bg:#fff;--ink:#16191f;--acc:#3b6df0;--bar:rgba(255,255,255,.92);--line:#d8dce4}
+@media (prefers-color-scheme:dark){:root{--bg:#15181d;--ink:#eceff4;--acc:#7fa2ff;--bar:rgba(30,35,43,.92);--line:#363e4a}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair;user-select:none;-webkit-user-select:none}
+#ta{position:fixed;display:none;margin:0;padding:0;border:1.5px dashed var(--acc);outline:none;resize:none;overflow:hidden;white-space:pre;line-height:1.3;background:transparent;color:var(--ink);font:24px/1.3 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-width:120px}
+#bar{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:4px;padding:5px;background:var(--bar);border:1px solid var(--line);border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);max-width:96vw}
+#bar button{border:0;background:none;color:var(--ink);font:600 13px system-ui,sans-serif;padding:9px 12px;border-radius:10px;cursor:pointer;white-space:nowrap}
+#bar button:hover{background:rgba(127,127,127,.15)}
+#bar button:disabled{opacity:.35;cursor:default;background:none}
+#bar button.danger{color:#e03131}
+#bar button[hidden]{display:none}
+#hint{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);color:var(--ink);opacity:.28;font-size:15px;text-align:center;pointer-events:none;line-height:1.7}
+#toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);background:#1b2430;color:#fff;padding:7px 14px;border-radius:18px;font:600 13px system-ui;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:.95}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<textarea id="ta" wrap="off" spellcheck="false"></textarea>
+<div id="hint">Drag to draw<br>Tap to type<br>Tap something to select it</div>
+<div id="bar">
+  <button id="undo">Undo</button>
+  <button id="all">Select all</button>
+  <button id="copy">Copy all</button>
+  <button id="paste" hidden>Paste</button>
+  <button id="del" class="danger">Delete all</button>
+</div>
+<div id="toast"></div>
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s);
+const cv=$('#cv'),ctx=cv.getContext('2d'),ta=$('#ta'),KEY='blank-canvas-v1',FS=24,LW=3;
+const mctx=document.createElement('canvas').getContext('2d');
+let objs=[],sel=new Set(),clip=[],pasteN=0,undoS=[],redoS=[];
+let cur=null,drag=null,te=null,editingId=null,lastTap={t:0,x:0,y:0},uid=1,saveT=0,toastT=0;
+const nid=()=>'o'+Date.now().toString(36)+(uid++);
+const r1=n=>Math.round(n*10)/10;
+const fontOf=f=>f+'px ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+const ink=()=>getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#16191f';
+const snap=()=>JSON.stringify(objs);
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1500);}
+
+/* ---- geometry ---- */
+function textDims(o){mctx.font=fontOf(o.fs);const ls=o.s.split('\n');let w=0;ls.forEach(l=>w=Math.max(w,mctx.measureText(l).width));return[w,ls.length*o.fs*1.3];}
+function bbox(o){
+  if(o.t==='s'){let a=1e9,b=1e9,c=-1e9,d=-1e9;for(let i=0;i<o.p.length;i+=2){a=Math.min(a,o.p[i]);c=Math.max(c,o.p[i]);b=Math.min(b,o.p[i+1]);d=Math.max(d,o.p[i+1]);}const p=LW;return[a-p,b-p,c+p,d+p];}
+  const[w,h]=textDims(o);return[o.x,o.y,o.x+w,o.y+h];
+}
+function segDist(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;let t=l?((px-ax)*dx+(py-ay)*dy)/l:0;t=Math.max(0,Math.min(1,t));return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));}
+function hit(o,x,y,tol){
+  if(o.t==='tx'){const b=bbox(o);return x>=b[0]-tol&&x<=b[2]+tol&&y>=b[1]-tol&&y<=b[3]+tol;}
+  const p=o.p;if(p.length<4)return Math.hypot(p[0]-x,p[1]-y)<=tol+LW;
+  for(let i=0;i<p.length-2;i+=2)if(segDist(x,y,p[i],p[i+1],p[i+2],p[i+3])<=tol+LW/2)return true;return false;
+}
+function topAt(x,y){const tol=10;for(let i=objs.length-1;i>=0;i--)if(hit(objs[i],x,y,tol))return objs[i];return null;}
+function moveObj(o,dx,dy){if(o.t==='s'){for(let i=0;i<o.p.length;i+=2){o.p[i]=r1(o.p[i]+dx);o.p[i+1]=r1(o.p[i+1]+dy);}}else{o.x+=dx;o.y+=dy;}}
+
+/* ---- render ---- */
+function size(){
+  const dpr=window.devicePixelRatio||1,w=innerWidth,h=innerHeight;
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);draw();
+}
+function drawObj(o,col){
+  ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=LW;
+  if(o.t==='s'){
+    const p=o.p;
+    if(p.length<4){ctx.beginPath();ctx.arc(p[0],p[1],LW/2,0,6.2832);ctx.fill();}
+    else{ctx.beginPath();ctx.moveTo(p[0],p[1]);for(let i=2;i<p.length-2;i+=2)ctx.quadraticCurveTo(p[i],p[i+1],(p[i]+p[i+2])/2,(p[i+1]+p[i+3])/2);ctx.lineTo(p[p.length-2],p[p.length-1]);ctx.stroke();}
+  }else{ctx.font=fontOf(o.fs);ctx.textBaseline='top';o.s.split('\n').forEach((l,i)=>ctx.fillText(l,o.x,o.y+i*o.fs*1.3));}
+  ctx.restore();
+}
+function draw(){
+  const dpr=window.devicePixelRatio||1;ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  const col=ink();
+  for(const o of objs)if(o.id!==editingId)drawObj(o,col);
+  if(cur)drawObj(cur,col);
+  ctx.save();ctx.setLineDash([6,4]);ctx.strokeStyle='#3b6df0';ctx.lineWidth=1.5;
+  for(const o of objs)if(sel.has(o.id)&&o.id!==editingId){const b=bbox(o);ctx.strokeRect(b[0]-4,b[1]-4,b[2]-b[0]+8,b[3]-b[1]+8);}
+  ctx.restore();
+  $('#hint').style.display=(objs.length||te||cur)?'none':'block';
+}
+
+/* ---- state / persistence ---- */
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(objs));}catch(e){}},300);}
+function load(){try{const a=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(a))objs=a;}catch(e){}}
+function commit(pre){undoS.push(pre);if(undoS.length>80)undoS.shift();redoS=[];ui();save();}
+function undo(){commitText();if(!undoS.length)return;redoS.push(snap());objs=JSON.parse(undoS.pop());prune();draw();ui();save();}
+function prune(){const ids=new Set(objs.map(o=>o.id));sel=new Set([...sel].filter(i=>ids.has(i)));}
+function ui(){
+  const has=sel.size>0;
+  $('#undo').disabled=!undoS.length;
+  $('#all').textContent=has&&sel.size===objs.length?'Deselect':'Select all';
+  $('#all').disabled=!objs.length;
+  $('#copy').textContent=has?'Copy':'Copy all';$('#copy').disabled=!objs.length;
+  $('#del').textContent=has?'Delete':'Delete all';$('#del').disabled=!objs.length;
+  $('#paste').hidden=!clip.length;
+}
+
+/* ---- actions ---- */
+const targets=()=>sel.size?objs.filter(o=>sel.has(o.id)):objs.slice();
+function copy(){
+  commitText();const t=targets();if(!t.length)return;
+  clip=JSON.parse(JSON.stringify(t));pasteN=0;ui();toast('Copied '+t.length+(t.length>1?' items':' item'));
+  const txt=t.filter(o=>o.t==='tx').map(o=>o.s).join('\n');
+  try{if(txt&&navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).catch(()=>{});}catch(e){}
+}
+function del(){
+  commitText();if(!objs.length)return;
+  const pre=snap();
+  if(sel.size)objs=objs.filter(o=>!sel.has(o.id));
+  else{if(!confirm('Delete everything? (You can undo)'))return;objs=[];}
+  sel.clear();commit(pre);draw();
+}
+function paste(){
+  commitText();if(!clip.length)return;
+  const pre=snap();pasteN++;sel.clear();
+  JSON.parse(JSON.stringify(clip)).forEach(o=>{o.id=nid();moveObj(o,24*pasteN,24*pasteN);objs.push(o);sel.add(o.id);});
+  commit(pre);draw();
+}
+function selAll(){commitText();if(sel.size&&sel.size===objs.length)sel.clear();else sel=new Set(objs.map(o=>o.id));draw();ui();}
+$('#undo').onclick=undo;$('#copy').onclick=copy;$('#del').onclick=del;$('#paste').onclick=paste;$('#all').onclick=selAll;
+
+/* ---- text ---- */
+function autosize(){
+  if(!te)return;mctx.font=fontOf(te.fs);let w=0;ta.value.split('\n').forEach(l=>w=Math.max(w,mctx.measureText(l).width));
+  ta.style.width=Math.max(120,w+te.fs*2)+'px';ta.style.height='auto';ta.style.height=Math.max(te.fs*1.3,ta.scrollHeight)+'px';
+}
+function openText(x,y,obj){
+  commitText();
+  te={obj,x:obj?obj.x:x,y:obj?obj.y:y,fs:obj?obj.fs:FS};editingId=obj?obj.id:null;
+  ta.value=obj?obj.s:'';ta.style.display='block';ta.style.left=te.x+'px';ta.style.top=te.y+'px';ta.style.fontSize=te.fs+'px';
+  autosize();draw();ta.focus();
+}
+function commitText(){
+  if(!te)return;const t=te;te=null;const v=ta.value.replace(/\s+$/,'');ta.style.display='none';ta.value='';editingId=null;
+  const pre=snap();
+  if(t.obj){const o=objs.find(q=>q.id===t.obj.id);if(o){if(!v){objs=objs.filter(q=>q!==o);sel.delete(o.id);commit(pre);}else if(v!==o.s){o.s=v;commit(pre);}}}
+  else if(v){objs.push({id:nid(),t:'tx',x:t.x,y:t.y,s:v,fs:t.fs});commit(pre);}
+  draw();
+}
+function cancelText(){if(!te)return;te=null;editingId=null;ta.style.display='none';ta.value='';draw();}
+ta.addEventListener('input',autosize);
+ta.addEventListener('blur',commitText);
+
+/* ---- pointer ---- */
+const pt=e=>[e.clientX,e.clientY];
+cv.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  e.preventDefault();
+  if(te){commitText();return;}
+  cv.setPointerCapture(e.pointerId);
+  const[x,y]=pt(e),h=topAt(x,y);
+  if(h&&sel.has(h.id)){drag={type:'move',pre:snap(),lx:x,ly:y,sx:x,sy:y,moved:false,h};}
+  else{drag={type:'draw',pre:snap(),sx:x,sy:y,moved:false,h};cur={id:nid(),t:'s',p:[r1(x),r1(y)]};}
+});
+cv.addEventListener('pointermove',e=>{
+  if(!drag)return;const[x,y]=pt(e);
+  if(!drag.moved&&Math.hypot(x-drag.sx,y-drag.sy)>6)drag.moved=true;
+  if(drag.type==='move'){
+    if(!drag.moved)return;
+    const dx=x-drag.lx,dy=y-drag.ly;if(dx||dy){objs.forEach(o=>{if(sel.has(o.id))moveObj(o,dx,dy);});drag.lx=x;drag.ly=y;}
+  }else{
+    const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+    for(const ev of(evs.length?evs:[e])){const p=cur.p;if(Math.hypot(ev.clientX-p[p.length-2],ev.clientY-p[p.length-1])>0.8)p.push(r1(ev.clientX),r1(ev.clientY));}
+  }
+  draw();
+});
+function up(e){
+  if(!drag)return;const d=drag;drag=null;const[x,y]=pt(e);
+  const now=Date.now(),dbl=now-lastTap.t<350&&Math.hypot(x-lastTap.x,y-lastTap.y)<20;
+  if(d.moved){
+    if(d.type==='draw'){objs.push(cur);cur=null;commit(d.pre);}
+    else commit(d.pre);
+    lastTap.t=0;
+  }else{
+    cur=null;
+    if(d.h){
+      if(dbl&&d.h.t==='tx'){lastTap.t=0;sel.clear();openText(0,0,d.h);ui();return;}
+      if(d.type==='move')sel.delete(d.h.id);else sel.add(d.h.id);
+      lastTap={t:now,x,y};
+    }else{
+      lastTap={t:now,x,y};
+      if(sel.size)sel.clear();else{ui();draw();openText(x,y,null);return;}
+    }
+  }
+  draw();ui();
+}
+cv.addEventListener('pointerup',up);
+cv.addEventListener('pointercancel',()=>{drag=null;cur=null;draw();});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+
+/* ---- keyboard ---- */
+addEventListener('keydown',e=>{
+  if(e.target===ta){if(e.key==='Escape'){e.preventDefault();cancelText();}else if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();commitText();}return;}
+  const m=e.ctrlKey||e.metaKey,k=e.key.toLowerCase();
+  if(m&&k==='z'){e.preventDefault();undo();}
+  else if(m&&k==='a'){e.preventDefault();sel=new Set(objs.map(o=>o.id));draw();ui();}
+  else if(m&&k==='c'){e.preventDefault();copy();}
+  else if(m&&k==='v'){e.preventDefault();paste();}
+  else if(m&&k==='x'){e.preventDefault();if(objs.length){copy();if(sel.size){const pre=snap();objs=objs.filter(o=>!sel.has(o.id));sel.clear();commit(pre);draw();}}}
+  else if(e.key==='Delete'||e.key==='Backspace'){if(sel.size){e.preventDefault();del();}}
+  else if(e.key==='Escape'){sel.clear();draw();ui();}
+});
+addEventListener('resize',()=>{if(te)autosize();size();});
+matchMedia('(prefers-color-scheme:dark)').addEventListener&&matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw);
+
+load();size();ui();
+})();
+</script>
+</body>
+</html>
