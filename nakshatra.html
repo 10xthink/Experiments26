@@ -83,15 +83,15 @@ const N=[
 ];
 // 9-Tara cycle
 const T={
-1:["Janma","n","Same energy as you","Like a mirror. Great understanding, but both your strengths and shadows get amplified. Be honest, not competitive."],
-2:["Sampat","g","Wealth","Mutual gain. Share resources, plan together, build things."],
-3:["Vipat","r","Danger","Misread each other easily. Slow down, clarify intent, avoid big joint risks."],
-4:["Kshema","g","Wellbeing","Comforting and healthy. Good for rest, family and steady support."],
-5:["Pratyak","r","Obstacle","Friction and blocks. Keep expectations modest and communication direct."],
-6:["Sadhana","g","Achievement","Helps you get things done. Good for work and shared goals."],
-7:["Naidhana","r","Destruction","Draining or intense. Keep boundaries and do not take it personally."],
-8:["Mitra","g","Friend","Natural ease and goodwill. Easy to be yourself."],
-9:["Parama Mitra","g","Best friend","Deep support and trust. Value and nurture it."]
+1:["Janma","n","Same energy as you","Like a mirror. Great understanding, but both your strengths and shadows get amplified. Be honest, not competitive.","meeting someone who talks and moves just like you. Easy to understand, but you both trip over the same things."],
+2:["Sampat","g","Wealth","Mutual gain. Share resources, plan together, build things.","a friend who always has a spare ticket or a useful tip for you. You tend to come away better off."],
+3:["Vipat","r","Danger","Misread each other easily. Slow down, clarify intent, avoid big joint risks.","two people reading different maps in the same car. Both mean well, but directions get mixed, so check you mean the same thing."],
+4:["Kshema","g","Wellbeing","Comforting and healthy. Good for rest, family and steady support.","a warm kitchen on a cold day. Being around them rests you."],
+5:["Pratyak","r","Obstacle","Friction and blocks. Keep expectations modest and communication direct.","a sticky door. It opens, but you have to push. Things take extra effort, so do not force it."],
+6:["Sadhana","g","Achievement","Helps you get things done. Good for work and shared goals.","a gym or study buddy. Together you actually get things done."],
+7:["Naidhana","r","Destruction","Draining or intense. Keep boundaries and do not take it personally.","a very loud party. It can be exciting, but you need to step out and recharge, and it is not anyone's fault."],
+8:["Mitra","g","Friend","Natural ease and goodwill. Easy to be yourself.","an old friend you can be yourself around."],
+9:["Parama Mitra","g","Best friend","Deep support and trust. Value and nurture it.","the friend who would pick you up at 3 a.m. Deep trust, worth looking after."]
 };
 const LBL={g:"Supportive",n:"Neutral",r:"Challenging"};
 const FELT={g:["smile","Good"],n:["neutral","Okay"],r:["frown","Hard"]};
@@ -208,8 +208,8 @@ function personCard(p){
   if(open){
     const a=T[r.t1],b=T[r.t2];
     det=`<div style="margin-top:8px;font-size:14px">
-    <p style="margin:4px 0"><b>You → ${esc(p.name)}:</b> ${a[0]} (${a[2]}). ${a[3]}</p>
-    <p style="margin:4px 0"><b>${esc(p.name)} → you:</b> ${b[0]} (${b[2]}). ${b[3]}</p>
+    <p style="margin:4px 0"><b>You → ${esc(p.name)}</b> <span class="sub">(how ${esc(p.name)} feels to you)</span><br> ${a[0]} (${a[2]}). ${a[3]}<br><span class="sub">Like ${a[4]}</span></p>
+    <p style="margin:4px 0"><b>${esc(p.name)} → you</b> <span class="sub">(how you feel to ${esc(p.name)})</span><br> ${b[0]} (${b[2]}). ${b[3]}<br><span class="sub">Like ${b[4]}</span></p>
     <p style="margin:4px 0" class="sub">${esc(p.name)}'s star: ${N[p.star][1]} ${N[p.star][0]}. Strengths: ${esc(profile(p.star).str.join(", "))}. Shadows: ${esc(profile(p.star).sha.join(", "))}.</p>
     <button class="sm" data-act="delPerson" data-id="${p.id}">Remove person</button></div>`;
   }
@@ -221,6 +221,8 @@ function vOthers(){
   <input type="text" id="pName" placeholder="Name">
   <div class="row" style="margin-top:8px"><select id="pStar" class="grow"><option value="">Their nakshatra…</option>${N.map((n,i)=>`<option value="${i}">${i+1}. ${n[0]}</option>`).join("")}</select><button class="p" data-act="addPerson">Add</button></div></div>
   ${S.people.length?S.people.map(personCard).join(""):`<p class="sub">No one yet. Add someone and tap them to see how your stars relate.</p>`}
+  <details class="card" open><summary><b>How to read the arrows</b></summary><p class="sub" style="margin:8px 0 4px">Each person is counted <b>both ways</b>, because a bond can feel different from each side.</p><p style="margin:4px 0"><b>A → B</b> means: count from A's star to B's star. <b>A is the one who feels it</b>, and B is the one being felt. Read it as "how B feels to A".</p><p style="margin:4px 0">The arrow points from the one who <b>feels</b> toward the one who is <b>felt</b>.</p><p class="sub" style="margin:10px 0 4px"><b>Example.</b> You are Rohini and Raj is Ashwini.</p><p style="margin:4px 0"><b>You → Raj:</b> count Rohini forward to Ashwini = 25, and 25 leaves 7 after dividing by 9: <b>Naidhana</b>. Raj feels intense or draining <i>to you</i>, like a very loud party.</p><p style="margin:4px 0"><b>Raj → you:</b> count Ashwini forward to Rohini = 4: <b>Kshema</b>. You feel restful <i>to Raj</i>, like a warm kitchen.</p><p class="sub" style="margin:8px 0 0">Same relationship, a different feel from each side. Each person gets a short "Like…" picture to make it easier to relate to.</p></details>
+  <details class="card" open><summary><b>The nine types in everyday terms</b></summary>${Object.values(T).map(t=>`<div class="trait"><span class="chip ${t[1]}"><i class="dot"></i>${t[0]}</span> <b>${t[2]}</b><div class="sub" style="margin-top:3px">Like ${t[4]}</div></div>`).join("")}<p class="sub" style="margin:8px 0 0">Green is supportive, yellow neutral, red challenging. Each type describes how the other person tends to feel <i>to the one at the start of the arrow</i>.</p></details>
   <p class="note">Uses the 9-Tara cycle, counted both ways between the two stars. A challenging label means "needs more care", not "avoid".</p>`;
 }
 
