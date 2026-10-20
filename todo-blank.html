@@ -61,12 +61,22 @@
   #bar[hidden] { display:none; }
   #bar button { background:none; border:0; color:inherit; font:inherit; cursor:pointer; padding:4px 6px; }
   #bar button.danger { color:#ff8f87; }
+  #bar .count { font-size:16px; opacity:.8; }
+  @media (min-width:561px) { #bar .count::after { content:" selected"; } }
+  @media (max-width:560px) {
+    #bar { gap:6px; padding:8px 10px; font-size:16px; max-width:calc(100vw - 16px); }
+    #bar button { padding:4px 5px; }
+  }
+  li { -webkit-touch-callout:none; }
+  #hint { margin-top:28px; font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--faded); text-align:center; }
+  #hint[hidden] { display:none; }
 </style>
 </head>
 <body>
 <main>
   <input id="new" type="text" placeholder="write something…" autocomplete="off">
   <ul id="list"></ul>
+  <div id="hint" hidden>Press and hold a task to select &middot; swipe left to delete</div>
 </main>
 <div id="bar" hidden></div>
 <script>
@@ -179,6 +189,7 @@
   /* ---------- selection mode ---------- */
   function enterSel(t) {
     selMode = true;
+    markHintSeen();
     if (t) { sel.add(t); cur = t; anchor = t; }
     input.blur();
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
@@ -208,6 +219,35 @@
     if (!isTouch) input.focus();
   }
 
+  function pasteLines(lines) {
+    if (!lines.length) return;
+    if (selMode) {
+      snapshot();
+      tasks = tasks.filter(function (x) { return !sel.has(x); });
+      sel.clear(); selMode = false; anchor = null; cur = null;
+    }
+    lines.slice().reverse().forEach(function (l) { tasks.unshift({ text: l, done: false }); });
+    save(); render(); barRender();
+  }
+  function flash(btn, text) {
+    var old = btn.textContent;
+    btn.textContent = text;
+    setTimeout(function () { btn.textContent = old; }, 1500);
+  }
+  function pasteFromClipboard(btn) {
+    if (!navigator.clipboard || !navigator.clipboard.readText) { flash(btn, "No access"); return; }
+    navigator.clipboard.readText().then(function (txt) {
+      var lines = parseLines(txt);
+      if (!lines.length) { flash(btn, "Empty"); return; }
+      pasteLines(lines);
+    }, function () { flash(btn, "Blocked"); });
+  }
+
+  var hintEl = document.getElementById("hint");
+  function hintSeen() { try { return localStorage.getItem("blank-paper-hint") === "1"; } catch (e) { return false; } }
+  function markHintSeen() { try { localStorage.setItem("blank-paper-hint", "1"); } catch (e) {} }
+  function updateHint() { hintEl.hidden = !(isTouch && tasks.length && !hintSeen()); }
+
   function barBtn(label, fn, cls) {
     var b = document.createElement("button");
     b.textContent = label; if (cls) b.className = cls;
@@ -217,7 +257,8 @@
   function barRender() {
     bar.innerHTML = "";
     if (selMode) {
-      var c = document.createElement("span"); c.textContent = sel.size + " selected"; bar.appendChild(c);
+      var c = document.createElement("span"); c.className = "count"; c.textContent = sel.size; bar.appendChild(c);
+      bar.appendChild(barBtn("All", selectAll));
       var copy = barBtn("Copy", function () {
         copyText(selectedText(), function () {
           copy.textContent = "Copied";
@@ -225,6 +266,8 @@
         });
       });
       bar.appendChild(copy);
+      var paste = barBtn("Paste", function () { pasteFromClipboard(paste); });
+      bar.appendChild(paste);
       bar.appendChild(barBtn("Delete", deleteSelected, "danger"));
       bar.appendChild(barBtn("\u2715", exitSel));
       bar.hidden = false;
@@ -255,21 +298,21 @@
         if (justLong || selMode) return;
         toggleDone(t, false);
       };
-      // long-press the circle to start selecting
+      // long-press to start selecting: anywhere on a row (touch), or on the circle (mouse)
       var lp;
       function startLP() {
         if (selMode) return;
+        clearTimeout(lp);
         lp = setTimeout(function () {
           justLong = true; setTimeout(function () { justLong = false; }, 700);
+          var g = window.getSelection(); if (g) g.removeAllRanges();
           enterSel(t);
-        }, 450);
+        }, 480);
       }
       function stopLP() { clearTimeout(lp); }
-      cb.addEventListener("touchstart", startLP, { passive: true });
       cb.addEventListener("mousedown", startLP);
-      ["touchend", "touchmove", "touchcancel", "mouseup", "mouseleave"].forEach(function (ev) {
-        cb.addEventListener(ev, stopLP);
-      });
+      ["mouseup", "mouseleave"].forEach(function (ev) { cb.addEventListener(ev, stopLP); });
+      li.addEventListener("contextmenu", function (e) { if (justLong || selMode) e.preventDefault(); });
 
       var s = document.createElement("span");
       s.className = "txt"; s.textContent = t.text; s.contentEditable = selMode ? "false" : "true"; s.spellcheck = false;
@@ -315,10 +358,12 @@
       li.addEventListener("touchstart", function (e) {
         sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; horiz = null;
         editing = selMode || document.activeElement === s;
+        if (!editing) startLP();
       }, { passive: true });
       li.addEventListener("touchmove", function (e) {
         if (editing) return;
         var mx = e.touches[0].clientX - sx, my = e.touches[0].clientY - sy;
+        if (Math.abs(mx) > 8 || Math.abs(my) > 8) stopLP();
         if (horiz === null && (Math.abs(mx) > 8 || Math.abs(my) > 8)) horiz = Math.abs(mx) > Math.abs(my);
         if (!horiz) return;
         dx = Math.min(0, mx);
@@ -326,7 +371,9 @@
         li.style.transform = "translateX(" + dx + "px)";
         li.style.opacity = Math.max(.15, 1 - Math.abs(dx) / 200);
       }, { passive: true });
+      li.addEventListener("touchcancel", stopLP);
       li.addEventListener("touchend", function () {
+        stopLP();
         li.classList.remove("drag");
         if (horiz && dx < -90) {
           li.style.transform = "translateX(-110%)"; li.style.opacity = 0;
@@ -342,6 +389,7 @@
     });
     if (needScroll && cur && lis.get(cur)) lis.get(cur).scrollIntoView({ block: "nearest" });
     needScroll = false;
+    updateHint();
   }
 
   /* ---------- adding ---------- */
@@ -426,13 +474,7 @@
     var lines = parseLines((e.clipboardData || window.clipboardData).getData("text"));
     if (!lines.length) return;
     e.preventDefault();
-    if (selMode) {
-      snapshot();
-      tasks = tasks.filter(function (x) { return !sel.has(x); });
-      sel.clear(); selMode = false; anchor = null; cur = null;
-    }
-    lines.reverse().forEach(function (l) { tasks.unshift({ text: l, done: false }); });
-    save(); render(); barRender();
+    pasteLines(lines);
   });
 
   render();
