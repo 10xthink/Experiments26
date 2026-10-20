@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blank Paper</title>
+<style>
+  :root { --desk:#dcd8cf; --paper:#fdfcf8; --ink:#26252b; --faded:#aaa69b; --pen:#26252b; --sel:rgba(110,130,180,.16); }
+  @media (prefers-color-scheme: dark) {
+    :root { --desk:#1a1917; --paper:#262521; --ink:#ebe7db; --faded:#7c7869; --pen:#ebe7db; --sel:rgba(140,160,210,.2); }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; background:var(--desk); color:var(--ink);
+    font:22px/1.5 "Segoe Print","Bradley Hand","Marker Felt","Chalkboard SE","Comic Sans MS",cursive;
+    display:flex; justify-content:center; padding:32px 12px; overflow-x:hidden; }
+  main { width:100%; max-width:520px; min-height:calc(100vh - 64px); padding:56px 44px 100px;
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+      var(--paper);
+    border-radius:2px; overflow:hidden;
+    box-shadow:0 1px 1px rgba(0,0,0,.12), 0 8px 16px rgba(0,0,0,.14), 0 24px 48px rgba(0,0,0,.10); }
+  @media (max-width:480px) {
+    body { padding:8px; }
+    main { padding:36px 20px 100px; min-height:calc(100vh - 16px); }
+  }
+  #new { display:block; width:100%; padding:4px 0 14px; border:0; outline:none; background:transparent;
+    font:inherit; color:var(--pen); }
+  #new::placeholder { color:var(--faded); }
+  ul { list-style:none; margin:0; padding:0; }
+  li { position:relative; display:flex; align-items:flex-start; gap:14px; padding:4px 0; touch-action:pan-y;
+    transition:transform .18s ease, opacity .18s ease; }
+  li.drag { transition:none; }
+  li.sel { background:var(--sel); border-radius:6px; box-shadow:-8px 0 0 var(--sel), 8px 0 0 var(--sel); }
+  /* keyboard cursor: a small pen mark in the margin */
+  li.cur::before { content:"\203A"; position:absolute; left:-24px; top:0; font-size:28px; line-height:1.4;
+    color:var(--ink); opacity:.6; }
+  @media (max-width:480px) { li.cur::before { left:-16px; } }
+  .box { flex:none; width:22px; height:22px; margin-top:7px; border:2px solid var(--faded);
+    border-radius:50%; background:transparent; cursor:pointer; padding:0; }
+  li.done .box { background:var(--faded); border-color:var(--faded); }
+  .txt { flex:1; min-width:0; word-break:break-word; outline:none; cursor:text; border-radius:3px; }
+  .txt:focus { background:none; outline:none; caret-color:var(--pen); }
+  li.done { opacity:.5; }
+  li.done .txt { color:var(--faded); text-decoration:line-through; text-decoration-thickness:2px; }
+  .del { background:none; border:0; color:var(--faded); font:inherit; font-size:24px; line-height:1.4;
+    padding:0 6px; cursor:pointer; opacity:0; transition:opacity .12s; }
+  li:hover .del, .del:focus { opacity:1; }
+  .del:hover { color:#c9453f; }
+  @media (hover:none) { .del { display:none; } }
+  body.selmode .del { display:none; }
+  body.selmode li { cursor:pointer; -webkit-user-select:none; user-select:none; }
+  body.selmode .txt { cursor:pointer; }
+
+  #bar { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); display:flex; align-items:center;
+    gap:14px; padding:8px 16px; border-radius:999px; background:var(--ink); color:var(--paper);
+    font-size:17px; line-height:1.4; box-shadow:0 6px 20px rgba(0,0,0,.25); white-space:nowrap; z-index:10; }
+  #bar[hidden] { display:none; }
+  #bar button { background:none; border:0; color:inherit; font:inherit; cursor:pointer; padding:4px 6px; }
+  #bar button.danger { color:#ff8f87; }
+</style>
+</head>
+<body>
+<main>
+  <input id="new" type="text" placeholder="write something…" autocomplete="off">
+  <ul id="list"></ul>
+</main>
+<div id="bar" hidden></div>
+<script>
+  var KEY = "blank-paper-todo-v1", tasks = [];
+  try { tasks = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
+  tasks = tasks.filter(function (t) { return !t.done; }).concat(tasks.filter(function (t) { return t.done; }));
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(tasks)); } catch (e) {} }
+
+  var list = document.getElementById("list"), input = document.getElementById("new"), bar = document.getElementById("bar");
+  var selMode = false, sel = new Set(), anchor = null, cur = null, needScroll = false;
+  var undoSnap = null, undoTimer = null, justLong = false;
+  var lis = new Map(), spans = new Map();
+  var isTouch = window.matchMedia("(hover:none)").matches;
+
+  /* ---------- helpers ---------- */
+  function idx(t) { return tasks.indexOf(t); }
+  function snapshot() {
+    undoSnap = tasks.map(function (t) { return { text: t.text, done: t.done }; });
+    clearTimeout(undoTimer);
+    undoTimer = setTimeout(function () { undoSnap = null; barRender(); }, 8000);
+  }
+  function undo() {
+    if (!undoSnap) return;
+    tasks = undoSnap; undoSnap = null; clearTimeout(undoTimer);
+    cur = null; save(); render(); barRender();
+  }
+  function remove(t) { var i = idx(t); if (i > -1) tasks.splice(i, 1); sel.delete(t); save(); render(); }
+  function selectedText() {
+    return tasks.filter(function (t) { return sel.has(t); }).map(function (t) { return t.text; }).join("\n");
+  }
+  function copyText(text, done) {
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+      if (done) done();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { if (done) done(); }, fallback);
+    } else fallback();
+  }
+  function parseLines(txt) {
+    return txt.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+  }
+  function markCur() { lis.forEach(function (li, t) { li.classList.toggle("cur", t === cur); }); }
+
+  /* ---------- actions on a single task ---------- */
+  function toggleDone(t, viaKey) {
+    var i = idx(t);
+    tasks.splice(i, 1);
+    t.done = !t.done;
+    if (t.done) tasks.push(t); else tasks.unshift(t);
+    if (viaKey) {
+      // when ticking off, the cursor steps to the task that took its place
+      cur = t.done ? (tasks[i] && tasks[i] !== t ? tasks[i] : (tasks[i - 1] || t)) : t;
+      needScroll = true;
+    }
+    save(); render();
+  }
+  function deleteTask(t) {
+    var i = idx(t);
+    snapshot();
+    tasks.splice(i, 1);
+    cur = tasks[i] || tasks[i - 1] || null;
+    needScroll = true;
+    save(); render(); barRender();
+  }
+  function editTask(t) {
+    var s = spans.get(t);
+    if (!s || selMode) return;
+    cur = t; markCur(); needScroll = true;
+    s.focus();
+    var r = document.createRange(); r.selectNodeContents(s); r.collapse(false);
+    var g = window.getSelection(); g.removeAllRanges(); g.addRange(r);
+    s.scrollIntoView({ block: "nearest" });
+  }
+  function leaveToInput() {
+    cur = null; anchor = null;
+    render();
+    input.focus();
+  }
+
+  /* ---------- keyboard cursor ---------- */
+  function moveCur(delta, extend) {
+    if (!tasks.length) return;
+    var i = cur ? idx(cur) : -1;
+    var n = i === -1 ? (delta > 0 ? 0 : tasks.length - 1) : i + delta;
+    if (n < 0) {
+      if (extend || selMode) return;
+      leaveToInput(); return;
+    }
+    if (n >= tasks.length) n = tasks.length - 1;
+    if (extend) {
+      if (anchor === null) anchor = cur || tasks[n];
+      cur = tasks[n];
+      var a = idx(anchor), b = idx(cur);
+      sel = new Set(tasks.slice(Math.min(a, b), Math.max(a, b) + 1));
+      selMode = true;
+      input.blur();
+    } else {
+      cur = tasks[n];
+      if (selMode) anchor = cur;
+    }
+    needScroll = true;
+    render(); barRender();
+  }
+
+  /* ---------- selection mode ---------- */
+  function enterSel(t) {
+    selMode = true;
+    if (t) { sel.add(t); cur = t; anchor = t; }
+    input.blur();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    render(); barRender();
+  }
+  function selectAll() {
+    if (!tasks.length) return;
+    sel = new Set(tasks);
+    enterSel();
+  }
+  function exitSel() {
+    selMode = false; sel.clear(); anchor = null;
+    render(); barRender();
+    if (!isTouch) input.focus();
+  }
+  function toggleSel(t) {
+    if (sel.has(t)) sel.delete(t); else sel.add(t);
+    if (!sel.size) { exitSel(); return; }
+    render(); barRender();
+  }
+  function deleteSelected() {
+    if (!sel.size) return;
+    snapshot();
+    tasks = tasks.filter(function (t) { return !sel.has(t); });
+    sel.clear(); selMode = false; anchor = null; cur = null;
+    save(); render(); barRender();
+    if (!isTouch) input.focus();
+  }
+
+  function barBtn(label, fn, cls) {
+    var b = document.createElement("button");
+    b.textContent = label; if (cls) b.className = cls;
+    b.onclick = function (e) { fn(e); if (document.activeElement === b) b.blur(); };
+    return b;
+  }
+  function barRender() {
+    bar.innerHTML = "";
+    if (selMode) {
+      var c = document.createElement("span"); c.textContent = sel.size + " selected"; bar.appendChild(c);
+      var copy = barBtn("Copy", function () {
+        copyText(selectedText(), function () {
+          copy.textContent = "Copied";
+          setTimeout(function () { copy.textContent = "Copy"; }, 1200);
+        });
+      });
+      bar.appendChild(copy);
+      bar.appendChild(barBtn("Delete", deleteSelected, "danger"));
+      bar.appendChild(barBtn("\u2715", exitSel));
+      bar.hidden = false;
+    } else if (undoSnap) {
+      var m = document.createElement("span"); m.textContent = "Deleted"; bar.appendChild(m);
+      bar.appendChild(barBtn("Undo", undo));
+      bar.hidden = false;
+    } else {
+      bar.hidden = true;
+    }
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    if (cur && idx(cur) === -1) cur = null;
+    document.body.classList.toggle("selmode", selMode);
+    list.innerHTML = "";
+    lis = new Map(); spans = new Map();
+    tasks.forEach(function (t) {
+      var li = document.createElement("li");
+      if (t.done) li.classList.add("done");
+      if (sel.has(t)) li.classList.add("sel");
+      if (t === cur) li.classList.add("cur");
+
+      var cb = document.createElement("button");
+      cb.className = "box"; cb.setAttribute("aria-label", "Toggle done"); cb.tabIndex = -1;
+      cb.onclick = function () {
+        if (justLong || selMode) return;
+        toggleDone(t, false);
+      };
+      // long-press the circle to start selecting
+      var lp;
+      function startLP() {
+        if (selMode) return;
+        lp = setTimeout(function () {
+          justLong = true; setTimeout(function () { justLong = false; }, 700);
+          enterSel(t);
+        }, 450);
+      }
+      function stopLP() { clearTimeout(lp); }
+      cb.addEventListener("touchstart", startLP, { passive: true });
+      cb.addEventListener("mousedown", startLP);
+      ["touchend", "touchmove", "touchcancel", "mouseup", "mouseleave"].forEach(function (ev) {
+        cb.addEventListener(ev, stopLP);
+      });
+
+      var s = document.createElement("span");
+      s.className = "txt"; s.textContent = t.text; s.contentEditable = selMode ? "false" : "true"; s.spellcheck = false;
+      s.addEventListener("focus", function () { if (cur !== t) { cur = t; markCur(); } });
+      s.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault(); cur = t; s.blur(); render();
+        } else if (e.key === "Escape") {
+          e.preventDefault(); s.textContent = t.text; cur = t; s.blur(); render();
+        } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+          var n = idx(t) + (e.key === "ArrowUp" ? -1 : 1);
+          if (n >= tasks.length) return;          // last task: keep native caret movement
+          e.preventDefault();
+          var nextT = tasks[n];
+          s.blur();                                // commits; an emptied task is removed
+          if (!nextT) { leaveToInput(); return; }
+          cur = nextT; needScroll = true; render(); editTask(nextT);
+        }
+      });
+      s.addEventListener("paste", function (e) {
+        e.preventDefault();
+        var txt = (e.clipboardData || window.clipboardData).getData("text").replace(/\s*\n\s*/g, " ");
+        document.execCommand("insertText", false, txt);
+      });
+      s.addEventListener("blur", function () {
+        if (selMode) return;
+        var v = s.textContent.trim();
+        if (!v) { remove(t); return; }
+        t.text = v; s.textContent = v; save();
+      });
+
+      var x = document.createElement("button");
+      x.className = "del"; x.textContent = "\u00d7"; x.title = "Delete"; x.tabIndex = -1;
+      x.onclick = function (e) { e.stopPropagation(); snapshot(); remove(t); barRender(); };
+
+      li.addEventListener("click", function () {
+        if (!selMode || justLong) return;
+        toggleSel(t);
+      });
+
+      // swipe left to delete (touch)
+      var sx = 0, sy = 0, dx = 0, horiz = null, editing = false;
+      li.addEventListener("touchstart", function (e) {
+        sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; horiz = null;
+        editing = selMode || document.activeElement === s;
+      }, { passive: true });
+      li.addEventListener("touchmove", function (e) {
+        if (editing) return;
+        var mx = e.touches[0].clientX - sx, my = e.touches[0].clientY - sy;
+        if (horiz === null && (Math.abs(mx) > 8 || Math.abs(my) > 8)) horiz = Math.abs(mx) > Math.abs(my);
+        if (!horiz) return;
+        dx = Math.min(0, mx);
+        li.classList.add("drag");
+        li.style.transform = "translateX(" + dx + "px)";
+        li.style.opacity = Math.max(.15, 1 - Math.abs(dx) / 200);
+      }, { passive: true });
+      li.addEventListener("touchend", function () {
+        li.classList.remove("drag");
+        if (horiz && dx < -90) {
+          li.style.transform = "translateX(-110%)"; li.style.opacity = 0;
+          setTimeout(function () { snapshot(); remove(t); barRender(); }, 160);
+        } else {
+          li.style.transform = ""; li.style.opacity = "";
+        }
+      });
+
+      li.append(cb, s, x);
+      list.appendChild(li);
+      lis.set(t, li); spans.set(t, s);
+    });
+    if (needScroll && cur && lis.get(cur)) lis.get(cur).scrollIntoView({ block: "nearest" });
+    needScroll = false;
+  }
+
+  /* ---------- adding ---------- */
+  input.addEventListener("focus", function () {
+    if (cur) { cur = null; anchor = null; render(); }
+  });
+  input.addEventListener("paste", function (e) {
+    var lines = parseLines((e.clipboardData || window.clipboardData).getData("text"));
+    if (lines.length < 2) return;
+    e.preventDefault();
+    lines.reverse().forEach(function (l) { tasks.unshift({ text: l, done: false }); });
+    save(); render();
+  });
+  input.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter") return;
+    var v = input.value.trim();
+    if (!v) return;
+    tasks.unshift({ text: v, done: false });
+    input.value = "";
+    save(); render();
+  });
+
+  /* ---------- keyboard: navigate, select, copy, cut, delete, undo ---------- */
+  document.addEventListener("keydown", function (e) {
+    var mod = e.ctrlKey || e.metaKey, k = (e.key || "").toLowerCase();
+    var tgt = e.target, inTask = tgt.classList && tgt.classList.contains("txt");
+    var onBody = tgt === document.body || tgt === document.documentElement;
+    var dir = e.key === "ArrowDown" ? 1 : -1;
+
+    if (mod && k === "a") {
+      if (inTask) {
+        // first press selects the task's text, second press selects every task
+        var curSel = window.getSelection().toString().trim();
+        if (curSel && curSel === tgt.textContent.trim()) { e.preventDefault(); tgt.blur(); selectAll(); }
+        return;
+      }
+      if (tgt === input && input.value) return;   // let the box select its own text
+      e.preventDefault(); selectAll(); return;
+    }
+
+    if (selMode) {
+      if (e.key === "Escape") { e.preventDefault(); exitSel(); }
+      else if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); deleteSelected(); }
+      else if (mod && k === "c") { e.preventDefault(); copyText(selectedText()); }
+      else if (mod && k === "x") { e.preventDefault(); copyText(selectedText()); deleteSelected(); }
+      else if (!mod && (e.key === "ArrowUp" || e.key === "ArrowDown")) { e.preventDefault(); moveCur(dir, e.shiftKey); }
+      else if (e.key === " " && cur) { e.preventDefault(); toggleSel(cur); }
+      return;
+    }
+
+    if (mod && k === "z" && undoSnap && !inTask && !(tgt === input && input.value)) {
+      e.preventDefault(); undo(); return;
+    }
+
+    // from the input box, Down steps into the list
+    if (tgt === input) {
+      if (e.key === "ArrowDown" && !e.shiftKey && !mod && tasks.length) {
+        e.preventDefault(); input.blur(); moveCur(1, false);
+      }
+      return;
+    }
+
+    if (onBody && !mod && !e.altKey) {
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); moveCur(dir, e.shiftKey); return; }
+      if (cur) {
+        if (e.key === "Enter" || e.key === "F2") { e.preventDefault(); editTask(cur); return; }
+        if (e.key === " ") { e.preventDefault(); toggleDone(cur, true); return; }
+        if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); deleteTask(cur); return; }
+        if (e.key === "Escape") { e.preventDefault(); leaveToInput(); return; }
+      }
+      // just start typing: jump back to the input
+      if (e.key.length === 1 && e.key !== " ") { cur = null; anchor = null; render(); input.focus(); }
+    }
+  });
+
+  // paste: replaces the selected tasks, or adds new ones when nothing is focused
+  document.addEventListener("paste", function (e) {
+    if (e.defaultPrevented) return;
+    var t = e.target;
+    var editable = t === input || (t.classList && t.classList.contains("txt"));
+    if (!selMode && editable) return;
+    var lines = parseLines((e.clipboardData || window.clipboardData).getData("text"));
+    if (!lines.length) return;
+    e.preventDefault();
+    if (selMode) {
+      snapshot();
+      tasks = tasks.filter(function (x) { return !sel.has(x); });
+      sel.clear(); selMode = false; anchor = null; cur = null;
+    }
+    lines.reverse().forEach(function (l) { tasks.unshift({ text: l, done: false }); });
+    save(); render(); barRender();
+  });
+
+  render();
+  if (!isTouch) input.focus();
+</script>
+</body>
+</html>
