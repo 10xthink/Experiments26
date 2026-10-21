@@ -181,7 +181,7 @@
       <span id="active-week-dates" class="text-[11px] font-mono text-[var(--muted)]"></span>
       <button type="button" id="dri-filter-tag" onclick="clearDriFilter()" class="hidden text-xs font-mono px-1.5 py-0.5 rounded bg-[var(--hairline)] hover:bg-[var(--fg)] hover:text-[var(--bg)] transition-colors"></button>
     </div>
-    <div class="text-xs font-mono text-[var(--muted)] self-start sm:self-auto flex items-center space-x-1 cursor-pointer hover:text-[var(--fg)] transition-colors" onclick="toggleShippedView()" title="Toggle full quarter shipped ledger">
+    <div class="text-xs font-mono text-[var(--muted)] self-start sm:self-auto flex items-center space-x-1 cursor-pointer hover:text-[var(--fg)] transition-colors" onclick="toggleShippedView()" title="Toggle full quarter ledger">
       <span id="header-total-shipped" class="text-[var(--fg)] font-medium">0</span>
       <span>of</span>
       <span id="header-total-all">0</span>
@@ -190,7 +190,7 @@
     </div>
   </header>
 
-  <!-- Scrubber -->
+  <!-- 12-Week Rolling Scrubber -->
   <section id="scrubber-section" class="max-w-3xl mx-auto w-full px-4 sm:px-6 mb-6 sm:mb-8 select-none transition-opacity">
     <div class="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
       <div class="grid grid-flow-col auto-cols-[3.25rem] sm:auto-cols-auto sm:grid-flow-row sm:grid-cols-12 gap-1 sm:gap-1.5 min-w-max sm:min-w-0" id="week-scrubber">
@@ -242,14 +242,24 @@
     </div>
   </main>
 
-  <!-- Shipped Ledger View (Quarter Overview) -->
+  <!-- Comprehensive Quarter Ledger View -->
   <section id="shipped-ledger-view" class="hidden max-w-3xl mx-auto w-full px-4 sm:px-6 flex-1 flex flex-col select-none">
-    <div class="flex items-baseline justify-between pb-3 mb-4 border-b border-[var(--hairline)]">
+    <div class="flex flex-col sm:flex-row sm:items-baseline justify-between pb-3 mb-4 border-b border-[var(--hairline)] gap-2">
       <div>
-        <span class="text-xs font-mono uppercase tracking-wider text-[var(--fg)] font-semibold">Shipped Ledger</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-[var(--fg)] font-semibold">Quarter Ledger</span>
         <span id="ledger-subhead" class="text-xs font-mono text-[var(--muted)] ml-2"></span>
       </div>
-      <button type="button" onclick="toggleShippedView()" class="text-xs font-mono text-[var(--muted)] hover:text-[var(--fg)] underline decoration-dotted">return to active week ↵</button>
+      <div class="flex items-center space-x-3 text-xs font-mono">
+        <div class="flex items-center space-x-1.5 border border-[var(--hairline)] rounded px-1.5 py-0.5">
+          <button type="button" id="ledger-filter-all" onclick="setLedgerFilter('all')" class="px-1 font-semibold text-[var(--fg)]">all</button>
+          <span class="opacity-25">·</span>
+          <button type="button" id="ledger-filter-todo" onclick="setLedgerFilter('todo')" class="px-1 text-[var(--muted)] hover:text-[var(--fg)]">to do</button>
+          <span class="opacity-25">·</span>
+          <button type="button" id="ledger-filter-done" onclick="setLedgerFilter('done')" class="px-1 text-[var(--muted)] hover:text-[var(--fg)]">done</button>
+        </div>
+        <span class="opacity-30">·</span>
+        <button type="button" onclick="toggleShippedView()" class="text-[var(--muted)] hover:text-[var(--fg)] underline decoration-dotted">return to active week ↵</button>
+      </div>
     </div>
     <div id="ledger-weeks-container" class="space-y-6 overflow-y-auto"></div>
   </section>
@@ -284,6 +294,7 @@
     </div>
   </footer>
 
+  <!-- Application Logic -->
   <script>
     let tasks = [];
     let currentWeek = 1;
@@ -296,6 +307,7 @@
     let pendingIncomingTasks = null;
     let activeDriFilter = null;
     let showShippedView = false;
+    let ledgerFilter = 'all'; // 'all' | 'todo' | 'done'
 
     function getStorageKey() {
       return `cadence_tasks_${currentYear}_${currentQuarterName}`;
@@ -367,6 +379,7 @@
       if (savedTasks) {
         tasks = savedTasks;
       } else {
+        // Pure unassigned educational seed items
         tasks = [
           { id: "demo-1", title: "Click the circle to mark this deliverable as shipped", status: false, dri: "", week: currentWeek },
           { id: "demo-2", title: "Type a deliverable above and press Enter to capture", status: false, dri: "", week: currentWeek },
@@ -403,6 +416,24 @@
       render();
     }
 
+    function setLedgerFilter(filter) {
+      ledgerFilter = filter;
+      render();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      saveToStorage();
+      render();
+    }
+
+    function getDistinctDriCount() {
+      const names = new Set(
+        tasks.map(t => (t.dri || '').trim().toLowerCase()).filter(Boolean)
+      );
+      return names.size;
+    }
+
     function render() {
       const activeCanvas = document.getElementById('active-canvas');
       const scrubberSection = document.getElementById('scrubber-section');
@@ -414,7 +445,7 @@
         scrubberSection.classList.add('opacity-40');
         shippedLedgerView.classList.remove('hidden');
         arrowIndicator.textContent = '↑ return';
-        renderShippedLedger();
+        renderQuarterLedger();
       } else {
         activeCanvas.classList.remove('hidden');
         scrubberSection.classList.remove('opacity-40');
@@ -450,33 +481,50 @@
       }
     }
 
-    function renderShippedLedger() {
+    function renderQuarterLedger() {
       const container = document.getElementById('ledger-weeks-container');
       const subhead = document.getElementById('ledger-subhead');
       container.innerHTML = '';
 
+      // Update button visual active states
+      ['all', 'todo', 'done'].forEach(f => {
+        const btn = document.getElementById(`ledger-filter-${f}`);
+        if (btn) {
+          if (ledgerFilter === f) {
+            btn.className = 'px-1 font-semibold text-[var(--fg)]';
+          } else {
+            btn.className = 'px-1 text-[var(--muted)] hover:text-[var(--fg)]';
+          }
+        }
+      });
+
+      const filterLabel = ledgerFilter === 'all' ? 'All Deliverables' : (ledgerFilter === 'done' ? 'Shipped Deliverables' : 'Planned / To Do Deliverables');
       subhead.textContent = activeDriFilter 
-        ? `Shipped by @${activeDriFilter} across ${currentQuarterName}` 
-        : `All Shipped Deliverables across ${currentQuarterName}`;
+        ? `${filterLabel} for @${activeDriFilter} · ${currentQuarterName}` 
+        : `${filterLabel} across ${currentQuarterName}`;
 
       const scopedTasks = activeDriFilter
         ? tasks.filter(t => (t.dri || '').toLowerCase() === activeDriFilter.toLowerCase())
         : tasks;
 
-      const shippedTasks = scopedTasks.filter(t => t.status);
+      const filteredTasks = scopedTasks.filter(t => {
+        if (ledgerFilter === 'done') return t.status;
+        if (ledgerFilter === 'todo') return !t.status;
+        return true;
+      });
 
-      if (shippedTasks.length === 0) {
+      if (filteredTasks.length === 0) {
         container.innerHTML = `
           <div class="py-12 text-center text-xs font-mono text-[var(--muted)] opacity-60">
-            No completed items found ${activeDriFilter ? `for @${activeDriFilter}` : ''} yet this quarter.
+            No deliverables found for this filter ${activeDriFilter ? `for @${activeDriFilter}` : ''} yet.
           </div>
         `;
         return;
       }
 
       for (let w = 12; w >= 1; w--) {
-        const weekShipped = shippedTasks.filter(t => t.week === w);
-        if (weekShipped.length === 0) continue;
+        const weekTasks = filteredTasks.filter(t => t.week === w);
+        if (weekTasks.length === 0) continue;
 
         const section = document.createElement('div');
         section.className = 'pt-5 first:pt-0';
@@ -493,9 +541,12 @@
           render();
         };
 
+        const shippedCount = weekTasks.filter(t => t.status).length;
         const countLabel = document.createElement('span');
         countLabel.className = 'text-[var(--muted)] text-[11px]';
-        countLabel.textContent = `${weekShipped.length} shipped`;
+        countLabel.textContent = ledgerFilter === 'done' 
+          ? `${shippedCount} shipped` 
+          : (ledgerFilter === 'todo' ? `${weekTasks.length} to do` : `${shippedCount}/${weekTasks.length} shipped`);
 
         header.appendChild(weekLabel);
         header.appendChild(countLabel);
@@ -504,7 +555,7 @@
         const list = document.createElement('div');
         list.className = 'divide-y divide-[var(--hairline)]';
 
-        weekShipped.forEach(task => {
+        weekTasks.forEach(task => {
           const row = document.createElement('div');
           row.className = 'py-2 flex items-center justify-between text-sm';
 
@@ -512,12 +563,24 @@
           left.className = 'flex items-center space-x-2.5 min-w-0';
 
           const mark = document.createElement('span');
-          mark.className = 'text-[11px] font-mono text-[var(--muted)] opacity-60 select-none';
-          mark.textContent = '✓';
+          mark.className = 'text-[11px] font-mono text-[var(--muted)] opacity-60 select-none cursor-pointer hover:text-[var(--fg)]';
+          mark.textContent = task.status ? '✓' : '○';
+          mark.title = task.status ? 'Mark to do' : 'Mark shipped';
+          mark.onclick = (e) => {
+            e.stopPropagation();
+            task.status = !task.status;
+            saveToStorage();
+            render();
+          };
 
           const title = document.createElement('span');
-          title.className = 'line-through text-[var(--muted)] break-words text-sm sm:text-base';
+          title.className = `break-words text-sm sm:text-base cursor-pointer ${task.status ? 'line-through text-[var(--muted)]' : 'text-[var(--fg)]'}`;
           title.textContent = task.title;
+          title.onclick = () => {
+            currentWeek = w;
+            showShippedView = false;
+            render();
+          };
 
           left.appendChild(mark);
           left.appendChild(title);
@@ -570,7 +633,6 @@
         label.className = `text-xs font-mono tracking-tight leading-none ${isActive ? 'font-semibold text-[var(--fg)]' : ''}`;
         label.textContent = `W${w}`;
 
-        // Fixed-height, perfectly aligned track for every week cell
         const barTrack = document.createElement('div');
         barTrack.className = 'w-full h-[2.5px] bg-[var(--bar-bg)] mt-2 rounded-full overflow-hidden relative';
 
@@ -578,7 +640,6 @@
           const shippedPct = Math.round((shipped / total) * 100);
           const openPct = 100 - shippedPct;
 
-          // Inner wrapper spanning full width to avoid subpixel baseline collapse
           const innerFlex = document.createElement('div');
           innerFlex.className = 'w-full h-full flex absolute inset-0';
 
@@ -672,6 +733,7 @@
         };
         center.appendChild(text);
 
+        // Only display @Name pill if there are 2 or more distinct DRIs on board
         const uniqueDriCount = getDistinctDriCount();
         if (task.dri && uniqueDriCount >= 2) {
           const dri = document.createElement('span');
@@ -704,13 +766,6 @@
       row.appendChild(del);
 
       return row;
-    }
-
-    function getDistinctDriCount() {
-      const names = new Set(
-        tasks.map(t => (t.dri || '').trim().toLowerCase()).filter(Boolean)
-      );
-      return names.size;
     }
 
     function renderLists() {
@@ -757,6 +812,7 @@
       if (!val) return;
 
       const match = val.match(/@(\w+)/);
+      // Clean assignment: uses explicit typed @Name or active DRI filter, otherwise remains unassigned ("")
       const dri = match ? match[1] : (activeDriFilter || '');
       const title = match ? val.replace(/@\w+/, '').trim() : val;
 
