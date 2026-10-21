@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cadence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    :root {
+      --bg: #FAFAFA;
+      --fg: #111111;
+      --muted: #8E8E93;
+      --hairline: rgba(0, 0, 0, 0.08);
+      --bar-bg: rgba(0, 0, 0, 0.06);
+      --bar-fill: #111111;
+      --check-border: #999999;
+      --check-bg: #111111;
+      --check-tick: #FFFFFF;
+      --row-hover: rgba(0, 0, 0, 0.02);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #000000;
+        --fg: #F3F3F3;
+        --muted: #6B6B70;
+        --hairline: rgba(255, 255, 255, 0.08);
+        --bar-bg: rgba(255, 255, 255, 0.1);
+        --bar-fill: #F3F3F3;
+        --check-border: #4A4A4F;
+        --check-bg: #EDEDED;
+        --check-tick: #000000;
+        --row-hover: rgba(255, 255, 255, 0.03);
+      }
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      touch-action: manipulation;
+      min-height: 100dvh;
+    }
+
+    /* Tactile circular checkbox */
+    .tactile-checkbox-wrapper {
+      min-width: 36px;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: -8px;
+      cursor: pointer;
+    }
+
+    .tactile-checkbox {
+      width: 18px;
+      height: 18px;
+      border-radius: 9999px;
+      border: 1.5px solid var(--check-border);
+      transition: all 120ms ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: transparent;
+    }
+
+    .tactile-checkbox-wrapper:hover .tactile-checkbox {
+      border-color: var(--fg);
+    }
+
+    .tactile-checkbox.checked {
+      background-color: var(--check-bg);
+      border-color: var(--check-bg);
+    }
+
+    .tactile-checkbox.checked::after {
+      content: '';
+      width: 4.5px;
+      height: 9px;
+      border: solid var(--check-tick);
+      border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg) translate(-0.5px, -0.5px);
+      display: block;
+    }
+
+    .task-row {
+      border-bottom: 1px solid var(--hairline);
+      transition: background-color 80ms ease, opacity 140ms ease;
+    }
+    .task-row:hover {
+      background-color: var(--row-hover);
+    }
+
+    .action-del {
+      opacity: 0.35;
+      transition: opacity 120ms ease;
+      min-width: 32px;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    @media (hover: hover) {
+      .action-del {
+        opacity: 0;
+      }
+      .task-row:hover .action-del,
+      .task-row:focus-within .action-del {
+        opacity: 0.6;
+      }
+    }
+    .action-del:hover,
+    .action-del:active {
+      opacity: 1 !important;
+    }
+
+    .week-tab {
+      cursor: pointer;
+      position: relative;
+      transition: all 120ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .week-tab.active {
+      color: var(--fg);
+    }
+    .current-week-dot {
+      width: 3.5px;
+      height: 3.5px;
+      border-radius: 9999px;
+      background-color: var(--fg);
+      margin: 0 auto 3px auto;
+    }
+    .current-week-dot-placeholder {
+      width: 3.5px;
+      height: 3.5px;
+      margin: 0 auto 3px auto;
+      visibility: hidden;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-neutral-800 selection:text-white font-sans">
+
+  <!-- Responsive Header -->
+  <header class="w-full pt-6 sm:pt-10 pb-4 sm:pb-6 max-w-3xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 select-none">
+    <div class="flex items-baseline space-x-2 flex-wrap">
+      <span class="text-xs font-semibold tracking-widest uppercase font-mono">CADENCE</span>
+      <span class="text-xs font-mono text-[var(--muted)] opacity-40">/</span>
+      <span id="quarter-label" class="text-xs font-mono text-[var(--muted)]">Q4</span>
+      <span class="text-xs font-mono text-[var(--muted)] opacity-40">·</span>
+      <span id="active-week-label" class="text-xs font-mono text-[var(--fg)]">WEEK 1</span>
+      <span id="active-week-dates" class="text-[11px] font-mono text-[var(--muted)]"></span>
+      <button type="button" id="dri-filter-tag" onclick="clearDriFilter()" class="hidden text-xs font-mono px-1.5 py-0.5 rounded bg-[var(--hairline)] hover:bg-[var(--fg)] hover:text-[var(--bg)] transition-colors"></button>
+    </div>
+    <div class="text-xs font-mono text-[var(--muted)] self-start sm:self-auto flex items-center space-x-1 cursor-pointer hover:text-[var(--fg)] transition-colors" onclick="toggleShippedView()" title="Toggle full quarter shipped ledger">
+      <span id="header-total-shipped" class="text-[var(--fg)] font-medium">0</span>
+      <span>of</span>
+      <span id="header-total-all">0</span>
+      <span>shipped</span>
+      <span id="shipped-toggle-arrow" class="text-[10px] ml-1 opacity-70 underline decoration-dotted">↓ ledger</span>
+    </div>
+  </header>
+
+  <!-- Scrubber -->
+  <section id="scrubber-section" class="max-w-3xl mx-auto w-full px-4 sm:px-6 mb-6 sm:mb-8 select-none transition-opacity">
+    <div class="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div class="grid grid-flow-col auto-cols-[3.25rem] sm:auto-cols-auto sm:grid-flow-row sm:grid-cols-12 gap-1 sm:gap-1.5 min-w-max sm:min-w-0" id="week-scrubber">
+        <!-- W1 to W12 generated dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Active Canvas (To Do / Done) -->
+  <main id="active-canvas" class="max-w-3xl mx-auto w-full px-4 sm:px-6 flex-1 flex flex-col space-y-8 sm:space-y-10">
+
+    <!-- Frictionless Capture Underline -->
+    <div>
+      <form onsubmit="handleCapture(event)">
+        <input
+          id="capture-input"
+          type="text"
+          placeholder="New deliverable, assign with @Name & press Enter..."
+          class="w-full bg-transparent border-b border-[var(--hairline)] focus:border-[var(--fg)] py-2 sm:py-2.5 text-base sm:text-lg text-[var(--fg)] placeholder:text-[var(--muted)] outline-none transition-colors rounded-none"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="sentences"
+          spellcheck="false"
+        />
+      </form>
+    </div>
+
+    <!-- Binary To Do / Done Columns -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12 flex-1 items-start">
+      
+      <!-- To Do -->
+      <div>
+        <div class="flex items-baseline justify-between pb-2 mb-1 border-b border-[var(--hairline)]">
+          <span class="text-xs font-mono uppercase tracking-wider text-[var(--muted)]">To Do</span>
+          <span id="count-todo" class="text-xs font-mono text-[var(--muted)]">0</span>
+        </div>
+        <div id="list-todo" class="divide-y divide-[var(--hairline)]"></div>
+      </div>
+
+      <!-- Done -->
+      <div>
+        <div class="flex items-baseline justify-between pb-2 mb-1 border-b border-[var(--hairline)]">
+          <span class="text-xs font-mono uppercase tracking-wider text-[var(--muted)]">Done</span>
+          <span id="count-done" class="text-xs font-mono text-[var(--muted)]">0</span>
+        </div>
+        <div id="list-done" class="divide-y divide-[var(--hairline)]"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Shipped Ledger View (Quarter Overview) -->
+  <section id="shipped-ledger-view" class="hidden max-w-3xl mx-auto w-full px-4 sm:px-6 flex-1 flex flex-col select-none">
+    <div class="flex items-baseline justify-between pb-3 mb-4 border-b border-[var(--hairline)]">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-wider text-[var(--fg)] font-semibold">Shipped Ledger</span>
+        <span id="ledger-subhead" class="text-xs font-mono text-[var(--muted)] ml-2"></span>
+      </div>
+      <button type="button" onclick="toggleShippedView()" class="text-xs font-mono text-[var(--muted)] hover:text-[var(--fg)] underline decoration-dotted">return to active week ↵</button>
+    </div>
+    <div id="ledger-weeks-container" class="space-y-6 overflow-y-auto"></div>
+  </section>
+
+  <!-- Non-blocking Merge / Replace Team Dialogue -->
+  <div id="import-resolution-modal" class="hidden max-w-3xl mx-auto w-full px-4 sm:px-6 my-2 select-none">
+    <div class="py-2.5 px-3 border border-[var(--hairline)] rounded bg-[var(--bg)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+      <div class="flex items-center space-x-2">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--fg)]"></span>
+        <span id="import-incoming-count" class="text-[var(--fg)] font-medium">Incoming deliverables</span>
+      </div>
+      <div class="flex items-center space-x-3 shrink-0">
+        <button type="button" onclick="executeImport('merge')" class="text-[var(--fg)] underline underline-offset-4 hover:opacity-70 p-1">Merge (Append)</button>
+        <span class="opacity-30">·</span>
+        <button type="button" onclick="executeImport('replace')" class="text-[var(--fg)] underline underline-offset-4 hover:opacity-70 p-1">Replace All</button>
+        <span class="opacity-30">·</span>
+        <button type="button" onclick="cancelImport()" class="text-[var(--muted)] hover:text-[var(--fg)] p-1">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Minimal Footer -->
+  <footer class="py-6 max-w-3xl mx-auto w-full px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono text-[var(--muted)] select-none">
+    <span class="opacity-40 text-center sm:text-left">Click text to edit · Clear or tap × to delete</span>
+    <div class="flex items-center space-x-3 opacity-70 hover:opacity-100 transition-opacity">
+      <button type="button" id="clear-btn" onclick="promptClearAll()" class="hover:text-[var(--fg)] underline decoration-dotted underline-offset-2 p-1">clear</button>
+      <span class="opacity-30">/</span>
+      <button type="button" onclick="exportData()" class="hover:text-[var(--fg)] underline decoration-dotted underline-offset-2 p-1">export</button>
+      <span class="opacity-30">/</span>
+      <button type="button" onclick="document.getElementById('import-input').click()" class="hover:text-[var(--fg)] underline decoration-dotted underline-offset-2 p-1">import</button>
+      <input type="file" id="import-input" accept=".json" class="hidden" onchange="importData(event)">
+    </div>
+  </footer>
+
+  <script>
+    let tasks = [];
+    let currentWeek = 1;
+    let calendarWeek = 1;
+    let currentQuarterName = 'Q4';
+    let currentYear = 2026;
+    let quarterStartMonday = null;
+    let editingId = null;
+    let clearTimer = null;
+    let pendingIncomingTasks = null;
+    let activeDriFilter = null;
+    let showShippedView = false;
+
+    function getStorageKey() {
+      return `cadence_tasks_${currentYear}_${currentQuarterName}`;
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(getStorageKey(), JSON.stringify(tasks));
+      } catch (err) {
+        console.warn('Unable to persist to localStorage', err);
+      }
+    }
+
+    function loadFromStorage() {
+      try {
+        const raw = localStorage.getItem(getStorageKey());
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (err) {
+        console.warn('Unable to read from localStorage', err);
+      }
+      return null;
+    }
+
+    function calculateQuarterContext() {
+      const now = new Date();
+      currentYear = now.getFullYear();
+      const month = now.getMonth();
+      const qNum = Math.floor(month / 3) + 1;
+      currentQuarterName = `Q${qNum}`;
+
+      const quarterStartMonth = (qNum - 1) * 3;
+      const quarterStart = new Date(currentYear, quarterStartMonth, 1);
+      
+      const day = quarterStart.getDay();
+      const offsetToMonday = (day === 0) ? 1 : (day === 1 ? 0 : 8 - day);
+      quarterStart.setDate(quarterStart.getDate() + offsetToMonday);
+      quarterStartMonday = new Date(quarterStart);
+
+      const msDiff = now.getTime() - quarterStart.getTime();
+      const weekIndex = Math.floor(msDiff / (7 * 24 * 60 * 60 * 1000)) + 1;
+      calendarWeek = Math.max(1, Math.min(12, weekIndex));
+      return calendarWeek;
+    }
+
+    function getWeekDateRange(w) {
+      if (!quarterStartMonday) return '';
+      const start = new Date(quarterStartMonday);
+      start.setDate(start.getDate() + (w - 1) * 7);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 6);
+
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const sMonth = months[start.getMonth()];
+      const eMonth = months[end.getMonth()];
+
+      if (sMonth === eMonth) {
+        return `${sMonth} ${start.getDate()}–${end.getDate()}`;
+      }
+      return `${sMonth} ${start.getDate()}–${eMonth} ${end.getDate()}`;
+    }
+
+    function init() {
+      currentWeek = calculateQuarterContext();
+
+      const savedTasks = loadFromStorage();
+      if (savedTasks) {
+        tasks = savedTasks;
+      } else {
+        tasks = [
+          { id: "1", title: "Launch frictionless sign-up", status: false, dri: "Jay", week: currentWeek },
+          { id: "2", title: "Kill unused event telemetry", status: true, dri: "Elena", week: currentWeek },
+          { id: "3", title: "Zero-latency database query cache", status: false, dri: "Marcus", week: Math.min(12, currentWeek + 1) },
+          { id: "4", title: "Deliver design system tokens", status: true, dri: "Elena", week: Math.max(1, currentWeek - 1) }
+        ];
+        saveToStorage();
+      }
+
+      render();
+    }
+
+    function setDriFilter(name) {
+      if (activeDriFilter && activeDriFilter.toLowerCase() === name.toLowerCase()) {
+        activeDriFilter = null;
+      } else {
+        activeDriFilter = name;
+      }
+      render();
+    }
+
+    function clearDriFilter() {
+      activeDriFilter = null;
+      render();
+    }
+
+    function toggleShippedView() {
+      showShippedView = !showShippedView;
+      render();
+    }
+
+    function render() {
+      const activeCanvas = document.getElementById('active-canvas');
+      const scrubberSection = document.getElementById('scrubber-section');
+      const shippedLedgerView = document.getElementById('shipped-ledger-view');
+      const arrowIndicator = document.getElementById('shipped-toggle-arrow');
+
+      if (showShippedView) {
+        activeCanvas.classList.add('hidden');
+        scrubberSection.classList.add('opacity-40');
+        shippedLedgerView.classList.remove('hidden');
+        arrowIndicator.textContent = '↑ return';
+        renderShippedLedger();
+      } else {
+        activeCanvas.classList.remove('hidden');
+        scrubberSection.classList.remove('opacity-40');
+        shippedLedgerView.classList.add('hidden');
+        arrowIndicator.textContent = '↓ ledger';
+        renderLists();
+      }
+
+      renderScrubber();
+      renderTotals();
+    }
+
+    function renderTotals() {
+      const scopedTasks = activeDriFilter 
+        ? tasks.filter(t => (t.dri || '').toLowerCase() === activeDriFilter.toLowerCase())
+        : tasks;
+
+      const totalShipped = scopedTasks.filter(t => t.status).length;
+      const totalAll = scopedTasks.length;
+
+      document.getElementById('header-total-shipped').textContent = totalShipped;
+      document.getElementById('header-total-all').textContent = totalAll;
+      document.getElementById('quarter-label').textContent = currentQuarterName;
+      document.getElementById('active-week-label').textContent = `WEEK ${currentWeek}`;
+      document.getElementById('active-week-dates').textContent = `(${getWeekDateRange(currentWeek)})`;
+
+      const filterTag = document.getElementById('dri-filter-tag');
+      if (activeDriFilter) {
+        filterTag.textContent = `@${activeDriFilter} ×`;
+        filterTag.classList.remove('hidden');
+      } else {
+        filterTag.classList.add('hidden');
+      }
+    }
+
+    function renderShippedLedger() {
+      const container = document.getElementById('ledger-weeks-container');
+      const subhead = document.getElementById('ledger-subhead');
+      container.innerHTML = '';
+
+      subhead.textContent = activeDriFilter 
+        ? `Shipped by @${activeDriFilter} across ${currentQuarterName}` 
+        : `All Shipped Deliverables across ${currentQuarterName}`;
+
+      const scopedTasks = activeDriFilter
+        ? tasks.filter(t => (t.dri || '').toLowerCase() === activeDriFilter.toLowerCase())
+        : tasks;
+
+      const shippedTasks = scopedTasks.filter(t => t.status);
+
+      if (shippedTasks.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center text-xs font-mono text-[var(--muted)] opacity-60">
+            No completed items found ${activeDriFilter ? `for @${activeDriFilter}` : ''} yet this quarter.
+          </div>
+        `;
+        return;
+      }
+
+      for (let w = 12; w >= 1; w--) {
+        const weekShipped = shippedTasks.filter(t => t.week === w);
+        if (weekShipped.length === 0) continue;
+
+        const section = document.createElement('div');
+        section.className = 'pt-5 first:pt-0';
+
+        const header = document.createElement('div');
+        header.className = 'flex items-baseline justify-between mb-2 text-xs font-mono';
+        
+        const weekLabel = document.createElement('span');
+        weekLabel.className = 'text-[var(--fg)] font-semibold cursor-pointer hover:underline';
+        weekLabel.textContent = `WEEK ${w} · ${getWeekDateRange(w)}`;
+        weekLabel.onclick = () => {
+          currentWeek = w;
+          showShippedView = false;
+          render();
+        };
+
+        const countLabel = document.createElement('span');
+        countLabel.className = 'text-[var(--muted)] text-[11px]';
+        countLabel.textContent = `${weekShipped.length} shipped`;
+
+        header.appendChild(weekLabel);
+        header.appendChild(countLabel);
+        section.appendChild(header);
+
+        const list = document.createElement('div');
+        list.className = 'divide-y divide-[var(--hairline)]';
+
+        weekShipped.forEach(task => {
+          const row = document.createElement('div');
+          row.className = 'py-2 flex items-center justify-between text-sm';
+
+          const left = document.createElement('div');
+          left.className = 'flex items-center space-x-2.5 min-w-0';
+
+          const mark = document.createElement('span');
+          mark.className = 'text-[11px] font-mono text-[var(--muted)] opacity-60 select-none';
+          mark.textContent = '✓';
+
+          const title = document.createElement('span');
+          title.className = 'line-through text-[var(--muted)] break-words text-sm sm:text-base';
+          title.textContent = task.title;
+
+          left.appendChild(mark);
+          left.appendChild(title);
+
+          if (task.dri) {
+            const dri = document.createElement('span');
+            dri.className = 'text-xs font-mono text-[var(--muted)] shrink-0 ml-2 hover:text-[var(--fg)] cursor-pointer';
+            dri.textContent = `@${task.dri}`;
+            dri.onclick = () => setDriFilter(task.dri);
+            left.appendChild(dri);
+          }
+
+          row.appendChild(left);
+          list.appendChild(row);
+        });
+
+        section.appendChild(list);
+        container.appendChild(section);
+      }
+    }
+
+    function renderScrubber() {
+      const container = document.getElementById('week-scrubber');
+      container.innerHTML = '';
+
+      const scopedTasks = activeDriFilter
+        ? tasks.filter(t => (t.dri || '').toLowerCase() === activeDriFilter.toLowerCase())
+        : tasks;
+
+      for (let w = 1; w <= 12; w++) {
+        const weekTasks = scopedTasks.filter(t => t.week === w);
+        const total = weekTasks.length;
+        const shipped = weekTasks.filter(t => t.status).length;
+        const isActive = w === currentWeek;
+
+        const tab = document.createElement('div');
+        tab.className = `week-tab py-1.5 px-2 text-center select-none flex flex-col items-center ${isActive ? 'active' : 'text-[var(--muted)] hover:text-[var(--fg)]'}`;
+        tab.title = getWeekDateRange(w);
+        tab.onclick = () => {
+          currentWeek = w;
+          if (showShippedView) showShippedView = false;
+          render();
+        };
+
+        const dot = document.createElement('div');
+        dot.className = isActive ? 'current-week-dot' : 'current-week-dot-placeholder';
+
+        const label = document.createElement('div');
+        label.className = `text-xs font-mono tracking-tight leading-none ${isActive ? 'font-semibold text-[var(--fg)]' : ''}`;
+        label.textContent = `W${w}`;
+
+        const barTrack = document.createElement('div');
+        barTrack.className = 'w-full h-[2.5px] bg-[var(--bar-bg)] mt-2 rounded-full overflow-hidden flex';
+
+        if (total > 0) {
+          const shippedPct = (shipped / total) * 100;
+          const openPct = 100 - shippedPct;
+
+          if (shippedPct > 0) {
+            const shippedFill = document.createElement('div');
+            shippedFill.style.width = `${shippedPct}%`;
+            shippedFill.className = 'h-full bg-[var(--bar-fill)]';
+            barTrack.appendChild(shippedFill);
+          }
+
+          if (openPct > 0) {
+            const openFill = document.createElement('div');
+            openFill.style.width = `${openPct}%`;
+            openFill.className = 'h-full bg-[var(--bar-fill)] opacity-35';
+            barTrack.appendChild(openFill);
+          }
+        }
+
+        tab.appendChild(dot);
+        tab.appendChild(label);
+        tab.appendChild(barTrack);
+        container.appendChild(tab);
+      }
+    }
+
+    function createRow(task) {
+      const row = document.createElement('div');
+      row.className = 'task-row py-2.5 flex items-center justify-between text-sm sm:text-base group';
+
+      const checkWrapper = document.createElement('div');
+      checkWrapper.className = 'tactile-checkbox-wrapper';
+      checkWrapper.onclick = (e) => {
+        e.stopPropagation();
+        task.status = !task.status;
+        saveToStorage();
+        render();
+      };
+
+      const check = document.createElement('div');
+      check.className = `tactile-checkbox ${task.status ? 'checked' : ''}`;
+      checkWrapper.appendChild(check);
+
+      const center = document.createElement('div');
+      center.className = 'flex-1 min-w-0 flex items-center space-x-2 pl-1';
+
+      if (editingId === task.id) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = task.dri ? `${task.title} @${task.dri}` : task.title;
+        input.className = 'w-full bg-transparent border-b border-[var(--fg)] text-sm sm:text-base text-[var(--fg)] outline-none py-0.5 rounded-none';
+        input.setAttribute('autocapitalize', 'sentences');
+
+        const save = () => {
+          const val = input.value.trim();
+          if (!val) {
+            deleteTask(task.id);
+            return;
+          }
+          const match = val.match(/@(\w+)/);
+          task.title = match ? val.replace(/@\w+/, '').trim() : val;
+          task.dri = match ? match[1] : (task.dri || '');
+          editingId = null;
+          saveToStorage();
+          render();
+        };
+
+        input.onblur = save;
+        input.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            save();
+          } else if (e.key === 'Escape') {
+            editingId = null;
+            render();
+          } else if (e.key === 'Backspace' && input.value === '') {
+            deleteTask(task.id);
+          }
+        };
+
+        center.appendChild(input);
+        setTimeout(() => { input.focus(); input.select(); }, 15);
+      } else {
+        const text = document.createElement('span');
+        text.className = `text-sm sm:text-base leading-snug cursor-text break-words ${task.status ? 'line-through text-[var(--muted)]' : 'text-[var(--fg)]'}`;
+        text.textContent = task.title;
+        text.onclick = () => {
+          editingId = task.id;
+          render();
+        };
+        center.appendChild(text);
+
+        if (task.dri) {
+          const dri = document.createElement('span');
+          const isFilterActive = activeDriFilter && activeDriFilter.toLowerCase() === task.dri.toLowerCase();
+          dri.className = `text-xs font-mono cursor-pointer shrink-0 transition-colors ${
+            isFilterActive ? 'text-[var(--fg)] font-semibold underline underline-offset-2' : 'text-[var(--muted)] hover:text-[var(--fg)]'
+          }`;
+          dri.textContent = `@${task.dri}`;
+          dri.title = isFilterActive ? 'Click to show all team tasks' : `Filter board to @${task.dri}`;
+          dri.onclick = (e) => {
+            e.stopPropagation();
+            setDriFilter(task.dri);
+          };
+          center.appendChild(dri);
+        }
+      }
+
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.setAttribute('aria-label', 'Delete deliverable');
+      del.className = 'action-del text-base sm:text-sm font-mono text-[var(--muted)] hover:text-[var(--fg)]';
+      del.textContent = '×';
+      del.onclick = (e) => {
+        e.stopPropagation();
+        deleteTask(task.id);
+      };
+
+      row.appendChild(checkWrapper);
+      row.appendChild(center);
+      row.appendChild(del);
+
+      return row;
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      if (editingId === id) editingId = null;
+      saveToStorage();
+      render();
+    }
+
+    function renderLists() {
+      const todoList = document.getElementById('list-todo');
+      const doneList = document.getElementById('list-done');
+
+      todoList.innerHTML = '';
+      doneList.innerHTML = '';
+
+      const scopedTasks = activeDriFilter
+        ? tasks.filter(t => (t.dri || '').toLowerCase() === activeDriFilter.toLowerCase())
+        : tasks;
+
+      const currentTasks = scopedTasks.filter(t => t.week === currentWeek);
+      const todo = currentTasks.filter(t => !t.status);
+      const done = currentTasks.filter(t => t.status);
+
+      document.getElementById('count-todo').textContent = todo.length;
+      document.getElementById('count-done').textContent = done.length;
+
+      if (todo.length === 0) {
+        const emptyMsg = activeDriFilter 
+          ? `No deliverables for @${activeDriFilter} this week.`
+          : 'No deliverables this week.';
+        todoList.innerHTML = `<div class="py-5 text-xs font-mono text-[var(--muted)] opacity-50">${emptyMsg}</div>`;
+      } else {
+        todo.forEach(t => todoList.appendChild(createRow(t)));
+      }
+
+      if (done.length === 0) {
+        const emptyDoneMsg = activeDriFilter
+          ? `Nothing shipped by @${activeDriFilter} yet.`
+          : 'Nothing shipped yet.';
+        doneList.innerHTML = `<div class="py-5 text-xs font-mono text-[var(--muted)] opacity-50">${emptyDoneMsg}</div>`;
+      } else {
+        done.forEach(t => doneList.appendChild(createRow(t)));
+      }
+    }
+
+    function handleCapture(e) {
+      e.preventDefault();
+      const input = document.getElementById('capture-input');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const match = val.match(/@(\w+)/);
+      const dri = match ? match[1] : (activeDriFilter || 'Jay');
+      const title = match ? val.replace(/@\w+/, '').trim() : val;
+
+      tasks.unshift({
+        id: `t-${Date.now()}`,
+        title: title || val,
+        status: false,
+        dri: dri,
+        week: currentWeek
+      });
+
+      input.value = '';
+      saveToStorage();
+      render();
+    }
+
+    function promptClearAll() {
+      const btn = document.getElementById('clear-btn');
+      if (btn.getAttribute('data-confirm') === 'true') {
+        tasks = [];
+        saveToStorage();
+        render();
+        btn.textContent = 'clear';
+        btn.removeAttribute('data-confirm');
+        btn.classList.remove('text-red-500', 'font-semibold');
+        if (clearTimer) clearTimeout(clearTimer);
+        return;
+      }
+
+      btn.textContent = 'confirm clear?';
+      btn.setAttribute('data-confirm', 'true');
+      btn.classList.add('text-red-500', 'font-semibold');
+
+      if (clearTimer) clearTimeout(clearTimer);
+      clearTimer = setTimeout(() => {
+        btn.textContent = 'clear';
+        btn.removeAttribute('data-confirm');
+        btn.classList.remove('text-red-500', 'font-semibold');
+      }, 3500);
+    }
+
+    function exportData() {
+      try {
+        const payload = JSON.stringify({
+          quarter: currentQuarterName,
+          year: currentYear,
+          exportedAt: new Date().toISOString(),
+          tasks: tasks
+        }, null, 2);
+        const blob = new Blob([payload], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cadence-${currentYear}-${currentQuarterName}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.warn('Export error', err);
+      }
+    }
+
+    function importData(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = JSON.parse(e.target.result);
+          let incomingTasks = [];
+          if (Array.isArray(content)) {
+            incomingTasks = content;
+          } else if (content && Array.isArray(content.tasks)) {
+            incomingTasks = content.tasks;
+          }
+
+          if (incomingTasks.length === 0) {
+            event.target.value = '';
+            return;
+          }
+
+          if (tasks.length === 0) {
+            tasks = incomingTasks;
+            saveToStorage();
+            render();
+            event.target.value = '';
+            return;
+          }
+
+          pendingIncomingTasks = incomingTasks;
+          document.getElementById('import-incoming-count').textContent = 
+            `${incomingTasks.length} incoming deliverables found`;
+          document.getElementById('import-resolution-modal').classList.remove('hidden');
+
+        } catch (err) {
+          console.warn('Import parse error', err);
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    function executeImport(mode) {
+      if (!pendingIncomingTasks) return;
+
+      if (mode === 'replace') {
+        tasks = pendingIncomingTasks;
+      } else if (mode === 'merge') {
+        const existingKeys = new Set(
+          tasks.map(t => `${t.week}:${(t.title || '').trim().toLowerCase()}:${(t.dri || '').trim().toLowerCase()}`)
+        );
+
+        const newItems = [];
+        pendingIncomingTasks.forEach(item => {
+          const key = `${item.week}:${(item.title || '').trim().toLowerCase()}:${(item.dri || '').trim().toLowerCase()}`;
+          if (!existingKeys.has(key)) {
+            newItems.push({
+              ...item,
+              id: item.id || `t-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`
+            });
+            existingKeys.add(key);
+          } else {
+            const matched = tasks.find(t => 
+              `${t.week}:${(t.title || '').trim().toLowerCase()}:${(t.dri || '').trim().toLowerCase()}` === key
+            );
+            if (matched && item.status) {
+              matched.status = true;
+            }
+          }
+        });
+
+        tasks = [...tasks, ...newItems];
+      }
+
+      pendingIncomingTasks = null;
+      document.getElementById('import-resolution-modal').classList.add('hidden');
+      saveToStorage();
+      render();
+    }
+
+    function cancelImport() {
+      pendingIncomingTasks = null;
+      document.getElementById('import-resolution-modal').classList.add('hidden');
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && editingId === null) {
+        if (showShippedView) {
+          showShippedView = false;
+          render();
+        } else if (activeDriFilter) {
+          clearDriFilter();
+        }
+      }
+    });
+
+    window.onload = function() {
+      init();
+    };
+  </script>
+</body>
+</html>
