@@ -3,94 +3,160 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Cadence — Pure Focus Engine</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Cadence</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
     :root {
-      --bg: #fafafa;
+      --bg: #FAFAFA;
       --fg: #111111;
-      --muted: #888888;
+      --muted: #8E8E93;
       --hairline: rgba(0, 0, 0, 0.08);
-      --hairline-subtle: rgba(0, 0, 0, 0.04);
       --bar-bg: rgba(0, 0, 0, 0.06);
       --bar-fill: #111111;
-      --check-border: #bbbbbb;
-      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
+      --check-border: #999999;
+      --check-bg: #111111;
+      --check-tick: #FFFFFF;
+      --row-hover: rgba(0, 0, 0, 0.02);
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #000000;
-        --fg: #f3f3f3;
-        --muted: #737373;
-        --hairline: rgba(255, 255, 255, 0.10);
-        --hairline-subtle: rgba(255, 255, 255, 0.05);
-        --bar-bg: rgba(255, 255, 255, 0.12);
-        --bar-fill: #f3f3f3;
-        --check-border: #444444;
+        --fg: #F3F3F3;
+        --muted: #6B6B70;
+        --hairline: rgba(255, 255, 255, 0.08);
+        --bar-bg: rgba(255, 255, 255, 0.1);
+        --bar-fill: #F3F3F3;
+        --check-border: #4A4A4F;
+        --check-bg: #EDEDED;
+        --check-tick: #000000;
+        --row-hover: rgba(255, 255, 255, 0.03);
       }
     }
 
     body {
       background-color: var(--bg);
       color: var(--fg);
-      font-family: var(--font-sans);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       touch-action: manipulation;
+      min-height: 100dvh;
     }
 
-    .font-mono {
-      font-family: var(--font-mono);
+    /* Tactile circular checkbox */
+    .tactile-checkbox-wrapper {
+      min-width: 36px;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: -8px;
+      cursor: pointer;
     }
 
-    /* Minimalist tactile checkbox */
     .tactile-checkbox {
       width: 18px;
       height: 18px;
+      border-radius: 9999px;
       border: 1.5px solid var(--check-border);
-      border-radius: 50%;
-      cursor: pointer;
+      transition: all 120ms ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: all 120ms ease;
       background: transparent;
-      margin-top: 2px;
     }
 
-    .tactile-checkbox:hover {
+    .tactile-checkbox-wrapper:hover .tactile-checkbox {
       border-color: var(--fg);
     }
 
     .tactile-checkbox.checked {
-      background-color: var(--fg);
-      border-color: var(--fg);
+      background-color: var(--check-bg);
+      border-color: var(--check-bg);
     }
 
     .tactile-checkbox.checked::after {
       content: '';
-      width: 5px;
-      height: 8.5px;
-      border: solid var(--bg);
-      border-width: 0 1.75px 1.75px 0;
-      transform: rotate(45deg) translate(-0.5px, -1px);
+      width: 4.5px;
+      height: 9px;
+      border: solid var(--check-tick);
+      border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg) translate(-0.5px, -0.5px);
+      display: block;
     }
 
-    .del-btn {
-      opacity: 0.25;
-      transition: opacity 120ms ease, color 120ms ease;
+    .task-row {
+      border-bottom: 1px solid var(--hairline);
+      transition: background-color 80ms ease, opacity 140ms ease;
+    }
+    .task-row:hover {
+      background-color: var(--row-hover);
+    }
+
+    .action-del {
+      opacity: 0.35;
+      transition: opacity 120ms ease;
+      min-width: 32px;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     @media (hover: hover) {
-      .del-btn { opacity: 0; }
-      .task-item:hover .del-btn { opacity: 0.35; }
-      .task-item .del-btn:hover { opacity: 1; color: var(--fg); }
+      .action-del {
+        opacity: 0;
+      }
+      .task-row:hover .action-del,
+      .task-row:focus-within .action-del {
+        opacity: 0.6;
+      }
+    }
+    .action-del:hover,
+    .action-del:active {
+      opacity: 1 !important;
+    }
+
+    .week-tab {
+      cursor: pointer;
+      position: relative;
+      transition: all 120ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .week-tab.active {
+      color: var(--fg);
+    }
+    .current-week-dot {
+      width: 3.5px;
+      height: 3.5px;
+      border-radius: 9999px;
+      background-color: var(--fg);
+      margin: 0 auto 3px auto;
+    }
+    .current-week-dot-placeholder {
+      width: 3.5px;
+      height: 3.5px;
+      margin: 0 auto 3px auto;
+      visibility: hidden;
     }
 
     .no-scrollbar::-webkit-scrollbar {
@@ -100,239 +166,266 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-
-    .current-week-dot {
-      width: 4px;
-      height: 4px;
-      background-color: var(--fg);
-      border-radius: 50%;
-      margin-bottom: 3px;
-    }
-
-    .current-week-dot-placeholder {
-      width: 4px;
-      height: 4px;
-      margin-bottom: 3px;
-      visibility: hidden;
-    }
-
-    .week-tab {
-      transition: opacity 120ms ease;
-      cursor: pointer;
-    }
-
-    .week-tab:hover {
-      opacity: 1;
-    }
-
-    .week-tab.active {
-      opacity: 1;
-    }
   </style>
 </head>
-<body class="min-h-[100dvh] flex flex-col justify-between selection:bg-[var(--fg)] selection:text-[var(--bg)]">
+<body class="min-h-screen flex flex-col justify-between selection:bg-neutral-800 selection:text-white font-sans">
 
+  <!-- Responsive Header -->
   <header class="w-full pt-6 sm:pt-10 pb-4 sm:pb-6 max-w-3xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 select-none">
     <div class="flex items-baseline space-x-2 flex-wrap">
-      <button type="button" onclick="jumpToCurrentWeek()" title="Click to jump to active calendar week" class="text-xs font-semibold tracking-widest uppercase font-mono hover:opacity-60 transition-opacity flex items-center gap-1.5 cursor-pointer">
-        <span>CADENCE</span>
-      </button>
+      <button type="button" onclick="jumpToCurrentWeek()" title="Jump to current week" class="text-xs font-semibold tracking-widest uppercase font-mono hover:opacity-60 transition-opacity text-[var(--fg)] p-0 m-0 bg-transparent border-none cursor-pointer">CADENCE</button>
       <span class="text-xs font-mono text-[var(--muted)] opacity-40">/</span>
       <span id="quarter-label" class="text-xs font-mono text-[var(--muted)]">Q4</span>
       <span class="text-xs font-mono text-[var(--muted)] opacity-40">·</span>
-      <span id="active-week-label" class="text-xs font-mono text-[var(--fg)] font-medium">WEEK 1</span>
+      <span id="active-week-label" class="text-xs font-mono text-[var(--fg)]">WEEK 1</span>
       <span id="active-week-dates" class="text-[11px] font-mono text-[var(--muted)]"></span>
-      <span class="text-xs font-mono text-[var(--muted)] opacity-40 hidden sm:inline">·</span>
-      <span id="today-date-label" class="text-[11px] font-mono text-[var(--muted)] hidden sm:inline" title="Current calendar date"></span>
       <button type="button" id="dri-filter-tag" onclick="clearDriFilter()" class="hidden text-xs font-mono px-1.5 py-0.5 rounded bg-[var(--hairline)] hover:bg-[var(--fg)] hover:text-[var(--bg)] transition-colors"></button>
     </div>
     <div class="text-xs font-mono text-[var(--muted)] self-start sm:self-auto flex items-center space-x-1 cursor-pointer hover:text-[var(--fg)] transition-colors" onclick="toggleShippedView()" title="Toggle full quarter shipped ledger">
-      <span id="header-total-shipped">0</span>
+      <span id="header-total-shipped" class="text-[var(--fg)] font-medium">0</span>
       <span>of</span>
       <span id="header-total-all">0</span>
-      <span>total shipped</span>
-      <span class="text-[10px] ml-0.5 opacity-60" id="ledger-icon">↓</span>
+      <span>shipped</span>
+      <span id="shipped-toggle-arrow" class="text-[10px] ml-1 opacity-70 underline decoration-dotted">↓ ledger</span>
     </div>
   </header>
 
-  <div class="w-full max-w-3xl mx-auto px-4 sm:px-6 mb-8 sm:mb-12">
-    <div id="week-scrubber" class="grid grid-flow-col auto-cols-[3.25rem] sm:auto-cols-auto sm:grid-cols-12 gap-1 overflow-x-auto no-scrollbar py-1">
-      <!-- Week tabs dynamically injected -->
+  <!-- Scrubber -->
+  <section id="scrubber-section" class="max-w-3xl mx-auto w-full px-4 sm:px-6 mb-6 sm:mb-8 select-none transition-opacity">
+    <div class="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div class="grid grid-flow-col auto-cols-[3.25rem] sm:auto-cols-auto sm:grid-flow-row sm:grid-cols-12 gap-1 sm:gap-1.5 min-w-max sm:min-w-0" id="week-scrubber">
+        <!-- W1 to W12 generated dynamically -->
+      </div>
     </div>
-  </div>
+  </section>
 
-  <main class="w-full max-w-3xl mx-auto px-4 sm:px-6 flex-1 flex flex-col">
-    <!-- Capture Bar (only in active week view) -->
-    <div id="capture-container" class="mb-10 sm:mb-12">
-      <form id="capture-form" onsubmit="handleCapture(event)" class="relative border-b border-[var(--hairline)] focus-within:border-[var(--fg)] transition-colors duration-150">
-        <input 
-          id="capture-input" 
-          type="text" 
-          autocomplete="off" 
+  <!-- Active Canvas (To Do / Done) -->
+  <main id="active-canvas" class="max-w-3xl mx-auto w-full px-4 sm:px-6 flex-1 flex flex-col space-y-8 sm:space-y-10">
+
+    <!-- Frictionless Capture Underline -->
+    <div>
+      <form onsubmit="handleCapture(event)">
+        <input
+          id="capture-input"
+          type="text"
+          placeholder="New deliverable, assign with @Name & press Enter..."
+          class="w-full bg-transparent border-b border-[var(--hairline)] focus:border-[var(--fg)] py-2 sm:py-2.5 text-base sm:text-lg text-[var(--fg)] placeholder:text-[var(--muted)] outline-none transition-colors rounded-none"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="sentences"
           spellcheck="false"
-          placeholder="What are you shipping this week? Type title @DRI and press enter..."
-          class="w-full bg-transparent py-2.5 sm:py-3 text-base sm:text-lg outline-none placeholder:text-[var(--muted)] placeholder:opacity-50 font-normal rounded-none"
         />
-        <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center space-x-2 text-[11px] font-mono text-[var(--muted)] pointer-events-none opacity-40 hidden sm:flex">
-          <span>return ↵</span>
-        </div>
       </form>
     </div>
 
-    <!-- Active Deliverables Section (To Do & Done) -->
-    <div id="board-container" class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 flex-1">
-      <!-- To Do Column -->
-      <section class="flex flex-col">
-        <div class="flex items-baseline justify-between pb-3 border-b border-[var(--hairline)] mb-4">
-          <h2 class="text-xs font-mono font-medium tracking-wider text-[var(--muted)] uppercase">TO DO</h2>
-          <span id="todo-count" class="text-xs font-mono text-[var(--muted)]">0</span>
+    <!-- Binary To Do / Done Columns -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12 flex-1 items-start">
+      
+      <!-- To Do -->
+      <div>
+        <div class="flex items-baseline justify-between pb-2 mb-1 border-b border-[var(--hairline)]">
+          <span class="text-xs font-mono uppercase tracking-wider text-[var(--muted)]">To Do</span>
+          <span id="count-todo" class="text-xs font-mono text-[var(--muted)]">0</span>
         </div>
-        <div id="todo-list" class="flex flex-col divide-y divide-[var(--hairline-subtle)] flex-1 min-h-[160px]">
-          <!-- Items injected -->
-        </div>
-      </section>
-
-      <!-- Done Column -->
-      <section class="flex flex-col">
-        <div class="flex items-baseline justify-between pb-3 border-b border-[var(--hairline)] mb-4">
-          <h2 class="text-xs font-mono font-medium tracking-wider text-[var(--muted)] uppercase">DONE</h2>
-          <span id="done-count" class="text-xs font-mono text-[var(--muted)]">0</span>
-        </div>
-        <div id="done-list" class="flex flex-col divide-y divide-[var(--hairline-subtle)] flex-1 min-h-[160px]">
-          <!-- Items injected -->
-        </div>
-      </section>
-    </div>
-
-    <!-- Shipped Ledger View (Toggleable across all 12 weeks) -->
-    <div id="shipped-ledger-view" class="hidden flex-1 flex flex-col">
-      <div class="flex items-baseline justify-between pb-3 border-b border-[var(--hairline)] mb-6">
-        <div class="flex items-center space-x-2">
-          <h2 class="text-xs font-mono font-semibold tracking-wider uppercase">SHIPPED LEDGER</h2>
-          <span class="text-xs font-mono text-[var(--muted)]">· FULL HORIZON</span>
-        </div>
-        <button type="button" onclick="toggleShippedView()" class="text-xs font-mono text-[var(--muted)] hover:text-[var(--fg)] underline underline-offset-4 cursor-pointer">
-          return to active week ↵
-        </button>
+        <div id="list-todo" class="divide-y divide-[var(--hairline)]"></div>
       </div>
-      <div id="ledger-content" class="flex flex-col space-y-8 pb-12">
-        <!-- Rendered week rollups -->
+
+      <!-- Done -->
+      <div>
+        <div class="flex items-baseline justify-between pb-2 mb-1 border-b border-[var(--hairline)]">
+          <span class="text-xs font-mono uppercase tracking-wider text-[var(--muted)]">Done</span>
+          <span id="count-done" class="text-xs font-mono text-[var(--muted)]">0</span>
+        </div>
+        <div id="list-done" class="divide-y divide-[var(--hairline)]"></div>
       </div>
+
     </div>
   </main>
 
-  <footer class="w-full max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 border-t border-[var(--hairline-subtle)] mt-12 flex flex-col sm:flex-row justify-between items-center text-xs font-mono text-[var(--muted)] gap-3 select-none">
-    <div class="flex items-center space-x-2">
-      <span class="opacity-40">12-week rolling cadence</span>
+  <!-- Shipped Ledger View (Quarter Overview) -->
+  <section id="shipped-ledger-view" class="hidden max-w-3xl mx-auto w-full px-4 sm:px-6 flex-1 flex flex-col select-none">
+    <div class="flex items-baseline justify-between pb-3 mb-4 border-b border-[var(--hairline)]">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-wider text-[var(--fg)] font-semibold">Shipped Ledger</span>
+        <span id="ledger-subhead" class="text-xs font-mono text-[var(--muted)] ml-2"></span>
+      </div>
+      <button type="button" onclick="toggleShippedView()" class="text-xs font-mono text-[var(--muted)] hover:text-[var(--fg)] underline decoration-dotted">return to active week ↵</button>
     </div>
-    
-    <div class="flex items-center space-x-3">
-      <button type="button" onclick="exportData()" class="hover:text-[var(--fg)] transition-colors cursor-pointer">export</button>
-      <span class="opacity-30">/</span>
-      <button type="button" onclick="importData()" class="hover:text-[var(--fg)] transition-colors cursor-pointer">import</button>
-      <span class="opacity-30">/</span>
-      <button type="button" id="clear-board-btn" onclick="promptClearAll()" class="hover:text-[var(--fg)] transition-colors cursor-pointer">clear</button>
-      <input type="file" id="file-import-input" accept=".json" class="hidden" onchange="handleFileSelected(event)">
-    </div>
-  </footer>
+    <div id="ledger-weeks-container" class="space-y-6 overflow-y-auto"></div>
+  </section>
 
-  <!-- Non-blocking Import Resolution Notification -->
-  <div id="import-resolution-modal" class="fixed bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 w-[92%] max-w-md bg-[var(--bg)] border border-[var(--fg)] shadow-2xl p-4 rounded-sm hidden z-50">
-    <div class="text-xs font-mono mb-2">Importing <span id="import-count-label" class="font-bold">0</span> deliverables</div>
-    <div class="text-xs text-[var(--muted)] mb-3">Choose whether to append team items or replace current board state.</div>
-    <div class="flex items-center justify-end space-x-3 font-mono text-xs">
-      <button type="button" onclick="cancelImport()" class="px-2 py-1 text-[var(--muted)] hover:text-[var(--fg)]">cancel</button>
-      <button type="button" onclick="executeImport('merge')" class="px-2.5 py-1 bg-[var(--hairline)] hover:bg-[var(--fg)] hover:text-[var(--bg)] rounded-sm">merge</button>
-      <button type="button" onclick="executeImport('replace')" class="px-2.5 py-1 border border-[var(--fg)] hover:bg-[var(--fg)] hover:text-[var(--bg)] rounded-sm">replace all</button>
+  <!-- Non-blocking Merge / Replace Team Dialogue -->
+  <div id="import-resolution-modal" class="hidden max-w-3xl mx-auto w-full px-4 sm:px-6 my-2 select-none">
+    <div class="py-2.5 px-3 border border-[var(--hairline)] rounded bg-[var(--bg)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+      <div class="flex items-center space-x-2">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-[var(--fg)]"></span>
+        <span id="import-incoming-count" class="text-[var(--fg)] font-medium">Incoming deliverables</span>
+      </div>
+      <div class="flex items-center space-x-3 shrink-0">
+        <button type="button" onclick="executeImport('merge')" class="text-[var(--fg)] underline underline-offset-4 hover:opacity-70 p-1">Merge (Append)</button>
+        <span class="opacity-30">·</span>
+        <button type="button" onclick="executeImport('replace')" class="text-[var(--fg)] underline underline-offset-4 hover:opacity-70 p-1">Replace All</button>
+        <span class="opacity-30">·</span>
+        <button type="button" onclick="cancelImport()" class="text-[var(--muted)] hover:text-[var(--fg)] p-1">Cancel</button>
+      </div>
     </div>
   </div>
 
+  <!-- Minimal Footer -->
+  <footer class="py-6 max-w-3xl mx-auto w-full px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono text-[var(--muted)] select-none">
+    <span class="opacity-40 text-center sm:text-left">Click text to edit · Clear or tap × to delete</span>
+    <div class="flex items-center space-x-3 opacity-70 hover:opacity-100 transition-opacity">
+      <button type="button" id="clear-btn" onclick="promptClearAll()" class="hover:text-[var(--fg)] underline decoration-dotted underline-offset-2 p-1">clear</button>
+      <span class="opacity-30">/</span>
+      <button type="button" onclick="exportData()" class="hover:text-[var(--fg)] underline decoration-dotted underline-offset-2 p-1">export</button>
+      <span class="opacity-30">/</span>
+      <button type="button" onclick="document.getElementById('import-input').click()" class="hover:text-[var(--fg)] underline decoration-dotted underline-offset-2 p-1">import</button>
+      <input type="file" id="import-input" accept=".json" class="hidden" onchange="importData(event)">
+    </div>
+  </footer>
+
   <script>
+    let tasks = [];
     let currentWeek = 1;
     let calendarWeek = 1;
-    let currentQuarterName = 'Q1';
-    let currentQuarterYear = new Date().getFullYear();
-    let currentQuarterStart = null;
+    let currentQuarterName = 'Q4';
+    let currentYear = 2026;
+    let quarterStartMonday = null;
+    let editingId = null;
+    let clearTimer = null;
+    let pendingIncomingTasks = null;
     let activeDriFilter = null;
     let showShippedView = false;
-    let clearConfirmTimeout = null;
-    let pendingImportPayload = null;
-
-    // Seed Data
-    const defaultTasks = [
-      { id: 't-1', title: 'Ship responsive canvas layout', status: true, dri: 'Jay', week: 1 },
-      { id: 't-2', title: 'Implement zero-friction inline capture', status: true, dri: 'Elena', week: 1 },
-      { id: 't-3', title: 'Refactor binary status transitions', status: false, dri: 'Jay', week: 1 },
-      { id: 't-4', title: 'Add quarterly volume indicators', status: false, dri: 'Elena', week: 1 },
-      { id: 't-5', title: 'Execute full telemetry audit', status: false, dri: 'Marc', week: 2 },
-      { id: 't-6', title: 'Finalize core client contracts', status: true, dri: 'Marc', week: 2 },
-      { id: 't-7', title: 'Refactor authentication edge tokens', status: false, dri: 'Jay', week: 3 }
-    ];
-
-    let tasks = [];
-
-    function calculateQuarterContext() {
-      const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth(); // 0-11
-      const quarterIndex = Math.floor(currentMonth / 3);
-      const quarterNames = ['Q1', 'Q2', 'Q3', 'Q4'];
-      
-      currentQuarterName = quarterNames[quarterIndex];
-      currentQuarterYear = currentYear;
-
-      // Start of the calendar quarter
-      const startOfQuarterMonth = quarterIndex * 3;
-      const qStart = new Date(currentYear, startOfQuarterMonth, 1);
-      
-      // Align to the Monday of that week
-      const dayOfWeek = qStart.getDay();
-      const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-      qStart.setDate(qStart.getDate() + diffToMonday);
-      qStart.setHours(0, 0, 0, 0);
-      currentQuarterStart = qStart;
-
-      // Calculate the real-world current week (1-12)
-      const diffTime = now.getTime() - qStart.getTime();
-      const diffWeeks = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000)) + 1;
-      calendarWeek = Math.max(1, Math.min(12, diffWeeks));
-    }
-
-    function getWeekDateRange(w) {
-      if (!currentQuarterStart) return '';
-      const start = new Date(currentQuarterStart);
-      start.setDate(start.getDate() + (w - 1) * 7);
-      
-      const end = new Date(start);
-      end.setDate(end.getDate() + 6);
-
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      return `${months[start.getMonth()]} ${start.getDate()}–${months[end.getMonth()]} ${end.getDate()}`;
-    }
 
     function getStorageKey() {
-      return `cadence_tasks_${currentQuarterYear}_${currentQuarterName}`;
+      return `cadence_tasks_${currentYear}_${currentQuarterName}`;
     }
 
     function saveToStorage() {
       try {
         localStorage.setItem(getStorageKey(), JSON.stringify(tasks));
-      } catch (e) {
-        console.warn('Storage unavailable or quota exceeded', e);
+      } catch (err) {
+        console.warn('Unable to persist to localStorage', err);
       }
     }
 
     function loadFromStorage() {
       try {
-        const stored = localStorage.getItem(getStorageKey());
-        if (stored) {
-          tasks = JSON.parse(stored);
-          return true;
+        const raw = localStorage.getItem(getStorageKey());
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
         }
-      } catch (e) {
-        console.warn('Error reading storage', e);
+      } catch (err) {
+        console.warn('Unable to read from localStorage', err);
       }
-      return false;
+      return null;
+    }
+
+    function calculateQuarterContext() {
+      const now = new Date();
+      currentYear = now.getFullYear();
+      const month = now.getMonth();
+      const qNum = Math.floor(month / 3) + 1;
+      currentQuarterName = `Q${qNum}`;
+
+      const quarterStartMonth = (qNum - 1) * 3;
+      const quarterStart = new Date(currentYear, quarterStartMonth, 1);
+      
+      const day = quarterStart.getDay();
+      const offsetToMonday = (day === 0) ? 1 : (day === 1 ? 0 : 8 - day);
+      quarterStart.setDate(quarterStart.getDate() + offsetToMonday);
+      quarterStartMonday = new Date(quarterStart);
+
+      const msDiff = now.getTime() - quarterStart.getTime();
+      const weekIndex = Math.floor(msDiff / (7 * 24 * 60 * 60 * 1000)) + 1;
+      calendarWeek = Math.max(1, Math.min(12, weekIndex));
+      return calendarWeek;
+    }
+
+    function getWeekDateRange(w) {
+      if (!quarterStartMonday) return '';
+      const start = new Date(quarterStartMonday);
+      start.setDate(start.getDate() + (w - 1) * 7);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 6);
+
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const sMonth = months[start.getMonth()];
+      const eMonth = months[end.getMonth()];
+
+      if (sMonth === eMonth) {
+        return `${sMonth} ${start.getDate()}–${end.getDate()}`;
+      }
+      return `${sMonth} ${start.getDate()}–${eMonth} ${end.getDate()}`;
+    }
+
+    function init() {
+      currentWeek = calculateQuarterContext();
+
+      const savedTasks = loadFromStorage();
+      if (savedTasks) {
+        tasks = savedTasks;
+      } else {
+        tasks = [
+          { id: "1", title: "Launch frictionless sign-up", status: false, dri: "Jay", week: currentWeek },
+          { id: "2", title: "Kill unused event telemetry", status: true, dri: "Elena", week: currentWeek },
+          { id: "3", title: "Zero-latency database query cache", status: false, dri: "Marcus", week: Math.min(12, currentWeek + 1) },
+          { id: "4", title: "Deliver design system tokens", status: true, dri: "Elena", week: Math.max(1, currentWeek - 1) }
+        ];
+        saveToStorage();
+      }
+
+      render();
+    }
+
+    function setDriFilter(name) {
+      if (activeDriFilter && activeDriFilter.toLowerCase() === name.toLowerCase()) {
+        activeDriFilter = null;
+      } else {
+        activeDriFilter = name;
+      }
+      render();
+    }
+
+    function jumpToCurrentWeek() {
+      currentWeek = calendarWeek;
+      if (showShippedView) showShippedView = false;
+      render();
+    }
+
+    function clearDriFilter() {
+      activeDriFilter = null;
+      render();
+    }
+
+    function toggleShippedView() {
+      showShippedView = !showShippedView;
+      render();
+    }
+
+    function render() {
+      const activeCanvas = document.getElementById('active-canvas');
+      const scrubberSection = document.getElementById('scrubber-section');
+      const shippedLedgerView = document.getElementById('shipped-ledger-view');
+      const arrowIndicator = document.getElementById('shipped-toggle-arrow');
+
+      if (showShippedView) {
+        activeCanvas.classList.add('hidden');
+        scrubberSection.classList.add('opacity-40');
+        shippedLedgerView.classList.remove('hidden');
+        arrowIndicator.textContent = '↑ return';
+        renderShippedLedger();
+      } else {
+        activeCanvas.classList.remove('hidden');
+        scrubberSection.classList.remove('opacity-40');
+        shippedLedgerView.classList.add('hidden');
+        arrowIndicator.textContent = '↓ ledger';
+        renderLists();
+      }
+
+      renderScrubber();
+      renderTotals();
     }
 
     function renderTotals() {
@@ -346,16 +439,8 @@
       document.getElementById('header-total-shipped').textContent = totalShipped;
       document.getElementById('header-total-all').textContent = totalAll;
       document.getElementById('quarter-label').textContent = currentQuarterName;
-      document.getElementById('active-week-label').textContent = `WEEK ${currentWeek}${currentWeek === calendarWeek ? ' (CURRENT)' : ''}`;
+      document.getElementById('active-week-label').textContent = `WEEK ${currentWeek}`;
       document.getElementById('active-week-dates').textContent = `(${getWeekDateRange(currentWeek)})`;
-
-      const todayEl = document.getElementById('today-date-label');
-      if (todayEl) {
-        const now = new Date();
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        todayEl.textContent = `Today: ${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
-      }
 
       const filterTag = document.getElementById('dri-filter-tag');
       if (activeDriFilter) {
@@ -363,6 +448,95 @@
         filterTag.classList.remove('hidden');
       } else {
         filterTag.classList.add('hidden');
+      }
+    }
+
+    function renderShippedLedger() {
+      const container = document.getElementById('ledger-weeks-container');
+      const subhead = document.getElementById('ledger-subhead');
+      container.innerHTML = '';
+
+      subhead.textContent = activeDriFilter 
+        ? `Shipped by @${activeDriFilter} across ${currentQuarterName}` 
+        : `All Shipped Deliverables across ${currentQuarterName}`;
+
+      const scopedTasks = activeDriFilter
+        ? tasks.filter(t => (t.dri || '').toLowerCase() === activeDriFilter.toLowerCase())
+        : tasks;
+
+      const shippedTasks = scopedTasks.filter(t => t.status);
+
+      if (shippedTasks.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center text-xs font-mono text-[var(--muted)] opacity-60">
+            No completed items found ${activeDriFilter ? `for @${activeDriFilter}` : ''} yet this quarter.
+          </div>
+        `;
+        return;
+      }
+
+      for (let w = 12; w >= 1; w--) {
+        const weekShipped = shippedTasks.filter(t => t.week === w);
+        if (weekShipped.length === 0) continue;
+
+        const section = document.createElement('div');
+        section.className = 'pt-5 first:pt-0';
+
+        const header = document.createElement('div');
+        header.className = 'flex items-baseline justify-between mb-2 text-xs font-mono';
+        
+        const weekLabel = document.createElement('span');
+        weekLabel.className = 'text-[var(--fg)] font-semibold cursor-pointer hover:underline';
+        weekLabel.textContent = `WEEK ${w} · ${getWeekDateRange(w)}`;
+        weekLabel.onclick = () => {
+          currentWeek = w;
+          showShippedView = false;
+          render();
+        };
+
+        const countLabel = document.createElement('span');
+        countLabel.className = 'text-[var(--muted)] text-[11px]';
+        countLabel.textContent = `${weekShipped.length} shipped`;
+
+        header.appendChild(weekLabel);
+        header.appendChild(countLabel);
+        section.appendChild(header);
+
+        const list = document.createElement('div');
+        list.className = 'divide-y divide-[var(--hairline)]';
+
+        weekShipped.forEach(task => {
+          const row = document.createElement('div');
+          row.className = 'py-2 flex items-center justify-between text-sm';
+
+          const left = document.createElement('div');
+          left.className = 'flex items-center space-x-2.5 min-w-0';
+
+          const mark = document.createElement('span');
+          mark.className = 'text-[11px] font-mono text-[var(--muted)] opacity-60 select-none';
+          mark.textContent = '✓';
+
+          const title = document.createElement('span');
+          title.className = 'line-through text-[var(--muted)] break-words text-sm sm:text-base';
+          title.textContent = task.title;
+
+          left.appendChild(mark);
+          left.appendChild(title);
+
+          if (task.dri) {
+            const dri = document.createElement('span');
+            dri.className = 'text-xs font-mono text-[var(--muted)] shrink-0 ml-2 hover:text-[var(--fg)] cursor-pointer';
+            dri.textContent = `@${task.dri}`;
+            dri.onclick = () => setDriFilter(task.dri);
+            left.appendChild(dri);
+          }
+
+          row.appendChild(left);
+          list.appendChild(row);
+        });
+
+        section.appendChild(list);
+        container.appendChild(section);
       }
     }
 
@@ -378,12 +552,11 @@
         const weekTasks = scopedTasks.filter(t => t.week === w);
         const total = weekTasks.length;
         const shipped = weekTasks.filter(t => t.status).length;
-        const isSelected = w === currentWeek;
-        const isCalendarNow = w === calendarWeek;
+        const isActive = w === currentWeek;
 
         const tab = document.createElement('div');
-        tab.className = `week-tab py-1.5 px-2 text-center select-none flex flex-col items-center ${isSelected ? 'active' : 'text-[var(--muted)] hover:text-[var(--fg)]'}`;
-        tab.title = `${getWeekDateRange(w)}${isCalendarNow ? ' (Current Week)' : ''}`;
+        tab.className = `week-tab py-1.5 px-2 text-center select-none flex flex-col items-center ${isActive ? 'active' : 'text-[var(--muted)] hover:text-[var(--fg)]'}`;
+        tab.title = getWeekDateRange(w);
         tab.onclick = () => {
           currentWeek = w;
           if (showShippedView) showShippedView = false;
@@ -391,16 +564,10 @@
         };
 
         const dot = document.createElement('div');
-        if (isSelected) {
-          dot.className = 'current-week-dot';
-        } else if (isCalendarNow) {
-          dot.className = 'w-[4px] h-[4px] rounded-full border border-[var(--fg)] opacity-70 mb-[3px]';
-        } else {
-          dot.className = 'current-week-dot-placeholder';
-        }
+        dot.className = isActive ? 'current-week-dot' : 'current-week-dot-placeholder';
 
         const label = document.createElement('div');
-        label.className = `text-xs font-mono tracking-tight leading-none ${isSelected ? 'font-semibold text-[var(--fg)]' : ''} ${isCalendarNow && !isSelected ? 'text-[var(--fg)] font-medium' : ''}`;
+        label.className = `text-xs font-mono tracking-tight leading-none ${isActive ? 'font-semibold text-[var(--fg)]' : ''}`;
         label.textContent = `W${w}`;
 
         const barTrack = document.createElement('div');
@@ -432,172 +599,147 @@
       }
     }
 
-    function renderLists() {
-      const todoList = document.getElementById('todo-list');
-      const doneList = document.getElementById('done-list');
-      todoList.innerHTML = '';
-      doneList.innerHTML = '';
-
-      let weekTasks = tasks.filter(t => t.week === currentWeek);
-      if (activeDriFilter) {
-        weekTasks = weekTasks.filter(t => (t.dri || '').toLowerCase() === activeDriFilter.toLowerCase());
-      }
-
-      const todos = weekTasks.filter(t => !t.status);
-      const dones = weekTasks.filter(t => t.status);
-
-      document.getElementById('todo-count').textContent = todos.length;
-      document.getElementById('done-count').textContent = dones.length;
-
-      if (todos.length === 0) {
-        todoList.innerHTML = `<div class="py-6 text-xs text-[var(--muted)] opacity-50 italic font-mono select-none">No active commitments for Week ${currentWeek}.</div>`;
-      } else {
-        todos.forEach(task => todoList.appendChild(createTaskNode(task)));
-      }
-
-      if (dones.length === 0) {
-        doneList.innerHTML = `<div class="py-6 text-xs text-[var(--muted)] opacity-50 italic font-mono select-none">Nothing shipped yet this week.</div>`;
-      } else {
-        dones.forEach(task => doneList.appendChild(createTaskNode(task)));
-      }
-    }
-
-    function createTaskNode(task) {
+    function createRow(task) {
       const row = document.createElement('div');
-      row.className = 'task-item group flex items-start justify-between py-2.5 sm:py-3 transition-colors';
-      row.id = `item-${task.id}`;
+      row.className = 'task-row py-2.5 flex items-center justify-between text-sm sm:text-base group';
 
-      const left = document.createElement('div');
-      left.className = 'flex items-start space-x-3 flex-1 min-w-0 pr-3';
-
-      const check = document.createElement('button');
-      check.type = 'button';
-      check.className = `tactile-checkbox ${task.status ? 'checked' : ''}`;
-      check.setAttribute('aria-label', task.status ? 'Mark incomplete' : 'Mark complete');
-      check.onclick = (e) => {
+      const checkWrapper = document.createElement('div');
+      checkWrapper.className = 'tactile-checkbox-wrapper';
+      checkWrapper.onclick = (e) => {
         e.stopPropagation();
-        toggleStatus(task.id);
+        task.status = !task.status;
+        saveToStorage();
+        render();
       };
 
-      const titleContainer = document.createElement('div');
-      titleContainer.className = 'flex-1 min-w-0 flex items-baseline flex-wrap gap-x-2';
+      const check = document.createElement('div');
+      check.className = `tactile-checkbox ${task.status ? 'checked' : ''}`;
+      checkWrapper.appendChild(check);
 
-      const titleSpan = document.createElement('span');
-      titleSpan.className = `text-sm sm:text-base leading-snug cursor-text break-words ${task.status ? 'line-through text-[var(--muted)] opacity-60' : 'text-[var(--fg)]'}`;
-      titleSpan.textContent = task.title;
-      titleSpan.onclick = () => enableInlineEdit(task, titleContainer, titleSpan);
+      const center = document.createElement('div');
+      center.className = 'flex-1 min-w-0 flex items-center space-x-2 pl-1';
 
-      titleContainer.appendChild(titleSpan);
+      if (editingId === task.id) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = task.dri ? `${task.title} @${task.dri}` : task.title;
+        input.className = 'w-full bg-transparent border-b border-[var(--fg)] text-sm sm:text-base text-[var(--fg)] outline-none py-0.5 rounded-none';
+        input.setAttribute('autocapitalize', 'sentences');
 
-      if (task.dri) {
-        const driSpan = document.createElement('button');
-        driSpan.type = 'button';
-        driSpan.className = 'text-xs font-mono text-[var(--muted)] hover:text-[var(--fg)] transition-colors select-none cursor-pointer';
-        driSpan.textContent = `@${task.dri}`;
-        driSpan.title = `Filter by @${task.dri}`;
-        driSpan.onclick = (e) => {
-          e.stopPropagation();
-          setDriFilter(task.dri);
+        const save = () => {
+          const val = input.value.trim();
+          if (!val) {
+            deleteTask(task.id);
+            return;
+          }
+          const match = val.match(/@(\w+)/);
+          task.title = match ? val.replace(/@\w+/, '').trim() : val;
+          task.dri = match ? match[1] : (task.dri || '');
+          editingId = null;
+          saveToStorage();
+          render();
         };
-        titleContainer.appendChild(driSpan);
-      }
 
-      left.appendChild(check);
-      left.appendChild(titleContainer);
+        input.onblur = save;
+        input.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            save();
+          } else if (e.key === 'Escape') {
+            editingId = null;
+            render();
+          } else if (e.key === 'Backspace' && input.value === '') {
+            deleteTask(task.id);
+          }
+        };
+
+        center.appendChild(input);
+        setTimeout(() => { input.focus(); input.select(); }, 15);
+      } else {
+        const text = document.createElement('span');
+        text.className = `text-sm sm:text-base leading-snug cursor-text break-words ${task.status ? 'line-through text-[var(--muted)]' : 'text-[var(--fg)]'}`;
+        text.textContent = task.title;
+        text.onclick = () => {
+          editingId = task.id;
+          render();
+        };
+        center.appendChild(text);
+
+        if (task.dri) {
+          const dri = document.createElement('span');
+          const isFilterActive = activeDriFilter && activeDriFilter.toLowerCase() === task.dri.toLowerCase();
+          dri.className = `text-xs font-mono cursor-pointer shrink-0 transition-colors ${
+            isFilterActive ? 'text-[var(--fg)] font-semibold underline underline-offset-2' : 'text-[var(--muted)] hover:text-[var(--fg)]'
+          }`;
+          dri.textContent = `@${task.dri}`;
+          dri.title = isFilterActive ? 'Click to show all team tasks' : `Filter board to @${task.dri}`;
+          dri.onclick = (e) => {
+            e.stopPropagation();
+            setDriFilter(task.dri);
+          };
+          center.appendChild(dri);
+        }
+      }
 
       const del = document.createElement('button');
       del.type = 'button';
-      del.className = 'del-btn text-base font-mono leading-none p-1 text-[var(--muted)] hover:text-[var(--fg)] select-none cursor-pointer';
+      del.setAttribute('aria-label', 'Delete deliverable');
+      del.className = 'action-del text-base sm:text-sm font-mono text-[var(--muted)] hover:text-[var(--fg)]';
       del.textContent = '×';
-      del.title = 'Delete deliverable';
       del.onclick = (e) => {
         e.stopPropagation();
         deleteTask(task.id);
       };
 
-      row.appendChild(left);
+      row.appendChild(checkWrapper);
+      row.appendChild(center);
       row.appendChild(del);
+
       return row;
     }
 
-    function renderShippedLedger() {
-      const container = document.getElementById('ledger-content');
-      container.innerHTML = '';
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      if (editingId === id) editingId = null;
+      saveToStorage();
+      render();
+    }
+
+    function renderLists() {
+      const todoList = document.getElementById('list-todo');
+      const doneList = document.getElementById('list-done');
+
+      todoList.innerHTML = '';
+      doneList.innerHTML = '';
 
       const scopedTasks = activeDriFilter
         ? tasks.filter(t => (t.dri || '').toLowerCase() === activeDriFilter.toLowerCase())
         : tasks;
 
-      const shipped = scopedTasks.filter(t => t.status);
+      const currentTasks = scopedTasks.filter(t => t.week === currentWeek);
+      const todo = currentTasks.filter(t => !t.status);
+      const done = currentTasks.filter(t => t.status);
 
-      if (shipped.length === 0) {
-        container.innerHTML = `<div class="py-12 text-center text-sm font-mono text-[var(--muted)] opacity-60">No shipped deliverables recorded yet this quarter.</div>`;
-        return;
+      document.getElementById('count-todo').textContent = todo.length;
+      document.getElementById('count-done').textContent = done.length;
+
+      if (todo.length === 0) {
+        const emptyMsg = activeDriFilter 
+          ? `No deliverables for @${activeDriFilter} this week.`
+          : 'No deliverables this week.';
+        todoList.innerHTML = `<div class="py-5 text-xs font-mono text-[var(--muted)] opacity-50">${emptyMsg}</div>`;
+      } else {
+        todo.forEach(t => todoList.appendChild(createRow(t)));
       }
 
-      // Group deliverables by week (12 down to 1)
-      for (let w = 12; w >= 1; w--) {
-        const weekShipped = shipped.filter(t => t.week === w);
-        if (weekShipped.length === 0) continue;
-
-        const section = document.createElement('div');
-        section.className = 'flex flex-col border-b border-[var(--hairline-subtle)] pb-6';
-
-        const header = document.createElement('div');
-        header.className = 'flex items-baseline justify-between mb-3';
-
-        const title = document.createElement('div');
-        title.className = 'text-xs font-mono font-medium';
-        title.innerHTML = `<span class="text-[var(--fg)]">WEEK ${w}</span> <span class="text-[var(--muted)] opacity-60 ml-2">(${getWeekDateRange(w)})</span>`;
-
-        const count = document.createElement('div');
-        count.className = 'text-xs font-mono text-[var(--muted)]';
-        count.textContent = `${weekShipped.length} shipped`;
-
-        header.appendChild(title);
-        header.appendChild(count);
-        section.appendChild(header);
-
-        const list = document.createElement('div');
-        list.className = 'flex flex-col space-y-2';
-
-        weekShipped.forEach(t => {
-          const row = document.createElement('div');
-          row.className = 'flex items-baseline justify-between text-sm';
-
-          const left = document.createElement('div');
-          left.className = 'flex items-baseline space-x-2';
-          left.innerHTML = `<span class="text-[var(--fg)] opacity-80 line-through">${escapeHtml(t.title)}</span>`;
-
-          if (t.dri) {
-            left.innerHTML += `<span class="text-xs font-mono text-[var(--muted)]">@${escapeHtml(t.dri)}</span>`;
-          }
-
-          row.appendChild(left);
-          list.appendChild(row);
-        });
-
-        section.appendChild(list);
-        container.appendChild(section);
+      if (done.length === 0) {
+        const emptyDoneMsg = activeDriFilter
+          ? `Nothing shipped by @${activeDriFilter} yet.`
+          : 'Nothing shipped yet.';
+        doneList.innerHTML = `<div class="py-5 text-xs font-mono text-[var(--muted)] opacity-50">${emptyDoneMsg}</div>`;
+      } else {
+        done.forEach(t => doneList.appendChild(createRow(t)));
       }
-    }
-
-    function escapeHtml(str) {
-      return (str || '').replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
-    }
-
-    function toggleStatus(id) {
-      tasks = tasks.map(t => t.id === id ? { ...t, status: !t.status } : t);
-      saveToStorage();
-      render();
-    }
-
-    function deleteTask(id) {
-      tasks = tasks.filter(t => t.id !== id);
-      saveToStorage();
-      render();
     }
 
     function handleCapture(e) {
@@ -606,21 +748,13 @@
       const val = input.value.trim();
       if (!val) return;
 
-      const driMatch = val.match(/@(\w+)/);
-      let dri = driMatch ? driMatch[1] : null;
-      let title = val.replace(/@\w+/, '').trim();
+      const match = val.match(/@(\w+)/);
+      const dri = match ? match[1] : (activeDriFilter || 'Jay');
+      const title = match ? val.replace(/@\w+/, '').trim() : val;
 
-      if (!dri && activeDriFilter) {
-        dri = activeDriFilter;
-      }
-
-      if (!title && dri) {
-        title = `Focus commitment`;
-      }
-
-      tasks.push({
-        id: 't-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
-        title: title,
+      tasks.unshift({
+        id: `t-${Date.now()}`,
+        title: title || val,
         status: false,
         dri: dri,
         week: currentWeek
@@ -631,223 +765,142 @@
       render();
     }
 
-    function enableInlineEdit(task, container, textElement) {
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.className = 'bg-transparent text-sm sm:text-base border-b border-[var(--fg)] outline-none w-full py-0 font-normal rounded-none';
-      input.value = task.dri ? `${task.title} @${task.dri}` : task.title;
-
-      container.innerHTML = '';
-      container.appendChild(input);
-      input.focus();
-
-      let isFinished = false;
-
-      const save = () => {
-        if (isFinished) return;
-        isFinished = true;
-
-        const val = input.value.trim();
-        if (!val) {
-          deleteTask(task.id);
-          return;
-        }
-
-        const driMatch = val.match(/@(\w+)/);
-        const dri = driMatch ? driMatch[1] : null;
-        const title = val.replace(/@\w+/, '').trim();
-
-        tasks = tasks.map(t => t.id === task.id ? {
-          ...t,
-          title: title || task.title,
-          dri: dri
-        } : t);
-
+    function promptClearAll() {
+      const btn = document.getElementById('clear-btn');
+      if (btn.getAttribute('data-confirm') === 'true') {
+        tasks = [];
         saveToStorage();
         render();
-      };
-
-      input.onkeydown = (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          save();
-        } else if (e.key === 'Escape') {
-          e.preventDefault();
-          isFinished = true;
-          render();
-        } else if (e.key === 'Backspace' && input.value.trim() === '') {
-          e.preventDefault();
-          deleteTask(task.id);
-        }
-      };
-
-      input.onblur = save;
-    }
-
-    function setDriFilter(dri) {
-      activeDriFilter = dri;
-      render();
-    }
-
-    function clearDriFilter() {
-      activeDriFilter = null;
-      render();
-    }
-
-    function jumpToCurrentWeek() {
-      calculateQuarterContext();
-      currentWeek = calendarWeek;
-      if (showShippedView) showShippedView = false;
-      render();
-    }
-
-    function toggleShippedView() {
-      showShippedView = !showShippedView;
-      const board = document.getElementById('board-container');
-      const capture = document.getElementById('capture-container');
-      const ledger = document.getElementById('shipped-ledger-view');
-      const icon = document.getElementById('ledger-icon');
-
-      if (showShippedView) {
-        board.classList.add('hidden');
-        capture.classList.add('hidden');
-        ledger.classList.remove('hidden');
-        icon.textContent = '↑ board';
-        renderShippedLedger();
-      } else {
-        board.classList.remove('hidden');
-        capture.classList.remove('hidden');
-        ledger.classList.add('hidden');
-        icon.textContent = '↓';
-        render();
+        btn.textContent = 'clear';
+        btn.removeAttribute('data-confirm');
+        btn.classList.remove('text-red-500', 'font-semibold');
+        if (clearTimer) clearTimeout(clearTimer);
+        return;
       }
+
+      btn.textContent = 'confirm clear?';
+      btn.setAttribute('data-confirm', 'true');
+      btn.classList.add('text-red-500', 'font-semibold');
+
+      if (clearTimer) clearTimeout(clearTimer);
+      clearTimer = setTimeout(() => {
+        btn.textContent = 'clear';
+        btn.removeAttribute('data-confirm');
+        btn.classList.remove('text-red-500', 'font-semibold');
+      }, 3500);
     }
 
     function exportData() {
-      const payload = {
-        app: "cadence",
-        year: currentQuarterYear,
-        quarter: currentQuarterName,
-        exportedAt: new Date().toISOString(),
-        tasks: tasks
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `cadence-${currentQuarterYear}-${currentQuarterName}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      try {
+        const payload = JSON.stringify({
+          quarter: currentQuarterName,
+          year: currentYear,
+          exportedAt: new Date().toISOString(),
+          tasks: tasks
+        }, null, 2);
+        const blob = new Blob([payload], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cadence-${currentYear}-${currentQuarterName}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.warn('Export error', err);
+      }
     }
 
-    function importData() {
-      document.getElementById('file-import-input').click();
-    }
-
-    function handleFileSelected(event) {
+    function importData(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const parsed = JSON.parse(e.target.result);
-          const importedTasks = Array.isArray(parsed) ? parsed : (parsed.tasks || []);
-          
-          if (!Array.isArray(importedTasks) || importedTasks.length === 0) {
+          const content = JSON.parse(e.target.result);
+          let incomingTasks = [];
+          if (Array.isArray(content)) {
+            incomingTasks = content;
+          } else if (content && Array.isArray(content.tasks)) {
+            incomingTasks = content.tasks;
+          }
+
+          if (incomingTasks.length === 0) {
+            event.target.value = '';
             return;
           }
 
           if (tasks.length === 0) {
-            tasks = importedTasks;
+            tasks = incomingTasks;
             saveToStorage();
             render();
+            event.target.value = '';
             return;
           }
 
-          pendingImportPayload = importedTasks;
-          document.getElementById('import-count-label').textContent = importedTasks.length;
+          pendingIncomingTasks = incomingTasks;
+          document.getElementById('import-incoming-count').textContent = 
+            `${incomingTasks.length} incoming deliverables found`;
           document.getElementById('import-resolution-modal').classList.remove('hidden');
+
         } catch (err) {
-          console.warn('Invalid JSON file format', err);
+          console.warn('Import parse error', err);
         }
+        event.target.value = '';
       };
       reader.readAsText(file);
-      event.target.value = '';
-    }
-
-    function cancelImport() {
-      pendingImportPayload = null;
-      document.getElementById('import-resolution-modal').classList.add('hidden');
     }
 
     function executeImport(mode) {
-      if (!pendingImportPayload) return;
+      if (!pendingIncomingTasks) return;
 
       if (mode === 'replace') {
-        tasks = pendingImportPayload;
+        tasks = pendingIncomingTasks;
       } else if (mode === 'merge') {
-        const existingKeys = new Set(tasks.map(t => `${t.week}-${(t.title || '').trim().toLowerCase()}-${(t.dri || '').toLowerCase()}`));
-        const toAdd = [];
+        const existingKeys = new Set(
+          tasks.map(t => `${t.week}:${(t.title || '').trim().toLowerCase()}:${(t.dri || '').trim().toLowerCase()}`)
+        );
 
-        pendingImportPayload.forEach(item => {
-          const key = `${item.week}-${(item.title || '').trim().toLowerCase()}-${(item.dri || '').toLowerCase()}`;
+        const newItems = [];
+        pendingIncomingTasks.forEach(item => {
+          const key = `${item.week}:${(item.title || '').trim().toLowerCase()}:${(item.dri || '').trim().toLowerCase()}`;
           if (!existingKeys.has(key)) {
-            toAdd.push(item);
+            newItems.push({
+              ...item,
+              id: item.id || `t-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`
+            });
             existingKeys.add(key);
           } else {
-            if (item.status) {
-              tasks = tasks.map(t => {
-                const curKey = `${t.week}-${(t.title || '').trim().toLowerCase()}-${(t.dri || '').toLowerCase()}`;
-                return curKey === key ? { ...t, status: true } : t;
-              });
+            const matched = tasks.find(t => 
+              `${t.week}:${(t.title || '').trim().toLowerCase()}:${(t.dri || '').trim().toLowerCase()}` === key
+            );
+            if (matched && item.status) {
+              matched.status = true;
             }
           }
         });
 
-        tasks = [...tasks, ...toAdd];
+        tasks = [...tasks, ...newItems];
       }
 
+      pendingIncomingTasks = null;
+      document.getElementById('import-resolution-modal').classList.add('hidden');
       saveToStorage();
-      cancelImport();
       render();
     }
 
-    function promptClearAll() {
-      const btn = document.getElementById('clear-board-btn');
-      if (btn.dataset.confirming === "true") {
-        clearTimeout(clearConfirmTimeout);
-        tasks = [];
-        saveToStorage();
-        btn.textContent = 'clear';
-        btn.dataset.confirming = "false";
-        render();
-      } else {
-        btn.textContent = 'confirm clear?';
-        btn.dataset.confirming = "true";
-        clearConfirmTimeout = setTimeout(() => {
-          btn.textContent = 'clear';
-          btn.dataset.confirming = "false";
-        }, 3500);
-      }
-    }
-
-    function render() {
-      renderTotals();
-      renderScrubber();
-      if (showShippedView) {
-        renderShippedLedger();
-      } else {
-        renderLists();
-      }
+    function cancelImport() {
+      pendingIncomingTasks = null;
+      document.getElementById('import-resolution-modal').classList.add('hidden');
     }
 
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && editingId === null) {
         if (showShippedView) {
-          toggleShippedView();
+          showShippedView = false;
+          render();
         } else if (activeDriFilter) {
           clearDriFilter();
         }
@@ -855,16 +908,7 @@
     });
 
     window.onload = function() {
-      calculateQuarterContext();
-      currentWeek = calendarWeek;
-
-      const loaded = loadFromStorage();
-      if (!loaded) {
-        tasks = [...defaultTasks];
-        saveToStorage();
-      }
-
-      render();
+      init();
     };
   </script>
 </body>
