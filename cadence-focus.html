@@ -368,10 +368,8 @@
         tasks = savedTasks;
       } else {
         tasks = [
-          { id: "1", title: "Launch frictionless sign-up", status: false, dri: "Jay", week: currentWeek },
-          { id: "2", title: "Kill unused event telemetry", status: true, dri: "Elena", week: currentWeek },
-          { id: "3", title: "Zero-latency database query cache", status: false, dri: "Marcus", week: Math.min(12, currentWeek + 1) },
-          { id: "4", title: "Deliver design system tokens", status: true, dri: "Elena", week: Math.max(1, currentWeek - 1) }
+          { id: "1", title: "Launch frictionless sign-up", status: false, dri: "", week: currentWeek },
+          { id: "2", title: "Kill unused event telemetry", status: true, dri: "", week: currentWeek }
         ];
         saveToStorage();
       }
@@ -523,7 +521,8 @@
           left.appendChild(mark);
           left.appendChild(title);
 
-          if (task.dri) {
+          const uniqueDriCount = getDistinctDriCount();
+          if (task.dri && uniqueDriCount >= 2) {
             const dri = document.createElement('span');
             dri.className = 'text-xs font-mono text-[var(--muted)] shrink-0 ml-2 hover:text-[var(--fg)] cursor-pointer';
             dri.textContent = `@${task.dri}`;
@@ -570,26 +569,33 @@
         label.className = `text-xs font-mono tracking-tight leading-none ${isActive ? 'font-semibold text-[var(--fg)]' : ''}`;
         label.textContent = `W${w}`;
 
+        // Fixed-height, perfectly aligned track for every week cell
         const barTrack = document.createElement('div');
-        barTrack.className = 'w-full h-[2.5px] bg-[var(--bar-bg)] mt-2 rounded-full overflow-hidden flex';
+        barTrack.className = 'w-full h-[2.5px] bg-[var(--bar-bg)] mt-2 rounded-full overflow-hidden relative';
 
         if (total > 0) {
-          const shippedPct = (shipped / total) * 100;
+          const shippedPct = Math.round((shipped / total) * 100);
           const openPct = 100 - shippedPct;
+
+          // Inner wrapper spanning full width to avoid subpixel baseline collapse
+          const innerFlex = document.createElement('div');
+          innerFlex.className = 'w-full h-full flex absolute inset-0';
 
           if (shippedPct > 0) {
             const shippedFill = document.createElement('div');
             shippedFill.style.width = `${shippedPct}%`;
-            shippedFill.className = 'h-full bg-[var(--bar-fill)]';
-            barTrack.appendChild(shippedFill);
+            shippedFill.className = 'h-full bg-[var(--bar-fill)] shrink-0';
+            innerFlex.appendChild(shippedFill);
           }
 
           if (openPct > 0) {
             const openFill = document.createElement('div');
             openFill.style.width = `${openPct}%`;
-            openFill.className = 'h-full bg-[var(--bar-fill)] opacity-35';
-            barTrack.appendChild(openFill);
+            openFill.className = 'h-full bg-[var(--bar-fill)] opacity-30 shrink-0';
+            innerFlex.appendChild(openFill);
           }
+
+          barTrack.appendChild(innerFlex);
         }
 
         tab.appendChild(dot);
@@ -665,7 +671,8 @@
         };
         center.appendChild(text);
 
-        if (task.dri) {
+        const uniqueDriCount = getDistinctDriCount();
+        if (task.dri && uniqueDriCount >= 2) {
           const dri = document.createElement('span');
           const isFilterActive = activeDriFilter && activeDriFilter.toLowerCase() === task.dri.toLowerCase();
           dri.className = `text-xs font-mono cursor-pointer shrink-0 transition-colors ${
@@ -698,11 +705,11 @@
       return row;
     }
 
-    function deleteTask(id) {
-      tasks = tasks.filter(t => t.id !== id);
-      if (editingId === id) editingId = null;
-      saveToStorage();
-      render();
+    function getDistinctDriCount() {
+      const names = new Set(
+        tasks.map(t => (t.dri || '').trim().toLowerCase()).filter(Boolean)
+      );
+      return names.size;
     }
 
     function renderLists() {
@@ -749,7 +756,7 @@
       if (!val) return;
 
       const match = val.match(/@(\w+)/);
-      const dri = match ? match[1] : (activeDriFilter || 'Jay');
+      const dri = match ? match[1] : (activeDriFilter || '');
       const title = match ? val.replace(/@\w+/, '').trim() : val;
 
       tasks.unshift({
