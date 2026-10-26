@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Today">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Today</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231c1b19'/%3E%3Cpath d='M18 33l10 10 19-22' fill='none' stroke='%23faf9f6' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#faf9f6; --surface:#ffffff; --fg:#1c1b19; --muted:#8a867f; --line:#e9e6df;
+  --accent:#d9480f; --ok:#2f9e63;
+  --serif:ui-serif,"New York","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e0e0f;--surface:#19191b;--fg:#f3f1ec;--muted:#8d8981;--line:#2b2b2e;--accent:#ff8a5c;--ok:#4cc38a}
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font:17px/1.45 var(--sans);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;min-height:100vh;min-height:100dvh}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
+a{color:inherit}
+input,textarea{font:inherit;font-size:17px;color:var(--fg)}
+#app{max-width:600px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) calc(72px + env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))}
+#app.in{animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.top{display:flex;justify-content:space-between;align-items:center;min-height:48px;color:var(--muted);font-size:15px}
+.back{color:var(--muted);font-weight:500;min-height:44px;display:inline-flex;align-items:center;text-decoration:none;font-size:16px;padding-right:16px}
+h1{font-family:var(--serif);font-size:clamp(32px,9vw,46px);line-height:1.08;font-weight:500;letter-spacing:-.02em;margin:14px 0 8px}
+.sub{color:var(--muted);font-size:17px;margin-bottom:8px}
+.meta{color:var(--muted);font-size:15px}
+
+.note{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--fg);color:var(--bg);border-radius:14px;padding:4px 6px 4px 16px;font-size:15px;margin:6px 0 2px;min-height:44px;animation:fade .25s ease}
+.note button{font-weight:700;text-decoration:underline;text-underline-offset:3px;min-height:44px;padding:0 12px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px 20px 16px;margin-top:14px;cursor:pointer;transition:opacity .3s,transform .15s;animation:fade .3s ease both}
+.card:active{transform:scale(.992)}
+.card .head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.card .name{font-family:var(--serif);font-size:27px;line-height:1.15;font-weight:500;letter-spacing:-.01em;padding-top:2px;overflow-wrap:anywhere}
+.later{font-size:14px;color:var(--muted);min-height:44px;padding:0 4px 0 14px;margin:-8px -4px 0 0;flex:none}
+.since{color:var(--muted);font-size:15px;margin-top:4px}
+.quote{font-family:var(--serif);font-style:italic;font-size:17px;margin-top:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.actions{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;text-decoration:none;font-size:15px;font-weight:500;background:var(--surface)}
+.pill:active{background:var(--bg)}
+.spacer{flex:1}
+.check{width:52px;height:52px;border-radius:50%;background:var(--fg);color:var(--bg);display:grid;place-items:center;transition:transform .15s;flex:none}
+.check:active{transform:scale(.9)}
+.card.done{opacity:.6}
+.donetag{color:var(--ok);font-weight:600;font-size:15px;display:flex;gap:6px;align-items:center;min-height:44px}
+
+input.field,textarea,.search,#app input.add-in{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:13px 15px;outline:none;-webkit-appearance:none;appearance:none}
+textarea:focus,input.field:focus,.search:focus,#app input.add-in:focus{border-color:var(--fg)}
+.card input.field{background:var(--bg)}
+.logrow{display:flex;gap:10px;align-items:center;margin-top:16px;width:100%}
+.logrow input{flex:1;min-width:0}
+.add{margin-top:22px}
+#app input.add-in{background:transparent;border-style:dashed}
+#app input.add-in:focus{border-style:solid}
+
+textarea{resize:none;line-height:1.5;min-height:52px;display:block}
+#rem{background:var(--surface);font-family:var(--serif);font-size:18px;min-height:96px}
+#app input.h1in{font-family:var(--serif);font-size:clamp(32px,9vw,46px);font-weight:500;letter-spacing:-.02em;line-height:1.1;background:transparent;border:0;border-radius:0;padding:6px 0;margin:10px 0 2px;width:100%;outline:none;-webkit-appearance:none}
+#app input.h1in:focus{box-shadow:0 1px 0 var(--fg)}
+#app .fields{display:flex;gap:16px;flex-wrap:wrap}
+#app .fields input{flex:1;min-width:150px;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:10px 0;font-size:16px;outline:none;-webkit-appearance:none}
+#app .fields input:focus{border-bottom-color:var(--fg)}
+.cyc{color:var(--muted);font-size:15px;min-height:44px;text-decoration:underline dotted;text-underline-offset:4px}
+.quick{display:flex;gap:8px;flex-wrap:wrap}
+.quick:empty{display:none}
+.cap{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:28px 0 10px}
+
+.hist{width:100%;text-align:left;display:flex;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);min-height:48px}
+.hist .d{flex:none;width:64px;color:var(--muted);font-size:15px;padding-top:1px}
+.hist .t{overflow-wrap:anywhere}
+.hist .t.empty{color:var(--muted)}
+.hist.editing{align-items:center;gap:10px}
+.hist.editing input{flex:1;min-width:0}
+.tb{color:var(--muted);font-size:15px;min-height:44px;padding:0 8px;font-weight:500}
+.tb.danger{color:var(--accent)}
+.none{color:var(--muted);padding:6px 0}
+.snooze{display:block;margin-top:30px;color:var(--muted);font-size:15px;min-height:44px}
+.snooze.danger{color:var(--accent)}
+
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 0;border-bottom:1px solid var(--line);min-height:58px}
+.row .n{font-family:var(--serif);font-size:20px;overflow-wrap:anywhere}
+.row .l{color:var(--muted);font-size:15px;flex:none}
+.row .l.due{color:var(--accent);font-weight:600}
+.search{margin:8px 0 6px}
+.settings{margin-top:36px;border-top:1px solid var(--line);padding-top:6px}
+.setrow{display:flex;justify-content:space-between;align-items:center;min-height:56px;gap:12px}
+.step{display:flex;align-items:center;gap:4px}
+.step button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);font-size:22px;line-height:1;background:var(--surface)}
+.step b{min-width:28px;text-align:center;font-size:19px}
+.small{color:var(--muted);font-size:14px;margin-top:10px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .pill{cursor:pointer}
+.pending{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:8px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pending span{flex:1;min-width:200px}
+
+.foot{margin-top:40px;display:flex;gap:22px;align-items:center;color:var(--muted);font-size:15px;flex-wrap:wrap}
+.foot a,.foot button{color:var(--fg);font-weight:500;text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.foot .nudge{color:var(--accent)}
+.foot .hint{display:none;margin-left:auto;font-size:13px}
+@media (hover:hover) and (pointer:fine){.foot .hint{display:block}}
+
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (min-width:700px){#app{padding-top:40px}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<input type="file" id="file" accept="application/json,.json" hidden>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- storage ---------- */
+const KEY = 'today.v1';
+const blank = () => ({ people: [], perDay: 3, today: null, lastBackup: null });
+let memoryOnly = false;
+let S = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) { const d = JSON.parse(raw); if (d && Array.isArray(d.people)) return Object.assign(blank(), d); }
+  } catch (e) { memoryOnly = true; }
+  return blank();
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch (e) { if (!memoryOnly) { memoryOnly = true; setNote('This browser is blocking storage. Changes will not be kept.'); } }
+}
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
+const DAY = 864e5;
+const sod = t => { const d = new Date(t); d.setHours(0,0,0,0); return d.getTime(); };
+const addDays = (t, n) => { const d = new Date(t); d.setDate(d.getDate() + n); d.setHours(0,0,0,0); return d.getTime(); };
+const diff = (a, b) => Math.round((sod(b) - sod(a)) / DAY);
+const key = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+const pl = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+const first = n => (String(n).trim().split(/\s+/)[0]) || n;
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const byId = id => S.people.find(p => p.id === id);
+const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+const WORDS = ['no','one','two','three','four','five','six','seven','eight','nine','ten'];
+const CADS = [7, 30, 90, 365];
+const cadNice = p => ({7:'Every week',30:'Every month',90:'Every quarter',365:'Every year'}[p.cadence] || 'Every ' + pl(p.cadence,'day'));
+const fmtDate = t => { const o = { day:'2-digit', month:'short' }; if (new Date(t).getFullYear() !== new Date().getFullYear()) o.year = 'numeric'; return new Date(t).toLocaleDateString(undefined, o); };
+const fine = () => window.matchMedia && matchMedia('(pointer:fine)').matches;
+
+const lastLog = p => p.log.length ? Math.max(...p.log.map(l => l.t)) : null;
+const effDue = p => {
+  const l = lastLog(p);
+  let d = l ? addDays(l, p.cadence) : sod(p.created);
+  if (p.snooze && p.snooze > d) d = p.snooze;
+  return d;
+};
+const doneToday = p => p.log.some(l => key(l.t) === key(Date.now()));
+const span = d => d < 14 ? pl(d,'day') : d < 60 ? pl(Math.round(d/7),'week') : d < 730 ? pl(Math.round(d/30),'month') : pl(Math.round(d/365),'year');
+const since = p => {
+  const l = lastLog(p); if (!l) return 'New. Say hello.';
+  const d = diff(l, Date.now());
+  return d === 0 ? 'You spoke today' : d === 1 ? 'You spoke yesterday' : span(d) + ' since you spoke';
+};
+const dueLabel = p => {
+  const n = diff(Date.now(), effDue(p));
+  return n < 0 ? 'overdue' : n === 0 ? 'due today' : n === 1 ? 'tomorrow' : 'in ' + span(n);
+};
+const quoteOf = p => {
+  const line = (p.remember || '').split('\n').map(s => s.trim()).find(Boolean);
+  if (line) return line;
+  const l = p.log.filter(l => l.text).sort((a,b) => b.t - a.t)[0];
+  return l ? l.text : '';
+};
+
+/* ---------- in-page state (no popups) ---------- */
+const ui = { logging: null, editLog: null, pending: null, focus: null };
+let note = null, noteTimer;
+function setNote(msg, undo) {
+  note = { msg, undo: undo || null };
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(() => { note = null; const n = $('.note'); if (n) n.remove(); }, 8000);
+}
+const noteHtml = () => note ? `<p class="note" role="status"><span>${esc(note.msg)}</span>${note.undo ? '<button data-act="undo">Undo</button>' : ''}</p>` : '';
+
+/* ---------- today's set ---------- */
+const score = (p, t) => (t - effDue(p)) / DAY / p.cadence;
+function candidates() {
+  const t = sod(Date.now());
+  return S.people.filter(p => effDue(p) <= t).sort((a,b) => score(b,t) - score(a,t) || a.name.localeCompare(b.name));
+}
+function ensureToday() {
+  const k = key(Date.now());
+  if (!S.today || S.today.day !== k) S.today = { day: k, ids: [] };
+  let ids = S.today.ids.filter(id => byId(id));
+  const keep = id => doneToday(byId(id)) || key(byId(id).created) === k;   // finished or just added: never bumped
+  while (ids.length > S.perDay) {
+    let i = -1;
+    for (let j = ids.length - 1; j >= 0; j--) if (!keep(ids[j])) { i = j; break; }
+    if (i < 0) break;
+    ids.splice(i, 1);
+  }
+  for (const p of candidates()) {
+    if (ids.length >= S.perDay) break;
+    if (!ids.includes(p.id)) ids.push(p.id);
+  }
+  S.today.ids = ids;
+  return ids.map(byId);
+}
+
+/* ---------- routing ---------- */
+function route() {
+  const h = location.hash.slice(1) || '/';
+  const m = h.match(/^\/p\/(.+)$/);
+  if (m && byId(decodeURIComponent(m[1]))) return { v: 'person', id: decodeURIComponent(m[1]) };
+  if (h === '/all') return { v: 'all' };
+  return { v: 'today' };
+}
+let lastRoute = '';
+function render() {
+  const r = route();
+  const app = $('#app');
+  let html = ({ today: vToday, person: vPerson, all: vAll })[r.v](r);
+  html = html.replace('</header>', '</header>' + noteHtml());
+  app.innerHTML = html;
+  const rk = r.v + (r.id || '');
+  if (rk !== lastRoute) {
+    lastRoute = rk; ui.logging = null; ui.editLog = null;
+    window.scrollTo(0, 0);
+    app.classList.remove('in'); void app.offsetWidth; app.classList.add('in');
+  }
+  const rem = $('#rem'); if (rem) grow(rem);
+  if (r.v === 'all') { const q = $('#q'); if (q && q.value) filterRows(q.value); }
+  if (ui.focus) { const el = $(ui.focus); if (el) el.focus(); ui.focus = null; }
+}
+window.addEventListener('hashchange', render);
+document.addEventListener('visibilitychange', () => {
+  const a = document.activeElement;
+  if (!document.hidden && !(a && /^(INPUT|TEXTAREA)$/.test(a.tagName))) render();
+});
+
+/* ---------- views ---------- */
+const CHECK = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+function contactPills(p) {
+  let h = '';
+  const phone = (p.phone || '').trim(), email = (p.email || '').trim();
+  const tel = phone.replace(/[^\d+]/g, '');
+  if (phone) h += `<a class="pill" href="tel:${esc(tel)}">Call</a><a class="pill" href="sms:${esc(tel)}">Message</a>`;
+  if (email) h += `<a class="pill" href="mailto:${esc(email)}">Email</a>`;
+  return h;
+}
+const addField = () => `<form class="add" data-form="add"><input class="add-in" id="add-name" name="name" placeholder="Add someone" aria-label="Add someone" autocomplete="off" autocapitalize="words" enterkeyhint="done"><button hidden type="submit"></button></form>`;
+const logField = (p, ph) => `<form class="logrow" data-form="log" data-id="${esc(p.id)}"><input class="field" id="f-text" name="text" placeholder="${esc(ph)}" autocomplete="off" enterkeyhint="done"><button class="check" aria-label="Save: I spoke with ${esc(p.name)}">${CHECK}</button></form>`;
+
+function card(p) {
+  const done = doneToday(p);
+  let q = quoteOf(p);
+  if (done) { const t = p.log.filter(l => key(l.t) === key(Date.now()) && l.text).sort((a,b) => b.t - a.t)[0]; q = t ? t.text : q; }
+  const logging = ui.logging === p.id && !done;
+  let actions;
+  if (done) actions = `<span class="donetag">${CHECK.replace('width="24" height="24"','width="18" height="18"')} Spoke today</span>`;
+  else if (logging) actions = logField(p, 'What did you talk about?');
+  else actions = `${contactPills(p)}<span class="spacer"></span><button class="check" data-act="startlog" data-id="${esc(p.id)}" aria-label="I spoke with ${esc(p.name)}">${CHECK}</button>`;
+  return `<article class="card ${done ? 'done' : ''}" data-act="person" data-id="${esc(p.id)}">
+    <div class="head"><h2 class="name">${esc(p.name)}</h2>${done ? '' : `<button class="later" data-act="later" data-id="${esc(p.id)}" aria-label="Not today: ${esc(p.name)}">Later</button>`}</div>
+    ${done ? '' : `<p class="since">${esc(since(p))}</p>`}
+    ${q ? `<p class="quote">“${esc(q)}”</p>` : ''}
+    <div class="actions">${actions}</div>
+  </article>`;
+}
+
+function vToday() {
+  const date = new Date().toLocaleDateString(undefined, { weekday:'long', day:'numeric', month:'long' });
+  const top = `<header class="top"><span>${esc(date)}</span><span></span></header>`;
+  if (!S.people.length) {
+    return `${top}<h1>Who have you been meaning to call?</h1>
+      <p class="sub">Type a name and press return.</p>
+      ${addField()}
+      <p class="small" style="margin-top:28px">Everything stays on this device. No account. No internet.</p>`;
+  }
+  const set = ensureToday(); save();
+  const n = set.length, done = set.filter(doneToday).length, left = n - done;
+  let head, sub = '';
+  if (!n) {
+    head = 'No one is due today.';
+    const next = [...S.people].sort((a,b) => effDue(a) - effDue(b))[0];
+    sub = next ? `Next up: ${next.name}, ${dueLabel(next)}.` : '';
+  } else if (!left) { head = 'That’s today.'; sub = 'Go and do something else.'; }
+  else if (done) head = `${cap(WORDS[left] || left)} more today.`;
+  else head = `Today, talk to ${WORDS[n] || n} ${n === 1 ? 'person' : 'people'}.`;
+  const oldest = Math.min(...S.people.map(p => p.created));
+  const nudge = S.people.length >= 3 && (S.lastBackup ? Date.now() - S.lastBackup > 30 * DAY : Date.now() - oldest > 14 * DAY)
+    ? `<button class="nudge" data-act="export">Back up</button>` : '';
+  const ordered = [...set.filter(p => !doneToday(p)), ...set.filter(doneToday)];
+  return `${top}<h1>${esc(head)}</h1>${sub ? `<p class="sub">${esc(sub)}</p>` : ''}
+    ${ordered.map(card).join('')}
+    ${addField()}
+    <footer class="foot"><a href="#/all">Everyone</a>${nudge}<span class="hint">N add · / search</span></footer>`;
+}
+
+function vPerson(r) {
+  const p = byId(r.id);
+  const hist = [...p.log].sort((a,b) => b.t - a.t).map(l => ui.editLog === l.id
+    ? `<form class="hist editing" data-form="editlog" data-id="${esc(p.id)}" data-lid="${esc(l.id)}"><span class="d">${esc(fmtDate(l.t))}</span><input class="field" id="f-edit" name="text" value="${esc(l.text)}" placeholder="Spoke." autocomplete="off" enterkeyhint="done"><button class="tb">Save</button><button type="button" class="tb danger" data-act="dellog" data-id="${esc(p.id)}" data-lid="${esc(l.id)}">Remove</button></form>`
+    : `<button class="hist" data-act="editlog" data-id="${esc(p.id)}" data-lid="${esc(l.id)}"><span class="d">${esc(fmtDate(l.t))}</span><span class="t ${l.text ? '' : 'empty'}">${esc(l.text || 'Spoke.')}</span></button>`).join('');
+  const due = effDue(p) <= sod(Date.now()) && !doneToday(p);
+  return `<header class="top"><a class="back" href="#/">‹ Today</a><span></span></header>
+    <input class="h1in" id="pname" data-id="${esc(p.id)}" value="${esc(p.name)}" aria-label="Name" autocomplete="off" autocapitalize="words">
+    <div class="fields">
+      <input id="pphone" data-id="${esc(p.id)}" type="tel" value="${esc(p.phone)}" placeholder="Phone" aria-label="Phone" autocomplete="off">
+      <input id="pemail" data-id="${esc(p.id)}" type="email" value="${esc(p.email)}" placeholder="Email" aria-label="Email" autocomplete="off">
+    </div>
+    <p class="meta"><button class="cyc" data-act="cycle" data-id="${esc(p.id)}" aria-label="Change how often">${esc(cadNice(p))}</button> · ${esc(since(p))}</p>
+    <span class="cap">I spoke with ${esc(first(p.name))}</span>
+    ${logField(p, 'What did you talk about?')}
+    <div class="quick" id="pills" style="margin-top:14px">${contactPills(p)}</div>
+    <label class="cap" for="rem">Remember</label>
+    <textarea id="rem" data-id="${esc(p.id)}" placeholder="What should you remember next time?" rows="3">${esc(p.remember)}</textarea>
+    <span class="cap">History</span>
+    ${hist || '<p class="none">Nothing yet. Your first conversation goes here.</p>'}
+    ${due ? `<button class="snooze" data-act="later" data-id="${esc(p.id)}">Not now. Ask me again in a week.</button>` : ''}
+    <button class="snooze" id="delbtn" data-act="delete" data-id="${esc(p.id)}">Delete ${esc(first(p.name))}</button>`;
+}
+
+function rowHtml(p) {
+  const n = diff(Date.now(), effDue(p));
+  return `<button class="row" data-act="person" data-id="${esc(p.id)}" data-name="${esc(p.name.toLowerCase())}"><span class="n">${esc(p.name)}</span><span class="l ${n <= 0 ? 'due' : ''}">${esc(dueLabel(p))}</span></button>`;
+}
+function vAll() {
+  const rows = [...S.people].sort((a,b) => effDue(a) - effDue(b) || a.name.localeCompare(b.name)).map(rowHtml).join('');
+  const lb = S.lastBackup ? fmtDate(S.lastBackup) : 'never';
+  const pend = ui.pending ? `<div class="pending"><span>Replace the ${S.people.length} here with ${ui.pending.people.length} from this backup?</span><button class="tb danger" data-act="applyimport">Replace</button><button class="tb" data-act="cancelimport">Cancel</button></div>` : '';
+  return `<header class="top"><a class="back" href="#/">‹ Today</a><span></span></header>
+    <h1>Everyone</h1>
+    <input class="search" id="q" type="search" placeholder="Search" autocomplete="off" aria-label="Search people">
+    <div id="rows">${rows || '<p class="none" style="margin-top:14px">No one yet.</p>'}</div>
+    ${addField()}
+    <div class="settings">
+      <div class="setrow"><span>People per day</span><span class="step"><button data-act="perday" data-d="-1" aria-label="Fewer">−</button><b>${S.perDay}</b><button data-act="perday" data-d="1" aria-label="More">+</button></span></div>
+      <div class="setrow"><span>Backup <span class="meta">· last: ${esc(lb)}</span></span><span class="btnrow"><button class="pill" data-act="export">Save</button><button class="pill" data-act="import">Restore</button></span></div>
+      ${pend}
+      <p class="small">Everything lives on this device, in this browser. Save a backup now and then. It’s the only copy.</p>
+    </div>`;
+}
+function filterRows(q) {
+  q = q.trim().toLowerCase();
+  let shown = 0;
+  document.querySelectorAll('#rows .row').forEach(r => { const m = !q || r.dataset.name.includes(q); r.style.display = m ? '' : 'none'; if (m) shown++; });
+  const n = $('#rows .none'); if (n) n.remove();
+  if (!shown && S.people.length) $('#rows').insertAdjacentHTML('beforeend', '<p class="none" style="margin-top:14px">No one by that name.</p>');
+}
+
+/* ---------- actions ---------- */
+function snooze(id) {
+  const p = byId(id); if (!p) return;
+  const prev = p.snooze || null;
+  const idx = S.today ? S.today.ids.indexOf(id) : -1;
+  p.snooze = addDays(Date.now(), 7);
+  if (S.today) S.today.ids = S.today.ids.filter(x => x !== id);
+  save();
+  setNote(first(p.name) + ' moved to next week.', () => {
+    p.snooze = prev;
+    if (idx >= 0 && S.today && !S.today.ids.includes(id)) S.today.ids.splice(idx, 0, id);
+    save(); render();
+  });
+  if (route().v === 'person') location.hash = '#/'; else render();
+}
+
+function exportData() {
+  const json = JSON.stringify(S, null, 2);
+  const name = 'today-backup-' + key(Date.now()) + '.json';
+  const mark = () => { S.lastBackup = Date.now(); save(); setNote('Backup saved.'); render(); };
+  try {
+    const f = new File([json], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) {
+      navigator.share({ files: [f], title: name }).then(mark).catch(() => {});
+      return;
+    }
+  } catch (e) {}
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  mark();
+}
+function importData(file) {
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d || !Array.isArray(d.people)) throw 0;
+      const people = d.people.filter(p => p && typeof p.name === 'string' && p.name.trim()).map(p => ({
+        id: String(p.id || uid()), name: p.name.trim(), phone: String(p.phone || ''), email: String(p.email || ''),
+        cadence: Math.max(1, +p.cadence || 30), remember: String(p.remember || ''), created: +p.created || Date.now(), snooze: +p.snooze || null,
+        log: (Array.isArray(p.log) ? p.log : []).filter(l => l && +l.t).map(l => ({ id: String(l.id || uid()), t: +l.t, text: String(l.text || '') }))
+      }));
+      ui.pending = { people, perDay: clamp(+d.perDay || 3, 1, 10) };
+      render();
+    } catch (e) { setNote('That isn’t a backup from this app.'); render(); }
+  };
+  r.readAsText(file);
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  if (e.target.closest('a, input, textarea, form') && !el.matches('a')) { if (!el.contains(e.target) || el.matches('article')) return; }
+  const id = el.dataset.id, a = el.dataset.act;
+  switch (a) {
+    case 'person': location.hash = '#/p/' + encodeURIComponent(id); break;
+    case 'startlog': ui.logging = id; ui.focus = '#f-text'; render(); break;
+    case 'editlog': ui.editLog = el.dataset.lid; ui.focus = '#f-edit'; render(); break;
+    case 'later': snooze(id); break;
+    case 'export': exportData(); break;
+    case 'import': $('#file').click(); break;
+    case 'applyimport': {
+      const pnd = ui.pending; if (!pnd) break;
+      S = { people: pnd.people, perDay: pnd.perDay, today: null, lastBackup: S.lastBackup };
+      ui.pending = null; save(); setNote('Restored ' + pl(pnd.people.length, 'person').replace('persons', 'people') + '.');
+      if (location.hash !== '#/all') location.hash = '#/all'; else render();
+      break;
+    }
+    case 'cancelimport': ui.pending = null; render(); break;
+    case 'perday': S.perDay = clamp(S.perDay + (+el.dataset.d), 1, 10); save(); render(); break;
+    case 'cycle': { const p = byId(id); if (!p) break; const i = CADS.indexOf(p.cadence); p.cadence = CADS[(i + 1) % CADS.length]; save(); render(); break; }
+    case 'undo': { const f = note && note.undo; note = null; if (f) f(); else render(); break; }
+    case 'dellog': {
+      const p = byId(id); if (!p) break;
+      const l = p.log.find(x => x.id === el.dataset.lid); if (!l) break;
+      p.log = p.log.filter(x => x !== l); ui.editLog = null; save();
+      setNote('Removed.', () => { p.log.push(l); save(); render(); });
+      render(); break;
+    }
+    case 'delete': {
+      const p = byId(id); if (!p) break;
+      if (el.dataset.arm !== '1') {
+        el.dataset.arm = '1'; el.classList.add('danger'); el.textContent = 'Tap again to delete ' + first(p.name);
+        setTimeout(() => { if (el.isConnected) { el.dataset.arm = ''; el.classList.remove('danger'); el.textContent = 'Delete ' + first(p.name); } }, 5000);
+        break;
+      }
+      S.people = S.people.filter(x => x !== p);
+      if (S.today) S.today.ids = S.today.ids.filter(x => x !== id);
+      save(); setNote(p.name + ' deleted.'); location.hash = '#/'; render();
+      break;
+    }
+  }
+});
+
+document.addEventListener('submit', e => {
+  const f = e.target.closest('form[data-form]'); if (!f) return;
+  e.preventDefault();
+  const fd = new FormData(f), kind = f.dataset.form;
+  if (kind === 'add') {
+    const name = String(fd.get('name') || '').trim(); if (!name) return;
+    const p = { id: uid(), name, phone: '', email: '', cadence: 30, remember: '', created: Date.now(), snooze: null, log: [] };
+    S.people.push(p);
+    if (S.today && S.today.day === key(Date.now())) S.today.ids.unshift(p.id);   // appears on Today right away
+    save();
+    const onToday = route().v === 'today';
+    setNote(onToday ? name + ' added. Say hello when you can.' : name + ' added. They’ll show up on Today.');
+    if (fine()) ui.focus = '#add-name';
+    render();
+  } else if (kind === 'log') {
+    const p = byId(f.dataset.id); if (!p) return;
+    const entry = { id: uid(), t: Date.now(), text: String(fd.get('text') || '').trim() };
+    const prevSnooze = p.snooze; p.log.push(entry); p.snooze = null; ui.logging = null; save();
+    setNote(`Logged. Next with ${first(p.name)}: ${dueLabel(p)}.`, () => { p.log = p.log.filter(l => l.id !== entry.id); p.snooze = prevSnooze; save(); render(); });
+    render();
+  } else if (kind === 'editlog') {
+    const p = byId(f.dataset.id); if (!p) return;
+    const l = p.log.find(x => x.id === f.dataset.lid); if (l) l.text = String(fd.get('text') || '').trim();
+    ui.editLog = null; save(); render();
+  }
+});
+
+document.addEventListener('input', e => {
+  const t = e.target, p = t.dataset && t.dataset.id ? byId(t.dataset.id) : null;
+  if (t.id === 'rem' && p) { p.remember = t.value; save(); grow(t); }
+  else if (t.id === 'pname' && p) { if (t.value.trim()) { p.name = t.value.trim(); save(); } }
+  else if ((t.id === 'pphone' || t.id === 'pemail') && p) { p[t.id === 'pphone' ? 'phone' : 'email'] = t.value.trim(); save(); const pills = $('#pills'); if (pills) pills.innerHTML = contactPills(p); }
+  else if (t.id === 'q') filterRows(t.value);
+});
+function grow(t) { t.style.height = 'auto'; t.style.height = Math.max(96, t.scrollHeight + 2) + 'px'; }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (ui.logging || ui.editLog) { ui.logging = null; ui.editLog = null; render(); }
+    return;
+  }
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  if (e.key === 'n') { e.preventDefault(); ui.focus = '#add-name'; if (route().v === 'person') location.hash = '#/'; else render(); }
+  else if (e.key === '/') { e.preventDefault(); ui.focus = '#q'; if (location.hash !== '#/all') location.hash = '#/all'; else render(); }
+});
+
+$('#file').addEventListener('change', e => { const f = e.target.files[0]; if (f) importData(f); e.target.value = ''; });
+
+render();
+})();
+</script>
+</body>
+</html>
